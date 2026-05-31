@@ -1,0 +1,92 @@
+version: "3.9"
+
+services:
+  # ─── PostgreSQL Database ──────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: scentinel-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-scentinel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-scentinel_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-scentinel_db}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-scentinel}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scentinel-network
+
+  # ─── FastAPI Backend ──────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: scentinel-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-scentinel}:${POSTGRES_PASSWORD:-scentinel_secret}@db:5432/${POSTGRES_DB:-scentinel_db}
+      SECRET_KEY: ${SECRET_KEY:-change-this-in-production}
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 1440
+      ESP32_API_KEY: ${ESP32_API_KEY:-esp32-static-api-key}
+      CORS_ORIGINS: '["http://localhost","http://localhost:3000","http://frontend:3000"]'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - scentinel-network
+    volumes:
+      - ./backend:/app
+    command: >
+      sh -c "
+        echo 'Waiting for DB...' &&
+        alembic upgrade head &&
+        python -m app.database.seed &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+
+  # ─── Next.js Frontend ────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: scentinel-frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost/api
+      NEXT_PUBLIC_SSE_URL: http://localhost/api/stream
+    depends_on:
+      - backend
+    networks:
+      - scentinel-network
+
+  # ─── Nginx Reverse Proxy ─────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: scentinel-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - scentinel-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  scentinel-network:
+    driver: bridge
