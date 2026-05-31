@@ -323,3 +323,4 @@ sudo certbot renew --dry-run
 ## 📄 Lisensi
 
 MIT License — PKM-KC 2026
+# PKM-KC-SCENTINEL
