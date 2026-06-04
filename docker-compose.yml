@@ -15,7 +15,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-scentinel}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-scentinel} -d ${POSTGRES_DB:-scentinel_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,6 +36,8 @@ services:
       ACCESS_TOKEN_EXPIRE_MINUTES: 1440
       ESP32_API_KEY: ${ESP32_API_KEY:-esp32-static-api-key}
       CORS_ORIGINS: '["http://localhost","http://localhost:3000","http://frontend:3000"]'
+    ports:
+      - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
