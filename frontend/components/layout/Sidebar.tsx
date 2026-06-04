@@ -35,12 +35,12 @@ export function Sidebar() {
       {/* Logo */}
       <div className="p-6 border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="w-16 h-16 flex items-center justify-center overflow-hidden">
+          <div className="w-20 h-20 flex items-center justify-center overflow-hidden">
             <Image 
               src="/logo-scentinel.png" 
               alt="SCENTINEL Logo" 
-              width={64} 
-              height={64} 
+              width={80} 
+              height={80} 
               className="object-contain"
               priority
             />
