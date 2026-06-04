@@ -6,25 +6,25 @@
 
 @layer base {
   :root {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 161 94% 43%;
-    --primary-foreground: 222 47% 6%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 14%;
-    --muted-foreground: 215 20% 60%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 350 89% 60%;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 227 67% 24%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 18%;
-    --input: 217 33% 14%;
-    --ring: 161 94% 43%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 227 67% 24%;
     --radius: 0.75rem;
   }
 }
@@ -63,7 +63,7 @@
 
   /* Gradient text */
   .gradient-text {
-    @apply bg-gradient-to-r from-primary to-emerald-300 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent;
   }
 
   /* Status indicator dot */
@@ -96,9 +96,9 @@
 .skeleton {
   background: linear-gradient(
     90deg,
-    hsl(217 33% 14%) 25%,
-    hsl(217 33% 18%) 50%,
-    hsl(217 33% 14%) 75%
+    hsl(210 40% 96.1%) 25%,
+    hsl(214.3 31.8% 91.4%) 50%,
+    hsl(210 40% 96.1%) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
