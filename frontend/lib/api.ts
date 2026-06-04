@@ -18,7 +18,7 @@ api.interceptors.request.use(
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("access_token");
       if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        config.headers.set("Authorization", `Bearer ${token}`);
       }
     }
     return config;
@@ -33,6 +33,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && typeof window !== "undefined") {
       localStorage.removeItem("access_token");
       localStorage.removeItem("user");
+      document.cookie = "access_token=; path=/; max-age=0; SameSite=Strict";
       window.location.href = "/login";
     }
     return Promise.reject(error);
