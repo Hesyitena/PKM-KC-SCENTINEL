@@ -19,7 +19,7 @@ export default function LoginPage() {
         <div className="glass-card p-8 shadow-2xl animate-fade-in">
           {/* Logo / Brand */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-40 h-40 mb-4">
+            <div className="inline-flex items-center justify-center w-40 h-40 -mb-2">
               <Image 
                 src="/logo-scentinel.png" 
                 alt="SCENTINEL Logo" 
