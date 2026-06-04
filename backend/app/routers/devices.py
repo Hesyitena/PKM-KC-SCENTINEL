@@ -15,7 +15,7 @@ from app.services.device_service import DeviceService
 router = APIRouter()
 
 
-@router.get("/", response_model=list[DeviceResponse], summary="List All Devices")
+@router.get("", response_model=list[DeviceResponse], summary="List All Devices")
 async def list_devices(current_user: CurrentUser, db: DBSession):
     """Retrieve all registered IoT devices."""
     service = DeviceService(db)
