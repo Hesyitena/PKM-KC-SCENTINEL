@@ -22,9 +22,9 @@ export default function LoginPage() {
             <Image 
               src="/horizontal-remove-bg.png" 
               alt="SCENTINEL Logo" 
-              width={300} 
-              height={100} 
-              className="object-contain h-20 w-auto"
+              width={450} 
+              height={150} 
+              className="object-contain h-32 w-auto"
               priority
             />
           </div>
