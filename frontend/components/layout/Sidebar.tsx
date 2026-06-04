@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -34,8 +35,15 @@ export function Sidebar() {
       {/* Logo */}
       <div className="p-6 border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
-            <Wind size={18} className="text-primary" />
+          <div className="w-16 h-16 flex items-center justify-center overflow-hidden">
+            <Image 
+              src="/logo-scentinel.png" 
+              alt="SCENTINEL Logo" 
+              width={64} 
+              height={64} 
+              className="object-contain"
+              priority
+            />
           </div>
           <div>
             <h2 className="font-bold text-sm gradient-text tracking-wide">SCENTINEL</h2>
