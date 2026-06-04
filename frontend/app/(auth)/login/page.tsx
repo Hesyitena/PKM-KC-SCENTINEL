@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { LoginForm } from "@/components/forms/LoginForm";
 
 export const metadata: Metadata = {
@@ -18,8 +19,15 @@ export default function LoginPage() {
         <div className="glass-card p-8 shadow-2xl animate-fade-in">
           {/* Logo / Brand */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/15 border border-primary/30 mb-4">
-              <span className="text-3xl">🌿</span>
+            <div className="inline-flex items-center justify-center w-28 h-28 mb-4">
+              <Image 
+                src="/logo-scentinel.png" 
+                alt="SCENTINEL Logo" 
+                width={112} 
+                height={112} 
+                className="object-contain"
+                priority
+              />
             </div>
             <h1 className="text-2xl font-bold gradient-text tracking-tight">SCENTINEL</h1>
             <p className="text-muted-foreground text-sm mt-1">
