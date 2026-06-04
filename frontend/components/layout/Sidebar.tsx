@@ -34,23 +34,15 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div className="p-6 border-b border-border">
-        <div className="flex items-center gap-3">
-          <div className="w-20 h-20 flex items-center justify-center overflow-hidden">
-            <Image 
-              src="/logo-scentinel.png" 
-              alt="SCENTINEL Logo" 
-              width={80} 
-              height={80} 
-              className="object-contain"
-              priority
-            />
-          </div>
-          <div>
-            <h2 className="font-bold text-sm gradient-text tracking-wide">SCENTINEL</h2>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
-              IoT Monitor
-            </p>
-          </div>
+        <div className="flex items-center justify-center">
+          <Image 
+            src="/logoscentinelwithtulisan.jpg" 
+            alt="SCENTINEL Logo" 
+            width={200} 
+            height={80} 
+            className="object-contain w-full h-auto"
+            priority
+          />
         </div>
       </div>
 
