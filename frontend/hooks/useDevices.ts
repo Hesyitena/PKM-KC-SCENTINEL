@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import api from "@/lib/api";
 import { Device } from "@/types/device";
+import { MOCK_DEVICES } from "@/lib/mockData";
+
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 export function useDevices() {
   const [devices, setDevices] = useState<Device[]>([]);
@@ -12,8 +15,14 @@ export function useDevices() {
   const fetchDevices = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+    // Demo mode: pakai data dummy
+    if (DEMO_MODE) {
+      setDevices(MOCK_DEVICES);
+      setIsLoading(false);
+      return;
+    }
     try {
-      const res = await api.get<Device[]>("/devices/");
+      const res = await api.get<Device[]>("/devices");
       setDevices(res.data);
     } catch {
       setError("Gagal memuat data perangkat");
@@ -36,6 +45,13 @@ export function useDevice(id: number) {
 
   useEffect(() => {
     const fetch = async () => {
+      // Demo mode: pakai data dummy
+      if (DEMO_MODE) {
+        const found = MOCK_DEVICES.find((d) => d.id === id) ?? null;
+        setDevice(found);
+        setIsLoading(false);
+        return;
+      }
       try {
         const res = await api.get<Device>(`/devices/${id}`);
         setDevice(res.data);
