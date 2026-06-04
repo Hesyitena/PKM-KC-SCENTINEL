@@ -18,21 +18,15 @@ export default function LoginPage() {
         {/* Card */}
         <div className="glass-card p-8 shadow-2xl animate-fade-in">
           {/* Logo / Brand */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-40 h-40 -mb-2">
-              <Image 
-                src="/logo-scentinel.png" 
-                alt="SCENTINEL Logo" 
-                width={160} 
-                height={160} 
-                className="object-contain"
-                priority
-              />
-            </div>
-            <h1 className="text-2xl font-bold gradient-text tracking-tight">SCENTINEL</h1>
-            <p className="text-muted-foreground text-sm mt-1">
-              Food Spoilage Detection System
-            </p>
+          <div className="text-center mb-8 flex items-center justify-center">
+            <Image 
+              src="/horizontal-remove-bg.png" 
+              alt="SCENTINEL Logo" 
+              width={300} 
+              height={100} 
+              className="object-contain h-20 w-auto"
+              priority
+            />
           </div>
 
           {/* Divider */}
