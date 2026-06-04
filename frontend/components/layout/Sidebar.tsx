@@ -38,8 +38,9 @@ export function Sidebar() {
           <Image 
             src="/logoscentinelwithtulisan.jpg" 
             alt="SCENTINEL Logo" 
-            width={200} 
-            height={80} 
+            width={800} 
+            height={320} 
+            quality={100}
             className="object-contain w-full h-auto"
             priority
           />
