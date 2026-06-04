@@ -6,21 +6,30 @@ import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Navbar } from "@/components/layout/Navbar";
 
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { token } = useAuthStore();
+  const { token, setUser } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
-    if (!token) {
+    // Demo mode: inject user dummy agar token tidak null
+    if (DEMO_MODE && !token) {
+      setUser({ id: 1, username: "demo", role: "ADMIN", created_at: new Date().toISOString() });
+      // Simulasikan token agar guard di bawah tidak redirect
+      useAuthStore.setState({ token: "demo-token" });
+      return;
+    }
+    if (!DEMO_MODE && !token) {
       router.replace("/login");
     }
-  }, [token, router]);
+  }, [token, router, setUser]);
 
-  if (!token) return null;
+  if (!DEMO_MODE && !token) return null;
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
