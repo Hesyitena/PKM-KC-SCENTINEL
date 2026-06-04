@@ -59,18 +59,67 @@ cp .env.example .env
 # Edit .env sesuai kebutuhan
 ```
 
-### 2. Jalankan dengan Docker Compose
+### 2. Jalankan Sistem (Daily Development Workflow)
 
+> ⚠️ **PENTING:** Selalu jalankan perintah `npm run dev` dari **dalam folder `frontend/`**, bukan dari root project.
+
+Jalankan dua terminal secara bersamaan:
+
+**Terminal 1 — Backend & Database (Docker):**
 ```bash
-docker-compose up --build
+# Pastikan kamu di folder root project: .../scentinel/
+docker-compose up backend
 ```
 
-Layanan akan tersedia:
+**Terminal 2 — Frontend (Local):**
+```bash
+# Masuk ke folder frontend dulu!
+cd ~/Documents/PKM-KC_2026/WEBSITE/scentinel/frontend
+npm run dev
+```
+
+Buka browser di **http://localhost:3000**
+
 | Service | URL |
 |---------|-----|
-| Dashboard | http://localhost |
-| API Docs | http://localhost/api/docs |
-| Backend (direct) | http://localhost:8000 |
+| Dashboard | http://localhost:3000 |
+| API Docs | http://localhost:8000/docs |
+| Backend API | http://localhost:8000/api |
+
+---
+
+### Cara Mematikan
+
+**Frontend:** Tekan `Ctrl+C` di Terminal 2.
+
+**Backend & Database:** Tekan `Ctrl+C` di Terminal 1, lalu:
+```bash
+docker-compose down
+```
+
+---
+
+### Troubleshooting: Error `KeyError: 'ContainerConfig'`
+
+Jika `docker-compose up` gagal dengan error ini, artinya ada *container* lama yang nyangkut. Jalankan perintah ini untuk membersihkannya:
+
+```bash
+# Lihat container yang ada
+docker ps -a
+
+# Hapus semua container lama (ganti ID sesuai output di atas)
+docker rm -f <CONTAINER_ID>
+
+# Jalankan ulang
+docker-compose up backend
+```
+
+---
+
+> **Catatan:** Jika ini adalah **pertama kalinya** menjalankan project ini di komputer baru, jalankan dulu:
+> ```bash
+> docker-compose up --build
+> ```
 
 ### 3. Login Default
 
