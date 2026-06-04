@@ -1,7 +1,7 @@
 "use client";
 
-
 import { useSSE } from "@/lib/useSSE";
+import { useMockSSE } from "@/lib/useMockSSE";
 import { useSensorStore } from "@/store/sensorStore";
 import { SensorReading } from "@/types/reading";
 import { StatusBadge } from "./StatusBadge";
@@ -9,6 +9,8 @@ import { SensorCard } from "./SensorCard";
 import { GasChart } from "./GasChart";
 import { formatDate } from "@/lib/utils";
 import { Thermometer, Droplets, Wind, FlaskConical } from "lucide-react";
+
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 export function LiveMonitoringPanel() {
   const { latestReading, chartData, setConnected, pushChartReading } = useSensorStore();
@@ -22,10 +24,16 @@ export function LiveMonitoringPanel() {
     setConnected(false);
   };
 
+  // Gunakan mock SSE saat demo mode (backend tidak menyala)
   useSSE({
     onReading: handleReading,
     onError: handleError,
-    enabled: true,
+    enabled: !DEMO_MODE,
+  });
+
+  useMockSSE({
+    onReading: handleReading,
+    enabled: DEMO_MODE,
   });
 
   if (!latestReading) {
