@@ -2,7 +2,6 @@
 
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 interface SensorCardProps {
   id: string;
@@ -10,58 +9,62 @@ interface SensorCardProps {
   value: string | number;
   unit?: string;
   icon?: ReactNode;
-  trend?: "up" | "down" | "stable";
   color?: "default" | "primary" | "fresh" | "spoiled" | "amber";
   sublabel?: string;
+  max?: number;
 }
 
 const colorConfig = {
   default: {
     icon: "text-slate-500",
-    value: "text-slate-700",
     iconBg: "bg-slate-100 border-slate-200",
-    border: "border-slate-200/80",
-    accent: "#64748b",
-    glow: "rgba(100,116,139,0.08)",
+    value: "text-slate-800",
+    bar: "#64748b",
+    barFrom: "#94a3b8",
+    shadow: "rgba(100,116,139,0.12)",
+    glow: "rgba(100,116,139,0.05)",
+    border: "#e2e8f0",
   },
   primary: {
     icon: "text-indigo-500",
+    iconBg: "bg-indigo-50 border-indigo-100",
     value: "text-indigo-700",
-    iconBg: "bg-indigo-50 border-indigo-200",
-    border: "border-indigo-200/60",
-    accent: "#6366f1",
-    glow: "rgba(99,102,241,0.08)",
+    bar: "#6366f1",
+    barFrom: "#818cf8",
+    shadow: "rgba(99,102,241,0.18)",
+    glow: "rgba(99,102,241,0.05)",
+    border: "#c7d2fe",
   },
   fresh: {
     icon: "text-emerald-500",
+    iconBg: "bg-emerald-50 border-emerald-100",
     value: "text-emerald-700",
-    iconBg: "bg-emerald-50 border-emerald-200",
-    border: "border-emerald-200/60",
-    accent: "#10b981",
-    glow: "rgba(16,185,129,0.08)",
+    bar: "#10b981",
+    barFrom: "#34d399",
+    shadow: "rgba(16,185,129,0.18)",
+    glow: "rgba(16,185,129,0.05)",
+    border: "#a7f3d0",
   },
   spoiled: {
     icon: "text-rose-500",
+    iconBg: "bg-rose-50 border-rose-100",
     value: "text-rose-700",
-    iconBg: "bg-rose-50 border-rose-200",
-    border: "border-rose-200/60",
-    accent: "#f43f5e",
-    glow: "rgba(244,63,94,0.08)",
+    bar: "#f43f5e",
+    barFrom: "#fb7185",
+    shadow: "rgba(244,63,94,0.18)",
+    glow: "rgba(244,63,94,0.05)",
+    border: "#fecdd3",
   },
   amber: {
     icon: "text-amber-500",
+    iconBg: "bg-amber-50 border-amber-100",
     value: "text-amber-700",
-    iconBg: "bg-amber-50 border-amber-200",
-    border: "border-amber-200/60",
-    accent: "#f59e0b",
-    glow: "rgba(245,158,11,0.08)",
+    bar: "#f59e0b",
+    barFrom: "#fcd34d",
+    shadow: "rgba(245,158,11,0.18)",
+    glow: "rgba(245,158,11,0.05)",
+    border: "#fde68a",
   },
-};
-
-const TrendIcon = ({ trend }: { trend: "up" | "down" | "stable" }) => {
-  if (trend === "up") return <TrendingUp size={11} className="text-emerald-500" />;
-  if (trend === "down") return <TrendingDown size={11} className="text-rose-500" />;
-  return <Minus size={11} className="text-muted-foreground" />;
 };
 
 export function SensorCard({
@@ -72,43 +75,54 @@ export function SensorCard({
   icon,
   color = "default",
   sublabel,
-  trend,
+  max,
 }: SensorCardProps) {
   const cfg = colorConfig[color];
+  const numVal = typeof value === "number" ? value : parseFloat(value as string) || 0;
+
+  // Auto-determine max if not provided — use a soft cap at 150% of the current value
+  // so the bar always has meaningful fill even for small values
+  const effectiveMax = max ?? Math.max(numVal * 1.5, 1);
+  const barPct = Math.min(100, Math.max(2, (numVal / effectiveMax) * 100));
 
   return (
     <div
       id={id}
-      className={cn(
-        "relative rounded-2xl p-5 border transition-all duration-300 group cursor-default overflow-hidden",
-        "hover:-translate-y-0.5",
-        cfg.border,
-      )}
+      className="relative rounded-2xl p-4 border transition-all duration-300 group cursor-default overflow-hidden hover:-translate-y-1"
       style={{
-        background: `linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)`,
-        backdropFilter: "blur(8px)",
-        boxShadow: `0 1px 4px rgba(0,0,0,0.05), 0 4px 16px ${cfg.glow}`,
+        background: "rgba(255,255,255,0.97)",
+        borderColor: cfg.border,
+        boxShadow: `0 1px 3px rgba(0,0,0,0.04), 0 6px 20px ${cfg.glow}`,
       }}
     >
-      {/* Accent top bar */}
+      {/* Hover top accent */}
       <div
-        className="absolute top-0 left-4 right-4 h-0.5 rounded-b-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{ background: cfg.accent }}
+        className="absolute top-0 inset-x-0 h-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{ background: `linear-gradient(90deg, ${cfg.barFrom}, ${cfg.bar})` }}
       />
 
-      {/* Header */}
+      {/* Subtle corner glow */}
+      <div
+        className="absolute -top-4 -right-4 w-16 h-16 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{ background: `radial-gradient(circle, ${cfg.bar}20, transparent 70%)` }}
+      />
+
+      {/* Icon + Label */}
       <div className="flex items-center justify-between mb-3.5">
-        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
           {label}
-        </span>
+        </p>
         {icon && (
           <div
             className={cn(
-              "w-8 h-8 rounded-lg flex items-center justify-center border",
+              "w-7 h-7 rounded-xl flex items-center justify-center border flex-shrink-0",
+              "transition-all duration-200 group-hover:scale-110 group-hover:shadow-md",
               cfg.iconBg,
-              cfg.icon,
-              "transition-transform duration-200 group-hover:scale-105",
+              cfg.icon
             )}
+            style={{
+              boxShadow: `0 0 0 0px ${cfg.bar}00`,
+            }}
           >
             {icon}
           </div>
@@ -116,24 +130,29 @@ export function SensorCard({
       </div>
 
       {/* Value */}
-      <div className="flex items-end gap-1.5">
-        <span className={cn("text-2xl font-bold tabular-nums tracking-tight", cfg.value)}>
+      <div className="flex items-baseline gap-1 mb-3.5">
+        <span className={cn("text-[26px] font-black tabular-nums leading-none tracking-tight", cfg.value)}>
           {typeof value === "number" ? value.toFixed(1) : value}
         </span>
         {unit && (
-          <span className="text-sm text-muted-foreground mb-0.5 font-medium">{unit}</span>
+          <span className="text-xs text-slate-400 font-semibold">{unit}</span>
         )}
       </div>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between mt-2">
+      {/* Progress bar */}
+      <div className="space-y-1.5">
+        <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-700 ease-out"
+            style={{
+              width: `${barPct}%`,
+              background: `linear-gradient(90deg, ${cfg.barFrom}, ${cfg.bar})`,
+              boxShadow: `0 0 8px ${cfg.bar}50`,
+            }}
+          />
+        </div>
         {sublabel && (
-          <p className="text-[11px] text-muted-foreground/70">{sublabel}</p>
-        )}
-        {trend && (
-          <div className="flex items-center gap-1 ml-auto">
-            <TrendIcon trend={trend} />
-          </div>
+          <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{sublabel}</p>
         )}
       </div>
     </div>
