@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { SensorReading, ReadingLatest } from "@/types/reading";
 
-const MAX_CHART_POINTS = 30; // keep last 30 points for realtime chart
+const MAX_CHART_POINTS = 60; // keep last 60 points for realtime chart
 
 interface SensorState {
   // Latest reading from SSE or API
