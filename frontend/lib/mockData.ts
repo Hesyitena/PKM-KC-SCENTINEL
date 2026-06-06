@@ -3,6 +3,9 @@
 import { ReadingLatest, SensorReading, PaginatedReadings } from "@/types/reading";
 import { Device } from "@/types/device";
 
+/** Interval antar data point live (ms) — harus sinkron dengan useMockSSE */
+export const LIVE_INTERVAL_MS = 1500;
+
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
 function hoursAgo(h: number): string {
@@ -70,31 +73,30 @@ let _readingIdCounter = 2049;
  * dengan sedikit variasi acak yang realistis.
  */
 export function generateNextReading(prev: SensorReading): SensorReading {
-  // Variasi kecil ±5% dari nilai sebelumnya, clamped ke range sensor
+  // Variasi ±12% dari nilai sebelumnya, clamped ke range sensor
   const jitter = (val: number, range: number, min = 0, max = 4095) =>
     Math.max(min, Math.min(max, val + (Math.random() - 0.5) * 2 * range));
 
-  const mq3 = jitter(prev.mq3, 15, 80, 600);
-  const mq4 = jitter(prev.mq4, 12, 100, 500);
-  const mq135 = jitter(prev.mq135, 20, 150, 700);
-  const tgs2602 = jitter(prev.tgs2602, 8, 40, 300);
-  const temperature = jitter(prev.temperature, 0.3, 15, 45);
-  const humidity = jitter(prev.humidity, 0.8, 20, 95);
+  const mq3     = jitter(prev.mq3,     40,  60,  700);
+  const mq4     = jitter(prev.mq4,     35,  80,  600);
+  const mq135   = jitter(prev.mq135,   55, 120,  900);
+  const tgs2602 = jitter(prev.tgs2602, 22,  30,  400);
+  const temperature = jitter(prev.temperature, 0.6, 15, 45);
+  const humidity    = jitter(prev.humidity,    1.5, 20, 95);
 
-  // Confidence berfluktuasi sedikit
-  const confidence = Math.max(0.7, Math.min(0.999, prev.confidence + (Math.random() - 0.5) * 0.04));
+  const confidence = Math.max(0.70, Math.min(0.999, prev.confidence + (Math.random() - 0.5) * 0.06));
 
   return {
     ...prev,
     id: _readingIdCounter++,
     timestamp: new Date().toISOString(),
-    mq3: parseFloat(mq3.toFixed(1)),
-    mq4: parseFloat(mq4.toFixed(1)),
-    mq135: parseFloat(mq135.toFixed(1)),
-    tgs2602: parseFloat(tgs2602.toFixed(1)),
+    mq3:      parseFloat(mq3.toFixed(1)),
+    mq4:      parseFloat(mq4.toFixed(1)),
+    mq135:    parseFloat(mq135.toFixed(1)),
+    tgs2602:  parseFloat(tgs2602.toFixed(1)),
     temperature: parseFloat(temperature.toFixed(1)),
-    humidity: parseFloat(humidity.toFixed(1)),
-    confidence: parseFloat(confidence.toFixed(4)),
+    humidity:    parseFloat(humidity.toFixed(1)),
+    confidence:  parseFloat(confidence.toFixed(4)),
   };
 }
 
@@ -173,16 +175,41 @@ export function getMockHistory(
 
 export const MOCK_INITIAL_CHART_DATA: SensorReading[] = (() => {
   const points: SensorReading[] = [];
-  let prev: SensorReading = { ...MOCK_LATEST_READING };
+  const N = 60; // match MAX_CHART_POINTS
 
-  for (let i = 29; i >= 0; i--) {
+  // Base values — realistic mid-range
+  const base = {
+    mq3: 130, mq4: 200, mq135: 310, tgs2602: 85,
+    temperature: 28.5, humidity: 67,
+  };
+
+  // Amplitude of oscillations per sensor
+  const amp = {
+    mq3: 85, mq4: 75, mq135: 120, tgs2602: 50,
+    temperature: 2.5, humidity: 9,
+  };
+
+  for (let i = 0; i < N; i++) {
+    // 3 full wave cycles across all 60 points, each sensor has own phase
+    const t = (i / N) * Math.PI * 6;
+    const noise = () => (Math.random() - 0.5) * 14;
+
+    // Occasional spikes to simulate real sensor events (~10% chance)
+    const spike = Math.random() < 0.10 ? (Math.random() * 50 + 20) : 0;
+
     const reading: SensorReading = {
-      ...prev,
-      id: 2018 + (29 - i),
-      timestamp: new Date(Date.now() - i * 5000).toISOString(),
+      ...MOCK_LATEST_READING,
+      id: 2018 + i,
+      timestamp: new Date(Date.now() - (N - 1 - i) * 1500).toISOString(),
+      mq3:      parseFloat(Math.max(40,  base.mq3     + Math.sin(t + 0.0) * amp.mq3     + noise() + spike).toFixed(1)),
+      mq4:      parseFloat(Math.max(60,  base.mq4     + Math.sin(t + 1.2) * amp.mq4     + noise()).toFixed(1)),
+      mq135:    parseFloat(Math.max(100, base.mq135   + Math.sin(t + 2.4) * amp.mq135   + noise()).toFixed(1)),
+      tgs2602:  parseFloat(Math.max(20,  base.tgs2602 + Math.sin(t + 0.8) * amp.tgs2602 + noise()).toFixed(1)),
+      temperature: parseFloat((base.temperature + Math.sin(t + 1.6) * amp.temperature + (Math.random() - 0.5) * 0.6).toFixed(1)),
+      humidity:    parseFloat((base.humidity    + Math.sin(t + 3.0) * amp.humidity    + (Math.random() - 0.5) * 2.0).toFixed(1)),
     };
     points.push(reading);
-    prev = generateNextReading(reading);
   }
+
   return points;
 })();
