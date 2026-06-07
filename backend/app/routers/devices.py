@@ -1,14 +1,10 @@
 """
 SCENTINEL - Devices Router
-GET  /devices         →  List all devices
-GET  /devices/{id}    →  Get single device
-POST /devices         →  Register new device (ADMIN only)
-PUT  /devices/{id}    →  Update device info (ADMIN only)
-DELETE /devices/{id}  →  Delete device (ADMIN only)
+GET  /devices         →  Get the single registered device info
 """
 from fastapi import APIRouter
 
-from app.core.dependencies import CurrentUser, AdminUser, DBSession
+from app.core.dependencies import CurrentUser, DBSession
 from app.schemas.device import DeviceCreate, DeviceResponse, DeviceUpdate
 from app.services.device_service import DeviceService
 
@@ -30,23 +26,23 @@ async def get_device(device_id: int, current_user: CurrentUser, db: DBSession):
 
 
 @router.post("/", response_model=DeviceResponse, status_code=201, summary="Register New Device")
-async def create_device(payload: DeviceCreate, admin_user: AdminUser, db: DBSession):
-    """Register a new ESP32 device. Requires ADMIN role."""
+async def create_device(payload: DeviceCreate, current_user: CurrentUser, db: DBSession):
+    """Register a new ESP32 device."""
     service = DeviceService(db)
     return await service.create_device(payload)
 
 
 @router.put("/{device_id}", response_model=DeviceResponse, summary="Update Device")
 async def update_device(
-    device_id: int, payload: DeviceUpdate, admin_user: AdminUser, db: DBSession
+    device_id: int, payload: DeviceUpdate, current_user: CurrentUser, db: DBSession
 ):
-    """Update device information. Requires ADMIN role."""
+    """Update device information."""
     service = DeviceService(db)
     return await service.update_device(device_id, payload)
 
 
 @router.delete("/{device_id}", summary="Delete Device")
-async def delete_device(device_id: int, admin_user: AdminUser, db: DBSession):
-    """Delete a device by ID. Requires ADMIN role."""
+async def delete_device(device_id: int, current_user: CurrentUser, db: DBSession):
+    """Delete a device by ID."""
     service = DeviceService(db)
     return await service.delete_device(device_id)

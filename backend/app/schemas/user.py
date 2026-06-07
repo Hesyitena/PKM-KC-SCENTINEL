@@ -3,12 +3,10 @@ SCENTINEL - User Pydantic Schemas
 """
 from datetime import datetime
 from pydantic import BaseModel
-from app.models.user import UserRole
 
 
 class UserBase(BaseModel):
     username: str
-    role: UserRole
 
 
 class UserCreate(UserBase):

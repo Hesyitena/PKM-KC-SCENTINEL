@@ -3,7 +3,6 @@ SCENTINEL - Authentication Pydantic Schemas
 Request/response schemas for login and token operations.
 """
 from pydantic import BaseModel, Field
-from app.models.user import UserRole
 
 
 class LoginRequest(BaseModel):
@@ -16,10 +15,8 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
     user_id: int
     username: str
-    role: UserRole
 
 
 class TokenPayload(BaseModel):
     sub: str  # username
     user_id: int
-    role: str

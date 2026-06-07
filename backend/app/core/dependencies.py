@@ -11,7 +11,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.security import decode_access_token
 from app.database.database import get_db
-from app.models.user import UserRole
 
 # --- JWT Bearer ---
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -40,18 +39,6 @@ async def get_current_user_payload(
     return payload
 
 
-async def require_admin(
-    payload: Annotated[dict, Depends(get_current_user_payload)],
-) -> dict:
-    """Require ADMIN role for protected endpoints."""
-    if payload.get("role") != UserRole.ADMIN.value:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required",
-        )
-    return payload
-
-
 async def verify_esp32_api_key(
     api_key: Annotated[str | None, Security(api_key_header)],
 ) -> str:
@@ -66,6 +53,5 @@ async def verify_esp32_api_key(
 
 # Type aliases for dependency injection
 CurrentUser = Annotated[dict, Depends(get_current_user_payload)]
-AdminUser = Annotated[dict, Depends(require_admin)]
 DBSession = Annotated[AsyncSession, Depends(get_db)]
 ESP32Auth = Annotated[str, Depends(verify_esp32_api_key)]

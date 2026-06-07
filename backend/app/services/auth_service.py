@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.security import verify_password, hash_password, create_access_token
-from app.models.user import User, UserRole
+from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.schemas.auth import LoginRequest, TokenResponse
 from app.schemas.user import UserCreate, UserResponse, ChangePasswordRequest
@@ -29,7 +29,7 @@ class AuthService:
             )
 
         access_token = create_access_token(
-            data={"sub": user.username, "user_id": user.id, "role": user.role.value},
+            data={"sub": user.username, "user_id": user.id},
             expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
         )
         return TokenResponse(
@@ -37,7 +37,6 @@ class AuthService:
             token_type="bearer",
             user_id=user.id,
             username=user.username,
-            role=user.role,
         )
 
     async def get_user_by_id(self, user_id: int) -> UserResponse:
@@ -56,7 +55,6 @@ class AuthService:
         user = User(
             username=payload.username,
             password_hash=hash_password(payload.password),
-            role=payload.role,
         )
         created = await self.repo.create(user)
         return UserResponse.model_validate(created)
