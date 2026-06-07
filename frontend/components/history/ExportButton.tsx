@@ -6,19 +6,17 @@ import { Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface ExportButtonProps {
-  deviceId?: number;
   startDate?: string;
   endDate?: string;
 }
 
-export function ExportButton({ deviceId, startDate, endDate }: ExportButtonProps) {
+export function ExportButton({ startDate, endDate }: ExportButtonProps) {
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = useCallback(async () => {
     setIsExporting(true);
     try {
       const params: Record<string, string | number> = {};
-      if (deviceId) params.device_id = deviceId;
       if (startDate) params.start_date = startDate;
       if (endDate) params.end_date = endDate;
 
@@ -40,7 +38,7 @@ export function ExportButton({ deviceId, startDate, endDate }: ExportButtonProps
     } finally {
       setIsExporting(false);
     }
-  }, [deviceId, startDate, endDate]);
+  }, [startDate, endDate]);
 
   return (
     <button

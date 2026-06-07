@@ -47,7 +47,6 @@ export function useReadingHistory(params: ReadingHistoryParams) {
     // Demo mode: pakai data dummy
     if (DEMO_MODE) {
       const result = getMockHistory(params.offset ?? 0, params.limit ?? 20, {
-        device_id: params.device_id,
         prediction: params.prediction,
         food_name: params.food_name,
       });

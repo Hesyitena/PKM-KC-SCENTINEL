@@ -29,7 +29,6 @@ export interface PaginatedReadings {
 }
 
 export interface ReadingHistoryParams {
-  device_id?: number;
   start_date?: string;
   end_date?: string;
   prediction?: PredictionLabel;

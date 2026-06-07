@@ -22,25 +22,9 @@ export const MOCK_DEVICES: Device[] = [
   {
     id: 1,
     device_name: "SCENTINEL-Node-01",
-    serial_number: "SCN-2026-001",
-    firmware_version: "v1.2.3",
+    serial_number: "SCT-ESP32-001",
+    firmware_version: "v1.0.0",
     last_seen: minutesAgo(2),
-    status: "ONLINE",
-  },
-  {
-    id: 2,
-    device_name: "SCENTINEL-Node-02",
-    serial_number: "SCN-2026-002",
-    firmware_version: "v1.2.1",
-    last_seen: hoursAgo(3),
-    status: "OFFLINE",
-  },
-  {
-    id: 3,
-    device_name: "SCENTINEL-Node-03",
-    serial_number: "SCN-2026-003",
-    firmware_version: "v1.2.3",
-    last_seen: minutesAgo(8),
     status: "ONLINE",
   },
 ];
@@ -135,7 +119,7 @@ function buildHistoryItem(id: number, minsAgo: number): SensorReading {
     prediction:  p.prediction,
     confidence,
     food_name: FOOD_SAMPLES[id % FOOD_SAMPLES.length],
-    device_id: (id % 3) + 1,
+    device_id: 1,
   };
 }
 
@@ -147,13 +131,10 @@ const ALL_HISTORY: SensorReading[] = Array.from({ length: 60 }, (_, i) =>
 export function getMockHistory(
   offset = 0,
   limit = 20,
-  filters: { device_id?: number; prediction?: string; food_name?: string } = {}
+  filters: { prediction?: string; food_name?: string } = {}
 ): PaginatedReadings {
   let filtered = [...ALL_HISTORY];
 
-  if (filters.device_id) {
-    filtered = filtered.filter((r) => r.device_id === filters.device_id);
-  }
   if (filters.prediction) {
     filtered = filtered.filter((r) => r.prediction === filters.prediction);
   }

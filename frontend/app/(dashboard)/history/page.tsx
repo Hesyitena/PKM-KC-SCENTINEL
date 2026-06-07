@@ -31,9 +31,9 @@ export default function HistoryPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-full p-6 gap-4 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-shrink-0">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
             Riwayat <span className="gradient-text">Pengujian</span>
@@ -43,18 +43,19 @@ export default function HistoryPage() {
           </p>
         </div>
         <ExportButton
-          deviceId={params.device_id}
           startDate={params.start_date}
           endDate={params.end_date}
         />
       </div>
 
       {/* Filters */}
-      <DateFilter params={params} onChange={handleFilterChange} onReset={handleReset} />
+      <div className="flex-shrink-0">
+        <DateFilter params={params} onChange={handleFilterChange} onReset={handleReset} />
+      </div>
 
       {/* Loading */}
       {isLoading && (
-        <div id="history-loading" className="flex items-center justify-center py-12 gap-2 text-muted-foreground">
+        <div id="history-loading" className="flex items-center justify-center py-12 gap-2 text-muted-foreground flex-shrink-0">
           <Loader2 size={20} className="animate-spin" />
           <span className="text-sm">Memuat data...</span>
         </div>
@@ -62,21 +63,23 @@ export default function HistoryPage() {
 
       {/* Error */}
       {error && !isLoading && (
-        <div id="history-error" className="glass-card p-6 flex items-center gap-3 text-destructive border-destructive/30">
+        <div id="history-error" className="glass-card p-6 flex items-center gap-3 text-destructive border-destructive/30 flex-shrink-0">
           <AlertCircle size={18} />
           <p className="text-sm">{error}</p>
         </div>
       )}
 
-      {/* Table */}
+      {/* Table — fills remaining height, scroll only inside */}
       {data && !isLoading && (
-        <ReadingTable
-          readings={data.items}
-          total={data.total}
-          limit={data.limit}
-          offset={data.offset}
-          onPageChange={handlePageChange}
-        />
+        <div className="flex-1 min-h-0">
+          <ReadingTable
+            readings={data.items}
+            total={data.total}
+            limit={data.limit}
+            offset={data.offset}
+            onPageChange={handlePageChange}
+          />
+        </div>
       )}
     </div>
   );
