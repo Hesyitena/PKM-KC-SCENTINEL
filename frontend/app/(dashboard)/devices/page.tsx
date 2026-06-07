@@ -55,8 +55,8 @@ export default function DevicesPage() {
   const isOnline = device?.status === "ONLINE";
 
   return (
-    <div className="h-full overflow-y-auto p-6">
-      <div className="space-y-6 max-w-2xl">
+    <div className="h-full overflow-y-auto scrollbar-hide p-6 lg:p-10 flex justify-center">
+      <div className="w-full max-w-3xl space-y-6">
 
         {/* Header */}
         <div className="flex items-center justify-between">
