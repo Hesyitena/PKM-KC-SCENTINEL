@@ -15,7 +15,7 @@ import { format } from "date-fns";
 
 interface GasChartProps {
   data: SensorReading[];
-  height?: number;
+  height?: number | string;
 }
 
 const GAS_LINES = [
@@ -120,7 +120,7 @@ export function GasChart({ data, height = 300 }: GasChartProps) {
   }
 
   return (
-    <div id="gas-chart">
+    <div id="gas-chart" style={{ height }} className="w-full">
       {/* SVG gradient defs */}
       <svg width="0" height="0" style={{ position: "absolute" }}>
         <defs>

@@ -9,63 +9,87 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-full px-6 pt-5 pb-4 gap-3 overflow-hidden">
       {/* Page header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{
-                background: "linear-gradient(135deg, hsl(227 68% 28% / 0.12), hsl(227 68% 28% / 0.06))",
-                border: "1px solid hsl(227 68% 28% / 0.15)",
-              }}
-            >
-              <Activity size={14} className="text-primary" />
-            </div>
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-              Live Monitoring
-            </p>
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Sensor{" "}
-            <span className="gradient-text">Realtime</span>
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Pembacaan sensor dari perangkat{" "}
-            <span className="font-medium text-foreground/70">ESP32 Edge AI</span>
-          </p>
-        </div>
-
-        {/* Quick stats chips */}
-        <div className="hidden sm:flex items-center gap-2">
+      <div className="flex items-center justify-between flex-shrink-0">
+        <div className="flex items-center gap-3">
           <div
-            className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full"
+            className="w-7 h-7 flex items-center justify-center flex-shrink-0"
             style={{
-              background: "linear-gradient(135deg, hsl(227 68% 28% / 0.08), hsl(227 68% 28% / 0.04))",
-              border: "1px solid hsl(227 68% 28% / 0.12)",
-              color: "hsl(var(--primary))",
+              background: "rgba(83,58,253,0.08)",
+              border: "1px solid rgba(83,58,253,0.15)",
+              borderRadius: "8px",
             }}
           >
-            <Cpu size={12} />
+            <Activity size={14} style={{ color: "#533afd" }} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h1
+                style={{
+                  fontSize: "18px",
+                  fontWeight: 300,
+                  letterSpacing: "-0.22px",
+                  color: "#0d253d",
+                  lineHeight: 1.1,
+                }}
+              >
+                Sensor{" "}
+                <span className="gradient-text" style={{ fontWeight: 500 }}>Realtime</span>
+              </h1>
+              <span
+                className="hidden sm:inline"
+                style={{ fontSize: "11px", fontWeight: 400, color: "#64748d", letterSpacing: "0.1px", textTransform: "uppercase" }}
+              >
+                · Live Monitoring
+              </span>
+            </div>
+            <p style={{ fontSize: "12px", fontWeight: 300, color: "#64748d", marginTop: "2px" }}>
+              Pembacaan sensor dari perangkat{" "}
+              <span style={{ fontWeight: 400, color: "#273951" }}>ESP32 Edge AI</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Stripe pill-tag-soft chips */}
+        <div className="hidden sm:flex items-center gap-2">
+          <div
+            className="flex items-center gap-1.5 px-2.5 py-1"
+            style={{
+              background: "#b9b9f9",
+              color: "#4434d4",
+              fontSize: "10px",
+              fontWeight: 400,
+              letterSpacing: "0.1px",
+              textTransform: "uppercase",
+              borderRadius: "9999px",
+            }}
+          >
+            <Cpu size={10} />
             ESP32
           </div>
           <div
-            className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full"
+            className="flex items-center gap-1.5 px-2.5 py-1"
             style={{
-              background: "linear-gradient(135deg, hsl(142 72% 29% / 0.08), hsl(142 72% 29% / 0.04))",
-              border: "1px solid hsl(142 72% 29% / 0.15)",
-              color: "#059669",
+              background: "#a7f3d0",
+              color: "#047857",
+              fontSize: "10px",
+              fontWeight: 400,
+              letterSpacing: "0.1px",
+              textTransform: "uppercase",
+              borderRadius: "9999px",
             }}
           >
-            <Zap size={12} />
+            <Zap size={10} />
             AI Detection
           </div>
         </div>
       </div>
 
-      {/* Live monitoring panel (SSE-connected) */}
-      <LiveMonitoringPanel />
+      {/* Live monitoring panel — fills remaining height */}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <LiveMonitoringPanel />
+      </div>
     </div>
   );
 }

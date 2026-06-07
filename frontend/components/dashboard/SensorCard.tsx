@@ -1,7 +1,6 @@
 "use client";
 
 import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
 
 interface SensorCardProps {
   id: string;
@@ -14,56 +13,42 @@ interface SensorCardProps {
   max?: number;
 }
 
+/* ── Stripe-adapted color tokens per sensor type ── */
 const colorConfig = {
   default: {
-    icon: "text-slate-500",
-    iconBg: "bg-slate-100 border-slate-200",
-    value: "text-slate-800",
-    bar: "#64748b",
-    barFrom: "#94a3b8",
-    shadow: "rgba(100,116,139,0.12)",
-    glow: "rgba(100,116,139,0.05)",
-    border: "#e2e8f0",
+    accent: "#64748d",       /* stripe ink-mute */
+    accentLight: "#e3e8ee",  /* stripe hairline */
+    value: "#273951",        /* stripe ink-secondary */
+    iconBg: "#f6f9fc",
+    iconColor: "#64748d",
   },
   primary: {
-    icon: "text-indigo-500",
-    iconBg: "bg-indigo-50 border-indigo-100",
-    value: "text-indigo-700",
-    bar: "#6366f1",
-    barFrom: "#818cf8",
-    shadow: "rgba(99,102,241,0.18)",
-    glow: "rgba(99,102,241,0.05)",
-    border: "#c7d2fe",
+    accent: "#533afd",       /* stripe primary */
+    accentLight: "#b9b9f9",  /* stripe primary-subdued */
+    value: "#4434d4",        /* stripe primary-deep */
+    iconBg: "#eef2ff",
+    iconColor: "#533afd",
   },
   fresh: {
-    icon: "text-emerald-500",
-    iconBg: "bg-emerald-50 border-emerald-100",
-    value: "text-emerald-700",
-    bar: "#10b981",
-    barFrom: "#34d399",
-    shadow: "rgba(16,185,129,0.18)",
-    glow: "rgba(16,185,129,0.05)",
-    border: "#a7f3d0",
+    accent: "#10b981",
+    accentLight: "#a7f3d0",
+    value: "#047857",
+    iconBg: "#ecfdf5",
+    iconColor: "#10b981",
   },
   spoiled: {
-    icon: "text-rose-500",
-    iconBg: "bg-rose-50 border-rose-100",
-    value: "text-rose-700",
-    bar: "#f43f5e",
-    barFrom: "#fb7185",
-    shadow: "rgba(244,63,94,0.18)",
-    glow: "rgba(244,63,94,0.05)",
-    border: "#fecdd3",
+    accent: "#ea2261",       /* stripe ruby */
+    accentLight: "#fecdd3",
+    value: "#be123c",
+    iconBg: "#fff1f2",
+    iconColor: "#ea2261",
   },
   amber: {
-    icon: "text-amber-500",
-    iconBg: "bg-amber-50 border-amber-100",
-    value: "text-amber-700",
-    bar: "#f59e0b",
-    barFrom: "#fcd34d",
-    shadow: "rgba(245,158,11,0.18)",
-    glow: "rgba(245,158,11,0.05)",
-    border: "#fde68a",
+    accent: "#f59e0b",
+    accentLight: "#fde68a",
+    value: "#92400e",
+    iconBg: "#fffbeb",
+    iconColor: "#f59e0b",
   },
 };
 
@@ -79,49 +64,59 @@ export function SensorCard({
 }: SensorCardProps) {
   const cfg = colorConfig[color];
   const numVal = typeof value === "number" ? value : parseFloat(value as string) || 0;
-
-  // Auto-determine max if not provided — use a soft cap at 150% of the current value
-  // so the bar always has meaningful fill even for small values
   const effectiveMax = max ?? Math.max(numVal * 1.5, 1);
   const barPct = Math.min(100, Math.max(2, (numVal / effectiveMax) * 100));
 
   return (
     <div
       id={id}
-      className="relative rounded-2xl p-4 border transition-all duration-300 group cursor-default overflow-hidden hover:-translate-y-1"
+      className="group relative cursor-default transition-all duration-200 hover:-translate-y-0.5"
       style={{
-        background: "rgba(255,255,255,0.97)",
-        borderColor: cfg.border,
-        boxShadow: `0 1px 3px rgba(0,0,0,0.04), 0 6px 20px ${cfg.glow}`,
+        /* Stripe card-feature-light */
+        background: "#ffffff",
+        border: "1px solid #e3e8ee",
+        borderRadius: "12px",  /* rounded.lg = 12px */
+        padding: "12px 14px",
+        boxShadow: "rgba(0,55,112,0.06) 0 1px 3px",
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLElement).style.boxShadow = `rgba(0,55,112,0.08) 0 4px 14px, rgba(0,55,112,0.04) 0 1px 3px`;
+        (e.currentTarget as HTMLElement).style.borderColor = cfg.accentLight;
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLElement).style.boxShadow = "rgba(0,55,112,0.06) 0 1px 3px";
+        (e.currentTarget as HTMLElement).style.borderColor = "#e3e8ee";
       }}
     >
-      {/* Hover top accent */}
+      {/* Top accent line — Stripe-style, visible on hover */}
       <div
-        className="absolute top-0 inset-x-0 h-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{ background: `linear-gradient(90deg, ${cfg.barFrom}, ${cfg.bar})` }}
+        className="absolute top-0 inset-x-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        style={{
+          background: cfg.accent,
+          borderRadius: "12px 12px 0 0",
+        }}
       />
 
-      {/* Subtle corner glow */}
-      <div
-        className="absolute -top-4 -right-4 w-16 h-16 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{ background: `radial-gradient(circle, ${cfg.bar}20, transparent 70%)` }}
-      />
-
-      {/* Icon + Label */}
-      <div className="flex items-center justify-between mb-3.5">
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+      {/* Label + Icon row */}
+      <div className="flex items-center justify-between mb-2">
+        <p
+          className="uppercase"
+          style={{
+            fontSize: "10px",
+            fontWeight: 400,
+            letterSpacing: "0.1px",
+            color: "#64748d",  /* stripe ink-mute */
+          }}
+        >
           {label}
         </p>
         {icon && (
           <div
-            className={cn(
-              "w-7 h-7 rounded-xl flex items-center justify-center border flex-shrink-0",
-              "transition-all duration-200 group-hover:scale-110 group-hover:shadow-md",
-              cfg.iconBg,
-              cfg.icon
-            )}
+            className="w-6 h-6 flex items-center justify-center flex-shrink-0 rounded"
             style={{
-              boxShadow: `0 0 0 0px ${cfg.bar}00`,
+              background: cfg.iconBg,
+              color: cfg.iconColor,
+              borderRadius: "6px",  /* rounded.sm */
             }}
           >
             {icon}
@@ -129,30 +124,51 @@ export function SensorCard({
         )}
       </div>
 
-      {/* Value */}
-      <div className="flex items-baseline gap-1 mb-3.5">
-        <span className={cn("text-[26px] font-black tabular-nums leading-none tracking-tight", cfg.value)}>
+      {/* Value — Stripe body-tabular style (tnum + tight tracking) */}
+      <div className="flex items-baseline gap-1 mb-2.5">
+        <span
+          style={{
+            fontSize: "20px",
+            fontWeight: 600,
+            lineHeight: 1,
+            letterSpacing: "-0.42px",
+            fontFeatureSettings: '"tnum" 1, "ss01" 1',
+            color: cfg.value,
+          }}
+        >
           {typeof value === "number" ? value.toFixed(1) : value}
         </span>
         {unit && (
-          <span className="text-xs text-slate-400 font-semibold">{unit}</span>
+          <span style={{ fontSize: "12px", fontWeight: 300, color: "#64748d" }}>
+            {unit}
+          </span>
         )}
       </div>
 
       {/* Progress bar */}
-      <div className="space-y-1.5">
-        <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+      <div>
+        <div
+          className="w-full overflow-hidden"
+          style={{ height: "3px", background: "#f0f4f8", borderRadius: "9999px" }}
+        >
           <div
-            className="h-full rounded-full transition-all duration-700 ease-out"
             style={{
+              height: "100%",
               width: `${barPct}%`,
-              background: `linear-gradient(90deg, ${cfg.barFrom}, ${cfg.bar})`,
-              boxShadow: `0 0 8px ${cfg.bar}50`,
+              background: cfg.accent,
+              borderRadius: "9999px",
+              transition: "width 0.7s cubic-bezier(0.16,1,0.3,1)",
+              opacity: 0.85,
             }}
           />
         </div>
         {sublabel && (
-          <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{sublabel}</p>
+          <p
+            className="mt-1 uppercase"
+            style={{ fontSize: "10px", fontWeight: 400, color: "#a8c3de", letterSpacing: "0.1px" }}
+          >
+            {sublabel}
+          </p>
         )}
       </div>
     </div>

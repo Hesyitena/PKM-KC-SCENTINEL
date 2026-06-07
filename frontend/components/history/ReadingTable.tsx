@@ -24,9 +24,9 @@ export function ReadingTable({
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div id="reading-table-container" className="glass-card overflow-hidden">
-      {/* Table */}
-      <div className="overflow-x-auto">
+    <div id="reading-table-container" className="glass-card overflow-hidden flex flex-col h-full">
+      {/* Table — scrollable area */}
+      <div className="overflow-y-auto overflow-x-auto flex-1 min-h-0">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border">

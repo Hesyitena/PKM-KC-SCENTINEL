@@ -4,7 +4,6 @@ import { useSSE } from "@/lib/useSSE";
 import { useMockSSE } from "@/lib/useMockSSE";
 import { useSensorStore } from "@/store/sensorStore";
 import { SensorReading } from "@/types/reading";
-import { StatusBadge } from "./StatusBadge";
 import { SensorCard } from "./SensorCard";
 import { GasChart } from "./GasChart";
 import { formatDate } from "@/lib/utils";
@@ -13,280 +12,318 @@ import {
   Droplets,
   Wind,
   FlaskConical,
-  Brain,
   Clock,
   BarChart3,
   Wifi,
-  Utensils,
+  ShieldCheck,
+  ShieldX,
+  Cpu,
 } from "lucide-react";
 
 const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
+/* ── Stripe-inspired SVG Confidence Arc ── */
+function ConfidenceArc({ value, isLayak }: { value: number; isLayak: boolean }) {
+  const R = 36;
+  const C = 2 * Math.PI * R;
+  const offset = C * (1 - value);
+  /* Stripe uses primary indigo for positive, ruby for negative */
+  const trackColor  = isLayak ? "#ecfdf5" : "#fff1f2";
+  const strokeColor = isLayak ? "#10b981" : "#ea2261"; /* emerald / stripe-ruby */
+
+  return (
+    <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+      <circle cx="44" cy="44" r={R} stroke={trackColor} strokeWidth="7" />
+      <circle
+        cx="44" cy="44" r={R}
+        stroke={strokeColor}
+        strokeWidth="7"
+        strokeLinecap="round"
+        strokeDasharray={C}
+        strokeDashoffset={offset}
+        transform="rotate(-90 44 44)"
+        style={{ transition: "stroke-dashoffset 1.2s cubic-bezier(0.16,1,0.3,1)" }}
+      />
+    </svg>
+  );
+}
+
 export function LiveMonitoringPanel() {
-  const { latestReading, chartData, setConnected, pushChartReading } = useSensorStore();
+  const { latestReading, chartData, setConnected, pushChartReading } =
+    useSensorStore();
 
   const handleReading = (reading: SensorReading) => {
     pushChartReading(reading);
     setConnected(true);
   };
-
   const handleError = () => setConnected(false);
 
   useSSE({ onReading: handleReading, onError: handleError, enabled: !DEMO_MODE });
   useMockSSE({ onReading: handleReading, enabled: DEMO_MODE });
 
+  /* ── Empty state ── */
   if (!latestReading) {
     return (
       <div
         id="live-panel-empty"
-        className="flex flex-col items-center justify-center py-28 gap-5 rounded-2xl border"
+        className="flex flex-col items-center justify-center h-full gap-5"
         style={{
-          background: "rgba(255,255,255,0.97)",
-          borderColor: "hsl(220 18% 92%)",
+          background: "#ffffff",
+          border: "1px solid #e3e8ee",
+          borderRadius: "12px",
+          boxShadow: "rgba(0,55,112,0.06) 0 1px 3px",
         }}
       >
         <div
-          className="w-16 h-16 rounded-3xl flex items-center justify-center animate-pulse"
-          style={{
-            background: "linear-gradient(135deg, hsl(227 68% 28% / 0.08), hsl(227 68% 28% / 0.03))",
-            border: "1px solid hsl(227 68% 28% / 0.12)",
-          }}
+          className="w-14 h-14 flex items-center justify-center"
+          style={{ background: "rgba(83,58,253,0.06)", border: "1px solid rgba(83,58,253,0.12)", borderRadius: "12px" }}
         >
-          <Wifi size={26} className="text-primary/40" />
+          <Wifi size={24} style={{ color: "#b9b9f9" }} />
         </div>
-        <div className="text-center space-y-1.5">
-          <p className="text-sm font-semibold text-slate-600">Menunggu data perangkat...</p>
-          <p className="text-xs text-slate-400">Pastikan ESP32 menyala dan terhubung ke jaringan.</p>
+        <div className="text-center">
+          <p style={{ fontSize: "15px", fontWeight: 300, color: "#273951" }}>Menunggu data perangkat…</p>
+          <p style={{ fontSize: "13px", fontWeight: 300, color: "#64748d", marginTop: "4px" }}>
+            Pastikan ESP32 menyala dan terhubung ke jaringan.
+          </p>
         </div>
       </div>
     );
   }
 
   const isLayak = latestReading.prediction === "LAYAK";
+  const conf    = latestReading.confidence ?? 0;
+  const confPct = (conf * 100).toFixed(1);
+
+  /* Stripe semantic: emerald for positive, ruby for negative */
+  const S = {
+    bg:     isLayak ? "#ecfdf5"    : "#fff1f2",
+    border: isLayak ? "#6ee7b7"    : "#fecdd3",
+    text:   isLayak ? "#047857"    : "#be123c",
+    accent: isLayak ? "#10b981"    : "#ea2261",   /* emerald / stripe-ruby */
+    shadow: isLayak
+      ? "rgba(0,55,112,0.06) 0 1px 3px, rgba(16,185,129,0.10) 0 8px 24px"
+      : "rgba(0,55,112,0.06) 0 1px 3px, rgba(234,34,97,0.10) 0 8px 24px",
+  };
 
   return (
-    <div id="live-monitoring-panel" className="space-y-4">
+    <div id="live-monitoring-panel" className="flex flex-col gap-3 h-full min-h-0">
 
-      {/* ── Top row: AI Detection + Timestamp ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-        {/* AI Detection — takes 2 columns */}
-        <div
-          className="lg:col-span-2 rounded-2xl border p-5 relative overflow-hidden"
-          style={{
-            background: "rgba(255,255,255,0.98)",
-            borderColor: isLayak ? "#bbf7d0" : "#fecdd3",
-            boxShadow: isLayak
-              ? "0 1px 4px rgba(0,0,0,0.04), 0 8px 24px rgba(16,185,129,0.07)"
-              : "0 1px 4px rgba(0,0,0,0.04), 0 8px 24px rgba(244,63,94,0.07)",
-          }}
-        >
-          {/* Colored left stripe */}
-          <div
-            className="absolute left-0 top-0 bottom-0 w-1.5 rounded-r"
-            style={{
-              background: isLayak
-                ? "linear-gradient(180deg, #10b981, #34d399)"
-                : "linear-gradient(180deg, #f43f5e, #fb7185)",
-            }}
-          />
-
-          <div className="pl-4 flex items-center justify-between gap-4 flex-wrap">
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-6 h-6 rounded-lg flex items-center justify-center"
-                  style={{
-                    background: "linear-gradient(135deg, hsl(227 68% 28% / 0.10), hsl(227 68% 28% / 0.04))",
-                    border: "1px solid hsl(227 68% 28% / 0.10)",
-                  }}
-                >
-                  <Brain size={13} className="text-primary" />
-                </div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Hasil Deteksi AI
-                </span>
-              </div>
-
-              <StatusBadge
-                prediction={latestReading.prediction}
-                confidence={latestReading.confidence}
-                size="lg"
-              />
-
-              {latestReading.food_name && (
-                <div className="flex items-center gap-2">
-                  <Utensils size={12} className="text-slate-400" />
-                  <span className="text-xs text-slate-500 font-medium">Sampel:</span>
-                  <span className="text-xs text-slate-700 font-bold">{latestReading.food_name}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Confidence ring / visual */}
-            {latestReading.confidence !== undefined && (
-              <div className="flex flex-col items-center gap-1">
-                <div
-                  className="relative w-16 h-16 rounded-full flex items-center justify-center"
-                  style={{
-                    background: `conic-gradient(${isLayak ? "#10b981" : "#f43f5e"} ${latestReading.confidence * 360}deg, #f1f5f9 0deg)`,
-                  }}
-                >
-                  <div className="absolute inset-2 rounded-full bg-white flex items-center justify-center">
-                    <span className={`text-sm font-black ${isLayak ? "text-emerald-600" : "text-rose-600"}`}>
-                      {(latestReading.confidence * 100).toFixed(0)}
-                      <span className="text-[9px] font-bold">%</span>
-                    </span>
-                  </div>
-                </div>
-                <span className="text-[10px] text-slate-400 font-semibold">Akurasi</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Timestamp card — takes 1 column */}
-        <div
-          className="rounded-2xl border p-5 flex flex-col justify-between"
-          style={{
-            background: "rgba(255,255,255,0.98)",
-            borderColor: "hsl(220 18% 92%)",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-          }}
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <div
-              className="w-6 h-6 rounded-lg flex items-center justify-center"
-              style={{
-                background: "linear-gradient(135deg, hsl(227 68% 28% / 0.10), hsl(227 68% 28% / 0.04))",
-                border: "1px solid hsl(227 68% 28% / 0.10)",
-              }}
-            >
-              <Clock size={13} className="text-primary" />
-            </div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-              Timestamp
-            </span>
-          </div>
-          <div>
-            <p className="text-lg font-black text-slate-800 tabular-nums leading-tight">
-              {formatDate(latestReading.timestamp)}
-            </p>
-            <p className="text-[11px] text-slate-400 font-medium mt-1">Pembacaan terakhir</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Sensor cards grid ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
-        <SensorCard
-          id="card-mq3"
-          label="MQ-3 Alkohol"
-          value={latestReading.mq3}
-          icon={<Wind size={13} />}
-          color="primary"
-          sublabel="ADC"
-        />
-        <SensorCard
-          id="card-mq4"
-          label="MQ-4 Metana"
-          value={latestReading.mq4}
-          icon={<Wind size={13} />}
-          color="fresh"
-          sublabel="ADC"
-        />
-        <SensorCard
-          id="card-mq135"
-          label="MQ-135 Udara"
-          value={latestReading.mq135}
-          icon={<FlaskConical size={13} />}
-          color="amber"
-          sublabel="ADC"
-        />
-        <SensorCard
-          id="card-tgs2602"
-          label="TGS-2602 VOC"
-          value={latestReading.tgs2602}
-          icon={<FlaskConical size={13} />}
-          color="spoiled"
-          sublabel="ADC"
-        />
-        <SensorCard
-          id="card-temperature"
-          label="Suhu"
-          value={latestReading.temperature}
-          unit="°C"
-          icon={<Thermometer size={13} />}
-          color="amber"
-          max={50}
-        />
-        <SensorCard
-          id="card-humidity"
-          label="Kelembapan"
-          value={latestReading.humidity}
-          unit="%"
-          icon={<Droplets size={13} />}
-          color="primary"
-          max={100}
-        />
-      </div>
-
-      {/* ── Chart section ── */}
+      {/* ══ STATUS CARD — Stripe card-dashboard-mockup style ══ */}
       <div
-        className="rounded-2xl border overflow-hidden"
+        className="flex-shrink-0 flex overflow-hidden"
         style={{
-          background: "rgba(255,255,255,0.98)",
-          borderColor: "hsl(220 18% 91%)",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(99,102,241,0.05)",
+          background: "#ffffff",
+          border: `1px solid ${S.border}`,
+          borderRadius: "12px",     /* rounded.lg */
+          boxShadow: S.shadow,
         }}
       >
-        {/* Header */}
+
+        {/* ── Zone 1: AI Prediction (hero) ── */}
         <div
-          className="flex items-center justify-between px-6 py-4"
-          style={{ borderBottom: "1px solid hsl(220 18% 94%)" }}
+          className="flex items-center gap-4 px-6 py-4 flex-shrink-0"
+          style={{
+            background: S.bg,
+            borderRight: `1px solid ${S.border}`,
+            minWidth: 220,
+          }}
+        >
+          {/* Stripe-style icon: flat rounded square */}
+          <div
+            className="w-12 h-12 flex items-center justify-center flex-shrink-0"
+            style={{
+              background: S.accent,
+              borderRadius: "12px",
+              boxShadow: `0 4px 14px ${S.accent}40`,
+            }}
+          >
+            {isLayak
+              ? <ShieldCheck size={22} color="#fff" strokeWidth={2} />
+              : <ShieldX     size={22} color="#fff" strokeWidth={2} />
+            }
+          </div>
+
+          {/* Prediction text — Stripe display-md: weight 300, -0.26px */}
+          <div>
+            <p style={{ fontSize: "10px", fontWeight: 400, color: S.accent, letterSpacing: "0.1px", textTransform: "uppercase", marginBottom: "4px" }}>
+              Hasil AI
+            </p>
+            <p style={{
+              fontSize: "28px",
+              fontWeight: 300,
+              letterSpacing: "-0.26px",
+              color: S.text,
+              lineHeight: 1.0,
+              fontFeatureSettings: '"ss01" 1',
+            }}>
+              {latestReading.prediction}
+            </p>
+          </div>
+        </div>
+
+        {/* ── Zone 2: Confidence gauge ── */}
+        <div
+          className="flex items-center gap-4 px-6 py-4 flex-shrink-0"
+          style={{ borderRight: "1px solid #e3e8ee", background: "#ffffff" }}
+        >
+          <div className="relative flex-shrink-0">
+            <ConfidenceArc value={conf} isLayak={isLayak} />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span style={{
+                fontSize: "17px",
+                fontWeight: 600,
+                letterSpacing: "-0.42px",
+                fontFeatureSettings: '"tnum" 1',
+                color: S.text,
+                lineHeight: 1,
+              }}>
+                {Math.round(conf * 100)}%
+              </span>
+            </div>
+          </div>
+          <div>
+            <p style={{ fontSize: "10px", fontWeight: 400, color: "#64748d", letterSpacing: "0.1px", textTransform: "uppercase", marginBottom: "4px" }}>
+              Akurasi
+            </p>
+            {/* Stripe body-tabular style */}
+            <p style={{
+              fontSize: "22px",
+              fontWeight: 300,
+              letterSpacing: "-0.42px",
+              fontFeatureSettings: '"tnum" 1, "ss01" 1',
+              color: "#0d253d",
+              lineHeight: 1,
+            }}>
+              {confPct}
+              <span style={{ fontSize: "13px", color: "#64748d", marginLeft: "2px", fontWeight: 300 }}>%</span>
+            </p>
+          </div>
+        </div>
+
+        {/* ── Zone 3: Timestamp ── */}
+        <div
+          className="flex flex-col justify-center px-6 py-4 flex-1"
+          style={{ borderRight: "1px solid #e3e8ee" }}
+        >
+          <div className="flex items-center gap-1.5 mb-1">
+            <Clock size={10} style={{ color: "#64748d" }} />
+            <p style={{ fontSize: "10px", fontWeight: 400, color: "#64748d", letterSpacing: "0.1px", textTransform: "uppercase" }}>
+              Waktu Pembacaan
+            </p>
+          </div>
+          {/* Stripe body-tabular for the timestamp */}
+          <p style={{
+            fontSize: "15px",
+            fontWeight: 400,
+            letterSpacing: "-0.42px",
+            fontFeatureSettings: '"tnum" 1',
+            color: "#0d253d",
+          }}>
+            {formatDate(latestReading.timestamp)}
+          </p>
+          <p style={{ fontSize: "12px", fontWeight: 300, color: "#64748d", marginTop: "2px" }}>
+            Pembacaan terakhir
+          </p>
+        </div>
+
+        {/* ── Zone 4: Device status ── */}
+        <div className="flex flex-col justify-center px-6 py-4 flex-shrink-0">
+          <div className="flex items-center gap-1.5 mb-1">
+            <Cpu size={10} style={{ color: "#64748d" }} />
+            <p style={{ fontSize: "10px", fontWeight: 400, color: "#64748d", letterSpacing: "0.1px", textTransform: "uppercase" }}>
+              Perangkat
+            </p>
+          </div>
+          <p style={{ fontSize: "14px", fontWeight: 400, color: "#0d253d", letterSpacing: "-0.1px" }}>
+            ESP32 Edge AI
+          </p>
+          <div className="flex items-center gap-1.5 mt-1.5">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            <span style={{ fontSize: "12px", fontWeight: 300, color: "#047857" }}>Terhubung</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ══ SENSOR CARDS ══ */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5 flex-shrink-0">
+        <SensorCard id="card-mq3"         label="MQ-3 Alkohol"  value={latestReading.mq3}         icon={<Wind size={12} />}         color="primary"  sublabel="ADC" />
+        <SensorCard id="card-mq4"         label="MQ-4 Metana"   value={latestReading.mq4}         icon={<Wind size={12} />}         color="fresh"    sublabel="ADC" />
+        <SensorCard id="card-mq135"       label="MQ-135 Udara"  value={latestReading.mq135}       icon={<FlaskConical size={12} />} color="amber"    sublabel="ADC" />
+        <SensorCard id="card-tgs2602"     label="TGS-2602 VOC"  value={latestReading.tgs2602}     icon={<FlaskConical size={12} />} color="spoiled"  sublabel="ADC" />
+        <SensorCard id="card-temperature" label="Suhu"          value={latestReading.temperature} icon={<Thermometer size={12} />}  color="amber"    unit="°C"  max={50} />
+        <SensorCard id="card-humidity"    label="Kelembapan"    value={latestReading.humidity}    icon={<Droplets size={12} />}     color="primary"  unit="%"   max={100} />
+      </div>
+
+      {/* ══ CHART — Stripe card-dashboard-mockup style ══ */}
+      <div
+        className="rounded-xl border overflow-hidden flex flex-col flex-1 min-h-0"
+        style={{
+          background: "#ffffff",
+          borderColor: "#e3e8ee",
+          boxShadow: "rgba(0,55,112,0.06) 0 1px 3px, rgba(0,55,112,0.04) 0 4px 16px",
+          borderRadius: "12px",
+        }}
+      >
+        {/* Chart header */}
+        <div
+          className="flex items-center justify-between px-5 py-3 flex-shrink-0"
+          style={{ borderBottom: "1px solid #e3e8ee" }}
         >
           <div className="flex items-center gap-3">
             <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center"
-              style={{
-                background: "linear-gradient(135deg, hsl(227 68% 28% / 0.10), hsl(227 68% 28% / 0.04))",
-                border: "1px solid hsl(227 68% 28% / 0.10)",
-              }}
+              className="w-7 h-7 flex items-center justify-center"
+              style={{ background: "rgba(83,58,253,0.07)", border: "1px solid rgba(83,58,253,0.12)", borderRadius: "8px" }}
             >
-              <BarChart3 size={15} className="text-primary" />
+              <BarChart3 size={14} style={{ color: "#533afd" }} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800 leading-tight">Grafik Sensor Gas</h3>
-              <p className="text-[11px] text-slate-400 font-medium">ADC readings over time</p>
+              <h3 style={{ fontSize: "14px", fontWeight: 400, color: "#0d253d", letterSpacing: "-0.22px" }}>
+                Grafik Sensor Gas
+              </h3>
+              <p style={{ fontSize: "11px", fontWeight: 300, color: "#64748d" }}>ADC readings over time</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <span className="text-[11px] text-slate-400 font-semibold tabular-nums">
-              {chartData.length} poin
+          <div className="flex items-center gap-3">
+            {/* Stripe body-tabular for count */}
+            <span style={{
+              fontSize: "12px",
+              fontWeight: 300,
+              color: "#64748d",
+              fontFeatureSettings: '"tnum" 1',
+              letterSpacing: "-0.42px",
+            }}>
+              {chartData.length} data poin
             </span>
-            <div className="flex items-center gap-1.5">
-              <div className="relative flex items-center justify-center w-2.5 h-2.5">
-                <span className="absolute w-full h-full rounded-full bg-emerald-400 animate-ping opacity-50" />
-                <span className="relative w-2 h-2 rounded-full bg-emerald-500" />
-              </div>
-              <span
-                className="text-[11px] font-bold px-2.5 py-1 rounded-full"
-                style={{
-                  background: "linear-gradient(135deg, hsl(142 60% 95%), hsl(142 60% 92%))",
-                  border: "1px solid hsl(142 60% 85%)",
-                  color: "hsl(142 70% 30%)",
-                }}
-              >
-                Live
+            {/* Stripe pill-tag-soft — emerald for Live */}
+            <div
+              className="flex items-center gap-1.5 px-3 py-1"
+              style={{
+                background: "#ecfdf5",
+                border: "1px solid #6ee7b7",
+                color: "#047857",
+                fontSize: "10px",
+                fontWeight: 400,
+                letterSpacing: "0.1px",
+                borderRadius: "9999px",
+                textTransform: "uppercase",
+              }}
+            >
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
               </span>
+              Live
             </div>
           </div>
         </div>
 
         {/* Chart body */}
-        <div className="px-4 py-5">
-          <GasChart data={chartData} height={300} />
+        <div className="px-3 py-2 flex-1 min-h-0">
+          <GasChart data={chartData} height="100%" />
         </div>
       </div>
     </div>
