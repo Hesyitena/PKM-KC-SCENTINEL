@@ -19,7 +19,7 @@ export default function DashboardLayout({
   useEffect(() => {
     // Demo mode: inject user dummy agar token tidak null
     if (DEMO_MODE && !token) {
-      setUser({ id: 1, username: "demo", role: "ADMIN", created_at: new Date().toISOString() });
+      setUser({ id: 1, username: "demo", created_at: new Date().toISOString() });
       // Simulasikan token agar guard di bawah tidak redirect
       useAuthStore.setState({ token: "demo-token" });
       return;
@@ -38,7 +38,7 @@ export default function DashboardLayout({
         <Navbar />
         <main
           id="dashboard-main"
-          className="flex-1 overflow-y-auto p-6 space-y-6 animate-fade-in"
+          className="flex-1 overflow-hidden h-full animate-fade-in"
         >
           {children}
         </main>

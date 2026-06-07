@@ -14,7 +14,6 @@ export function saveAuth(data: TokenResponse): void {
     JSON.stringify({
       id: data.user_id,
       username: data.username,
-      role: data.role,
     })
   );
 }

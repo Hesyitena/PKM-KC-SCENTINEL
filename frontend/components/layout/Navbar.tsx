@@ -10,53 +10,67 @@ export function Navbar() {
   return (
     <header
       id="dashboard-navbar"
-      className="h-14 flex items-center justify-between px-6 flex-shrink-0"
+      className="h-14 flex items-center justify-between flex-shrink-0"
       style={{
-        background: "rgba(255,255,255,0.75)",
+        /* Stripe nav-bar-on-mesh: canvas white, hairline border */
+        background: "rgba(255,255,255,0.92)",
         backdropFilter: "blur(12px)",
-        borderBottom: "1px solid hsl(220 18% 88% / 0.8)",
-        boxShadow: "0 1px 0 rgba(0,0,0,0.04)",
+        borderBottom: "1px solid #e3e8ee",
+        paddingLeft: "24px",
+        paddingRight: "24px",
+        boxShadow: "rgba(0,55,112,0.04) 0 1px 0",
       }}
     >
-      {/* Left: context info */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <Activity size={14} className="text-muted-foreground/60" />
-          <span className="text-sm text-muted-foreground hidden sm:block font-medium">
-            SCENTINEL · Monitoring Pembusukan Makanan
-          </span>
-        </div>
+      {/* Left: brand context */}
+      <div className="flex items-center gap-2.5">
+        <Activity size={13} style={{ color: "#64748d" }} />
+        <span
+          className="hidden sm:block text-sm"
+          style={{ color: "#64748d", fontWeight: 300, letterSpacing: "-0.1px" }}
+        >
+          SCENTINEL · Monitoring Pembusukan Makanan
+        </span>
       </div>
 
       {/* Right: status indicators */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
         {/* Last update */}
         {lastUpdatedAt && (
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground px-2.5 py-1.5 rounded-lg"
-            style={{ background: "hsl(220 20% 94%)" }}>
-            <Clock size={12} />
+          <div
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs"
+            style={{
+              background: "#f6f9fc",
+              border: "1px solid #e3e8ee",
+              color: "#64748d",
+              fontWeight: 300,
+              fontSize: "12px",
+            }}
+          >
+            <Clock size={11} />
             <span>Update: {formatRelativeTime(lastUpdatedAt)}</span>
           </div>
         )}
 
-        {/* SSE status */}
+        {/* SSE / connection status */}
         <div
           id="sse-status-indicator"
-          className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-500 ${isConnected
-              ? "text-emerald-600"
-              : "text-muted-foreground"
-            }`}
+          className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full transition-all duration-400"
           style={
             isConnected
               ? {
-                background: "linear-gradient(135deg, hsl(142 72% 95%), hsl(142 60% 92%))",
-                border: "1px solid hsl(142 72% 85%)",
-                boxShadow: "0 1px 4px hsl(142 72% 29% / 0.12)",
-              }
+                  background: "#ecfdf5",
+                  border: "1px solid #6ee7b7",
+                  color: "#047857",
+                  fontSize: "12px",
+                  fontWeight: 400,
+                }
               : {
-                background: "hsl(220 20% 94%)",
-                border: "1px solid hsl(220 18% 88%)",
-              }
+                  background: "#f6f9fc",
+                  border: "1px solid #e3e8ee",
+                  color: "#64748d",
+                  fontSize: "12px",
+                  fontWeight: 400,
+                }
           }
         >
           {isConnected ? (

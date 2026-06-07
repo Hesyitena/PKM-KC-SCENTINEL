@@ -33,20 +33,23 @@ export function Sidebar() {
       id="dashboard-sidebar"
       className="w-64 flex-shrink-0 flex flex-col h-full relative overflow-hidden"
       style={{
-        background: "linear-gradient(180deg, hsl(227 68% 22%) 0%, hsl(230 65% 18%) 100%)",
-        borderRight: "1px solid rgba(255,255,255,0.08)",
+        /* Stripe brand-dark-900 — the signature dark navy */
+        background: "linear-gradient(180deg, #1c1e54 0%, #16183f 100%)",
+        borderRight: "1px solid rgba(255,255,255,0.06)",
       }}
     >
-      {/* Subtle inner glow */}
+      {/* Stripe-style indigo top glow */}
       <div
-        className="absolute top-0 left-0 right-0 h-40 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.06) 0%, transparent 70%)" }}
+        className="absolute top-0 left-0 right-0 h-48 pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse 120% 80% at 50% -20%, rgba(83,58,253,0.20) 0%, transparent 65%)",
+        }}
       />
 
       {/* Logo */}
       <div
-        className="p-6 flex-shrink-0"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+        className="px-6 py-5 flex-shrink-0"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
       >
         <div className="flex items-center justify-center">
           <Image
@@ -55,11 +58,12 @@ export function Sidebar() {
             width={400}
             height={120}
             quality={100}
-            className="object-contain w-full h-auto opacity-95"
-            style={{ 
-              maxHeight: "84px",
+            className="object-contain w-full h-auto"
+            style={{
+              maxHeight: "80px",
               filter: "grayscale(100%) invert(100%) brightness(200%)",
-              mixBlendMode: "screen" 
+              mixBlendMode: "screen",
+              opacity: 0.92,
             }}
             priority
           />
@@ -67,9 +71,9 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-0.5 overflow-y-auto">
-        {/* Section label */}
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30 px-3 mb-3">
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        <p className="text-[10px] font-semibold uppercase tracking-widest px-3 mb-3"
+           style={{ color: "rgba(255,255,255,0.25)", letterSpacing: "0.1em" }}>
           Menu
         </p>
 
@@ -84,56 +88,51 @@ export function Sidebar() {
               href={item.href}
               id={`nav-${item.label.toLowerCase()}`}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative",
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 group relative",
                 "animate-fade-in",
               )}
-              style={{ animationDelay: `${i * 50}ms` }}
+              style={{
+                animationDelay: `${i * 50}ms`,
+                /* Active: indigo tint (Stripe primary subdued) */
+                ...(isActive ? {
+                  background: "rgba(83,58,253,0.18)",
+                  border: "1px solid rgba(83,58,253,0.25)",
+                  color: "#ffffff",
+                  fontWeight: 500,
+                } : {
+                  color: "rgba(255,255,255,0.42)",
+                  border: "1px solid transparent",
+                }),
+              }}
+              onMouseEnter={e => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.82)";
+                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)";
+                }
+              }}
+              onMouseLeave={e => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.42)";
+                  (e.currentTarget as HTMLElement).style.background = "transparent";
+                }
+              }}
             >
-              {/* Active background */}
+              {/* Indigo active stripe on left */}
               {isActive && (
                 <span
-                  className="absolute inset-0 rounded-xl"
-                  style={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08))",
-                    border: "1px solid rgba(255,255,255,0.15)",
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.10)",
-                  }}
+                  className="absolute left-0 top-2 bottom-2 w-0.5 rounded-r"
+                  style={{ background: "#533afd" }}
                 />
               )}
 
-              {/* Icon */}
-              <span
-                className={cn(
-                  "relative z-10 transition-transform duration-200",
-                  isActive
-                    ? "text-white"
-                    : "text-white/45 group-hover:text-white/80",
-                )}
-                style={isActive ? {} : {}}
-              >
-                <item.icon
-                  size={17}
-                  className={
-                    isActive
-                      ? ""
-                      : "group-hover:scale-105 transition-transform duration-200"
-                  }
-                />
-              </span>
+              <item.icon size={16} />
+              <span style={{ letterSpacing: "-0.1px" }}>{item.label}</span>
 
-              {/* Label */}
-              <span
-                className={cn(
-                  "relative z-10 transition-colors duration-200",
-                  isActive ? "text-white font-semibold" : "text-white/45 group-hover:text-white/80"
-                )}
-              >
-                {item.label}
-              </span>
-
-              {/* Active indicator pip */}
               {isActive && (
-                <span className="relative z-10 ml-auto w-1.5 h-1.5 rounded-full bg-white/70" />
+                <span
+                  className="ml-auto w-1.5 h-1.5 rounded-full"
+                  style={{ background: "rgba(83,58,253,0.8)" }}
+                />
               )}
             </Link>
           );
@@ -142,26 +141,30 @@ export function Sidebar() {
 
       {/* User section */}
       <div
-        className="p-4 flex-shrink-0"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+        className="px-3 py-4 flex-shrink-0"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
       >
         {/* User info */}
-        <div className="flex items-center gap-3 mb-2 px-2 py-2 rounded-xl"
-          style={{ background: "rgba(255,255,255,0.06)" }}>
-          {/* Avatar */}
+        <div
+          className="flex items-center gap-3 mb-2 px-3 py-2.5 rounded-lg"
+          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)" }}
+        >
+          {/* Avatar — Stripe primary */}
           <div
-            className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
             style={{
-              background: "linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.12))",
-              border: "1px solid rgba(255,255,255,0.20)",
+              background: "linear-gradient(135deg, #533afd, #4434d4)",
+              boxShadow: "0 2px 8px rgba(83,58,253,0.35)",
             }}
           >
             {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white/90 truncate">{user?.username}</p>
-            <p className="text-[10px] text-white/40 uppercase tracking-wider">
-              {user?.role}
+            <p className="text-sm font-medium truncate" style={{ color: "rgba(255,255,255,0.90)", letterSpacing: "-0.1px" }}>
+              {user?.username}
+            </p>
+            <p className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: "rgba(255,255,255,0.32)", letterSpacing: "0.08em" }}>
+              SCENTINEL
             </p>
           </div>
         </div>
@@ -170,9 +173,18 @@ export function Sidebar() {
         <button
           onClick={logout}
           id="sidebar-logout-btn"
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 group mt-1"
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200 group"
+          style={{ color: "rgba(255,255,255,0.35)", fontSize: "13px" }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.color = "#ea2261";
+            (e.currentTarget as HTMLElement).style.background = "rgba(234,34,97,0.08)";
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.35)";
+            (e.currentTarget as HTMLElement).style.background = "transparent";
+          }}
         >
-          <LogOut size={15} className="group-hover:translate-x-0.5 transition-transform duration-200" />
+          <LogOut size={14} />
           Keluar
         </button>
       </div>

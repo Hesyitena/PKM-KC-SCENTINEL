@@ -19,7 +19,6 @@ export function useAuth() {
     router.push("/login");
   };
 
-  const isAdmin = user?.role === "ADMIN";
   const isAuthenticated = !!token && !!user;
 
   return {
@@ -27,7 +26,6 @@ export function useAuth() {
     token,
     isLoading,
     error,
-    isAdmin,
     isAuthenticated,
     login: handleLogin,
     logout: handleLogout,

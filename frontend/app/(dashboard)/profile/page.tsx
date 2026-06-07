@@ -8,7 +8,7 @@ import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
-import { User, Shield, Lock, Loader2 } from "lucide-react";
+import { User, Lock, Loader2 } from "lucide-react";
 
 const changePasswordSchema = z
   .object({
@@ -56,6 +56,7 @@ export default function ProfilePage() {
   };
 
   return (
+    <div className="h-full overflow-y-auto p-6">
     <div className="space-y-6 max-w-2xl">
       {/* Header */}
       <div>
@@ -81,20 +82,11 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 pt-2">
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Username</p>
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <User size={14} className="text-primary" />
-              {user?.username}
-            </div>
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Role</p>
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <Shield size={14} className="text-primary" />
-              {user?.role}
-            </div>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">Username</p>
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <User size={14} className="text-primary" />
+            {user?.username}
           </div>
         </div>
       </div>
@@ -142,6 +134,7 @@ export default function ProfilePage() {
           </button>
         </form>
       </div>
+    </div>
     </div>
   );
 }
