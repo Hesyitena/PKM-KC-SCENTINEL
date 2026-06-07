@@ -106,3 +106,9 @@ class ReadingRepository:
             .order_by(SensorReading.timestamp.asc())
         )
         return list(result.scalars().all())
+
+    async def delete_all(self) -> int:
+        """Delete ALL sensor readings from database. Returns count of deleted rows."""
+        from sqlalchemy import delete
+        result = await self.db.execute(delete(SensorReading))
+        return result.rowcount

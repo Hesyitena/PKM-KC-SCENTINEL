@@ -122,3 +122,8 @@ class ReadingService:
     ) -> str:
         readings = await self.repo.get_all_for_export(device_id, start_date, end_date)
         return generate_csv_content(readings)
+
+    async def delete_all_readings(self) -> dict:
+        """Delete all sensor readings from the database."""
+        deleted_count = await self.repo.delete_all()
+        return {"message": f"{deleted_count} data pembacaan berhasil dihapus.", "deleted": deleted_count}

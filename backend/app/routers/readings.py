@@ -81,6 +81,23 @@ async def get_history(
     )
 
 
+@router.delete(
+    "/all",
+    summary="Delete All Sensor Readings",
+    status_code=200,
+)
+async def delete_all_readings(
+    db: DBSession,
+    current_user: CurrentUser,
+):
+    """
+    Permanently delete ALL sensor readings from the database.
+    This action cannot be undone.
+    """
+    service = ReadingService(db)
+    return await service.delete_all_readings()
+
+
 @router.get("/export", summary="Export Readings as CSV")
 async def export_csv(
     device_id: int | None = Query(None),
