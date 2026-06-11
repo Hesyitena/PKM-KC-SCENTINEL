@@ -13,37 +13,25 @@ export function DashboardSkeleton() {
         style={{
           background: "#ffffff",
           border: "1px solid #e3e8ee",
-          borderRadius: "12px",
+          borderRadius: "14px",
           boxShadow: "rgba(0,55,112,0.06) 0 1px 3px",
         }}
       >
-        {/* Zone 1 */}
-        <div className="flex items-center gap-4 px-6 py-4 flex-shrink-0" style={{ borderRight: "1px solid #e3e8ee", minWidth: 220 }}>
-          <div className="skeleton w-12 h-12 rounded-xl" />
-          <div className="flex flex-col gap-2">
-            <div className="skeleton h-3 w-16 rounded" />
-            <div className="skeleton h-7 w-24 rounded" />
+        {/* Zone 1: AI Prediction */}
+        <div className="flex items-center gap-5 px-8 py-5 flex-1" style={{ borderRight: "1px solid #f0f4f8" }}>
+          <div className="skeleton w-[56px] h-[56px] rounded-[14px] flex-shrink-0" />
+          <div className="flex flex-col gap-2.5">
+            <div className="skeleton h-[18px] w-24 rounded-full" />
+            <div className="skeleton h-[30px] w-32 rounded" />
           </div>
         </div>
-        {/* Zone 2 */}
-        <div className="flex items-center gap-4 px-6 py-4 flex-shrink-0" style={{ borderRight: "1px solid #e3e8ee" }}>
-          <div className="skeleton w-[88px] h-[88px] rounded-full" />
-          <div className="flex flex-col gap-2">
-            <div className="skeleton h-3 w-12 rounded" />
-            <div className="skeleton h-6 w-16 rounded" />
+        {/* Zone 2: Confidence gauge */}
+        <div className="flex items-center gap-5 px-8 py-5 flex-1">
+          <div className="skeleton w-[88px] h-[88px] rounded-full flex-shrink-0" />
+          <div className="flex flex-col gap-2.5 ml-2">
+            <div className="skeleton h-3 w-28 rounded" />
+            <div className="skeleton h-[28px] w-20 rounded" />
           </div>
-        </div>
-        {/* Zone 3 */}
-        <div className="flex flex-col justify-center px-6 py-4 flex-1" style={{ borderRight: "1px solid #e3e8ee" }}>
-          <div className="skeleton h-3 w-28 rounded mb-2" />
-          <div className="skeleton h-5 w-40 rounded mb-1" />
-          <div className="skeleton h-3 w-24 rounded" />
-        </div>
-        {/* Zone 4 */}
-        <div className="flex flex-col justify-center px-6 py-4 flex-shrink-0">
-          <div className="skeleton h-3 w-16 rounded mb-2" />
-          <div className="skeleton h-4 w-28 rounded mb-2" />
-          <div className="skeleton h-4 w-20 rounded" />
         </div>
       </div>
 

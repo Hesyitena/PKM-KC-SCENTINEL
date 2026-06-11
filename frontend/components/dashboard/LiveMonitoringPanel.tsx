@@ -137,45 +137,44 @@ export function LiveMonitoringPanel() {
       >
         {/* ── Zone 1: AI Prediction ── */}
         <div
-          className="flex items-center gap-4 px-6 py-5 flex-shrink-0"
+          className="flex items-center gap-5 px-8 py-5 flex-1"
           style={{
             background: `linear-gradient(135deg, ${S.bg} 0%, #ffffff 100%)`,
             borderRight: `1px solid ${S.border}`,
-            minWidth: 230,
           }}
         >
           {/* Icon */}
           <div
-            className="w-13 h-13 flex items-center justify-center flex-shrink-0"
+            className="flex items-center justify-center flex-shrink-0"
             style={{
               background: `linear-gradient(135deg, ${S.accent} 0%, ${S.accent}cc 100%)`,
               borderRadius: "14px",
-              width: "52px",
-              height: "52px",
+              width: "56px",
+              height: "56px",
               boxShadow: `0 6px 20px ${S.accent}40`,
             }}
           >
             {isLayak
-              ? <ShieldCheck size={24} color="#fff" strokeWidth={1.8} />
-              : <ShieldX     size={24} color="#fff" strokeWidth={1.8} />
+              ? <ShieldCheck size={28} color="#fff" strokeWidth={1.8} />
+              : <ShieldX     size={28} color="#fff" strokeWidth={1.8} />
             }
           </div>
 
           {/* Text */}
           <div>
             <div
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full mb-2"
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full mb-1.5"
               style={{
                 background: `${S.accent}18`,
                 border: `1px solid ${S.accent}30`,
               }}
             >
-              <span style={{ fontSize: "9px", fontWeight: 600, color: S.accent, letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                Hasil AI
+              <span style={{ fontSize: "10px", fontWeight: 600, color: S.accent, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                Hasil Deteksi AI
               </span>
             </div>
             <p style={{
-              fontSize: "26px",
+              fontSize: "30px",
               fontWeight: 600,
               letterSpacing: "-0.5px",
               color: S.text,
@@ -188,14 +187,14 @@ export function LiveMonitoringPanel() {
 
         {/* ── Zone 2: Confidence gauge ── */}
         <div
-          className="flex items-center gap-4 px-6 py-5 flex-shrink-0"
-          style={{ borderRight: "1px solid #f0f4f8", background: "#ffffff" }}
+          className="flex items-center gap-5 px-8 py-5 flex-1"
+          style={{ background: "#ffffff" }}
         >
-          <div className="relative flex-shrink-0">
+          <div className="relative flex-shrink-0" style={{ transform: "scale(1.15)", transformOrigin: "center left" }}>
             <ConfidenceArc value={conf} isLayak={isLayak} />
             <div className="absolute inset-0 flex items-center justify-center">
               <span style={{
-                fontSize: "16px",
+                fontSize: "14px",
                 fontWeight: 700,
                 letterSpacing: "-0.5px",
                 fontFeatureSettings: '"tnum" 1',
@@ -206,12 +205,12 @@ export function LiveMonitoringPanel() {
               </span>
             </div>
           </div>
-          <div>
-            <p style={{ fontSize: "10px", fontWeight: 500, color: "#94a3b8", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "5px" }}>
-              Confidence
+          <div className="ml-2">
+            <p style={{ fontSize: "11px", fontWeight: 500, color: "#94a3b8", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "4px" }}>
+              Confidence Level
             </p>
             <p style={{
-              fontSize: "24px",
+              fontSize: "28px",
               fontWeight: 600,
               letterSpacing: "-0.5px",
               fontFeatureSettings: '"tnum" 1',
@@ -219,59 +218,8 @@ export function LiveMonitoringPanel() {
               lineHeight: 1,
             }}>
               {confPct}
-              <span style={{ fontSize: "13px", color: "#94a3b8", marginLeft: "1px", fontWeight: 400 }}>%</span>
+              <span style={{ fontSize: "14px", color: "#94a3b8", marginLeft: "2px", fontWeight: 400 }}>%</span>
             </p>
-          </div>
-        </div>
-
-        {/* ── Zone 3: Timestamp ── */}
-        <div
-          className="flex flex-col justify-center px-6 py-5 flex-1"
-          style={{ borderRight: "1px solid #f0f4f8" }}
-        >
-          <p style={{ fontSize: "10px", fontWeight: 500, color: "#94a3b8", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "6px" }}>
-            Waktu Pembacaan
-          </p>
-          <p style={{
-            fontSize: "15px",
-            fontWeight: 500,
-            letterSpacing: "-0.3px",
-            fontFeatureSettings: '"tnum" 1',
-            color: "#0d253d",
-          }}>
-            {formatDate(latestReading.timestamp)}
-          </p>
-          <div className="flex items-center gap-1.5 mt-1.5">
-            <Clock size={10} style={{ color: "#94a3b8" }} />
-            <p style={{ fontSize: "11.5px", fontWeight: 300, color: "#94a3b8" }}>
-              Pembacaan terakhir
-            </p>
-          </div>
-        </div>
-
-        {/* ── Zone 4: Device status ── */}
-        <div className="flex flex-col justify-center px-6 py-5 flex-shrink-0">
-          <p style={{ fontSize: "10px", fontWeight: 500, color: "#94a3b8", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "6px" }}>
-            Perangkat
-          </p>
-          <div className="flex items-center gap-2 mb-2">
-            <Cpu size={13} style={{ color: "#533afd" }} />
-            <p style={{ fontSize: "14px", fontWeight: 500, color: "#0d253d", letterSpacing: "-0.2px" }}>
-              ESP32 Edge AI
-            </p>
-          </div>
-          <div
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full w-fit"
-            style={{
-              background: "linear-gradient(135deg, #ecfdf5, #d1fae5)",
-              border: "1px solid #6ee7b7",
-            }}
-          >
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
-            </span>
-            <span style={{ fontSize: "10.5px", fontWeight: 500, color: "#059669" }}>Terhubung</span>
           </div>
         </div>
       </div>
