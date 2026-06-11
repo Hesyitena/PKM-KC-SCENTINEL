@@ -99,12 +99,12 @@ export function DashboardSkeleton() {
         {/* Chart body skeleton */}
         <div className="px-3 py-2 flex-1 min-h-0 flex items-end gap-1 pb-6">
           {Array.from({ length: 20 }).map((_, i) => (
-            <div
-              key={i}
-              className="skeleton flex-1 rounded-t"
-              style={{ height: `${25 + Math.sin(i * 0.6) * 20 + Math.random() * 30}%` }}
-            />
-          ))}
+          <div
+            key={i}
+            className="skeleton flex-1 rounded-t"
+            style={{ height: `${30 + Math.sin(i * 0.7) * 18 + Math.cos(i * 1.3) * 12}%` }}
+          />
+        ))}
         </div>
       </div>
     </div>
