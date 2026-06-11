@@ -125,53 +125,61 @@ export function LiveMonitoringPanel() {
   return (
     <div id="live-monitoring-panel" className="flex flex-col gap-3 h-full min-h-0">
 
-      {/* ══ STATUS CARD — Stripe card-dashboard-mockup style ══ */}
+      {/* ══ STATUS CARD ══ */}
       <div
         className="flex-shrink-0 flex overflow-hidden"
         style={{
           background: "#ffffff",
           border: `1px solid ${S.border}`,
-          borderRadius: "12px",     /* rounded.lg */
+          borderRadius: "14px",
           boxShadow: S.shadow,
         }}
       >
-
-        {/* ── Zone 1: AI Prediction (hero) ── */}
+        {/* ── Zone 1: AI Prediction ── */}
         <div
-          className="flex items-center gap-4 px-6 py-4 flex-shrink-0"
+          className="flex items-center gap-4 px-6 py-5 flex-shrink-0"
           style={{
-            background: S.bg,
+            background: `linear-gradient(135deg, ${S.bg} 0%, #ffffff 100%)`,
             borderRight: `1px solid ${S.border}`,
-            minWidth: 220,
+            minWidth: 230,
           }}
         >
-          {/* Stripe-style icon: flat rounded square */}
+          {/* Icon */}
           <div
-            className="w-12 h-12 flex items-center justify-center flex-shrink-0"
+            className="w-13 h-13 flex items-center justify-center flex-shrink-0"
             style={{
-              background: S.accent,
-              borderRadius: "12px",
-              boxShadow: `0 4px 14px ${S.accent}40`,
+              background: `linear-gradient(135deg, ${S.accent} 0%, ${S.accent}cc 100%)`,
+              borderRadius: "14px",
+              width: "52px",
+              height: "52px",
+              boxShadow: `0 6px 20px ${S.accent}40`,
             }}
           >
             {isLayak
-              ? <ShieldCheck size={22} color="#fff" strokeWidth={2} />
-              : <ShieldX     size={22} color="#fff" strokeWidth={2} />
+              ? <ShieldCheck size={24} color="#fff" strokeWidth={1.8} />
+              : <ShieldX     size={24} color="#fff" strokeWidth={1.8} />
             }
           </div>
 
-          {/* Prediction text — Stripe display-md: weight 300, -0.26px */}
+          {/* Text */}
           <div>
-            <p style={{ fontSize: "10px", fontWeight: 400, color: S.accent, letterSpacing: "0.1px", textTransform: "uppercase", marginBottom: "4px" }}>
-              Hasil AI
-            </p>
+            <div
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full mb-2"
+              style={{
+                background: `${S.accent}18`,
+                border: `1px solid ${S.accent}30`,
+              }}
+            >
+              <span style={{ fontSize: "9px", fontWeight: 600, color: S.accent, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                Hasil AI
+              </span>
+            </div>
             <p style={{
-              fontSize: "28px",
-              fontWeight: 300,
-              letterSpacing: "-0.26px",
+              fontSize: "26px",
+              fontWeight: 600,
+              letterSpacing: "-0.5px",
               color: S.text,
               lineHeight: 1.0,
-              fontFeatureSettings: '"ss01" 1',
             }}>
               {latestReading.prediction}
             </p>
@@ -180,16 +188,16 @@ export function LiveMonitoringPanel() {
 
         {/* ── Zone 2: Confidence gauge ── */}
         <div
-          className="flex items-center gap-4 px-6 py-4 flex-shrink-0"
-          style={{ borderRight: "1px solid #e3e8ee", background: "#ffffff" }}
+          className="flex items-center gap-4 px-6 py-5 flex-shrink-0"
+          style={{ borderRight: "1px solid #f0f4f8", background: "#ffffff" }}
         >
           <div className="relative flex-shrink-0">
             <ConfidenceArc value={conf} isLayak={isLayak} />
             <div className="absolute inset-0 flex items-center justify-center">
               <span style={{
-                fontSize: "17px",
-                fontWeight: 600,
-                letterSpacing: "-0.42px",
+                fontSize: "16px",
+                fontWeight: 700,
+                letterSpacing: "-0.5px",
                 fontFeatureSettings: '"tnum" 1',
                 color: S.text,
                 lineHeight: 1,
@@ -199,67 +207,71 @@ export function LiveMonitoringPanel() {
             </div>
           </div>
           <div>
-            <p style={{ fontSize: "10px", fontWeight: 400, color: "#64748d", letterSpacing: "0.1px", textTransform: "uppercase", marginBottom: "4px" }}>
-              Akurasi
+            <p style={{ fontSize: "10px", fontWeight: 500, color: "#94a3b8", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "5px" }}>
+              Confidence
             </p>
-            {/* Stripe body-tabular style */}
             <p style={{
-              fontSize: "22px",
-              fontWeight: 300,
-              letterSpacing: "-0.42px",
-              fontFeatureSettings: '"tnum" 1, "ss01" 1',
+              fontSize: "24px",
+              fontWeight: 600,
+              letterSpacing: "-0.5px",
+              fontFeatureSettings: '"tnum" 1',
               color: "#0d253d",
               lineHeight: 1,
             }}>
               {confPct}
-              <span style={{ fontSize: "13px", color: "#64748d", marginLeft: "2px", fontWeight: 300 }}>%</span>
+              <span style={{ fontSize: "13px", color: "#94a3b8", marginLeft: "1px", fontWeight: 400 }}>%</span>
             </p>
           </div>
         </div>
 
         {/* ── Zone 3: Timestamp ── */}
         <div
-          className="flex flex-col justify-center px-6 py-4 flex-1"
-          style={{ borderRight: "1px solid #e3e8ee" }}
+          className="flex flex-col justify-center px-6 py-5 flex-1"
+          style={{ borderRight: "1px solid #f0f4f8" }}
         >
-          <div className="flex items-center gap-1.5 mb-1">
-            <Clock size={10} style={{ color: "#64748d" }} />
-            <p style={{ fontSize: "10px", fontWeight: 400, color: "#64748d", letterSpacing: "0.1px", textTransform: "uppercase" }}>
-              Waktu Pembacaan
-            </p>
-          </div>
-          {/* Stripe body-tabular for the timestamp */}
+          <p style={{ fontSize: "10px", fontWeight: 500, color: "#94a3b8", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "6px" }}>
+            Waktu Pembacaan
+          </p>
           <p style={{
             fontSize: "15px",
-            fontWeight: 400,
-            letterSpacing: "-0.42px",
+            fontWeight: 500,
+            letterSpacing: "-0.3px",
             fontFeatureSettings: '"tnum" 1',
             color: "#0d253d",
           }}>
             {formatDate(latestReading.timestamp)}
           </p>
-          <p style={{ fontSize: "12px", fontWeight: 300, color: "#64748d", marginTop: "2px" }}>
-            Pembacaan terakhir
-          </p>
+          <div className="flex items-center gap-1.5 mt-1.5">
+            <Clock size={10} style={{ color: "#94a3b8" }} />
+            <p style={{ fontSize: "11.5px", fontWeight: 300, color: "#94a3b8" }}>
+              Pembacaan terakhir
+            </p>
+          </div>
         </div>
 
         {/* ── Zone 4: Device status ── */}
-        <div className="flex flex-col justify-center px-6 py-4 flex-shrink-0">
-          <div className="flex items-center gap-1.5 mb-1">
-            <Cpu size={10} style={{ color: "#64748d" }} />
-            <p style={{ fontSize: "10px", fontWeight: 400, color: "#64748d", letterSpacing: "0.1px", textTransform: "uppercase" }}>
-              Perangkat
+        <div className="flex flex-col justify-center px-6 py-5 flex-shrink-0">
+          <p style={{ fontSize: "10px", fontWeight: 500, color: "#94a3b8", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "6px" }}>
+            Perangkat
+          </p>
+          <div className="flex items-center gap-2 mb-2">
+            <Cpu size={13} style={{ color: "#533afd" }} />
+            <p style={{ fontSize: "14px", fontWeight: 500, color: "#0d253d", letterSpacing: "-0.2px" }}>
+              ESP32 Edge AI
             </p>
           </div>
-          <p style={{ fontSize: "14px", fontWeight: 400, color: "#0d253d", letterSpacing: "-0.1px" }}>
-            ESP32 Edge AI
-          </p>
-          <div className="flex items-center gap-1.5 mt-1.5">
-            <span className="relative flex h-2 w-2">
+          <div
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full w-fit"
+            style={{
+              background: "linear-gradient(135deg, #ecfdf5, #d1fae5)",
+              border: "1px solid #6ee7b7",
+            }}
+          >
+            <span className="relative flex h-1.5 w-1.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
             </span>
-            <span style={{ fontSize: "12px", fontWeight: 300, color: "#047857" }}>Terhubung</span>
+            <span style={{ fontSize: "10.5px", fontWeight: 500, color: "#059669" }}>Terhubung</span>
           </div>
         </div>
       </div>
