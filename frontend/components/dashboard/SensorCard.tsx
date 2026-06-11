@@ -87,6 +87,7 @@ export function SensorCard({
   const effectiveMax = max ?? Math.max(numVal * 1.5, 1);
   const barPct = Math.min(100, Math.max(2, (numVal / effectiveMax) * 100));
   const [modalOpen, setModalOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const tipText = tooltip ?? SENSOR_TOOLTIPS[id];
 
@@ -94,27 +95,29 @@ export function SensorCard({
     <>
       <div
         id={id}
-        className="group relative cursor-default transition-all duration-200 hover:-translate-y-0.5"
+        className="relative cursor-default transition-all duration-200"
         style={{
           background: "#ffffff",
-          border: "1px solid #e3e8ee",
+          border: `1px solid ${isHovered ? cfg.accentLight : "#e3e8ee"}`,
           borderRadius: "12px",
           padding: "12px 14px",
-          boxShadow: "rgba(0,55,112,0.06) 0 1px 3px",
+          boxShadow: isHovered
+            ? "rgba(0,55,112,0.08) 0 4px 14px, rgba(0,55,112,0.04) 0 1px 3px"
+            : "rgba(0,55,112,0.06) 0 1px 3px",
+          transform: isHovered ? "translateY(-2px)" : "translateY(0)",
+          transition: "all 0.2s ease",
         }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.boxShadow = `rgba(0,55,112,0.08) 0 4px 14px, rgba(0,55,112,0.04) 0 1px 3px`;
-          (e.currentTarget as HTMLElement).style.borderColor = cfg.accentLight;
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLElement).style.boxShadow = "rgba(0,55,112,0.06) 0 1px 3px";
-          (e.currentTarget as HTMLElement).style.borderColor = "#e3e8ee";
-        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         {/* Top accent line — visible on hover */}
         <div
-          className="absolute top-0 inset-x-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-          style={{ background: cfg.accent, borderRadius: "12px 12px 0 0" }}
+          className="absolute top-0 inset-x-0 h-[2px] transition-opacity duration-200"
+          style={{
+            background: cfg.accent,
+            borderRadius: "12px 12px 0 0",
+            opacity: isHovered ? 1 : 0,
+          }}
         />
 
         {/* Label + Icon row */}
@@ -138,23 +141,17 @@ export function SensorCard({
                 id={`${id}-info-btn`}
                 type="button"
                 aria-label={`Info ${label}`}
-                title={`Lihat info ${label}`}
-                className="flex items-center justify-center w-5 h-5 rounded opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+                className="flex items-center justify-center w-5 h-5 rounded transition-all duration-200"
                 style={{
-                  color: "#a8c3de",
-                  background: "transparent",
+                  color: isHovered ? cfg.accent : "transparent",
+                  background: isHovered ? cfg.iconBg : "transparent",
+                  opacity: isHovered ? 1 : 0,
+                  pointerEvents: isHovered ? "auto" : "none",
+                  transform: isHovered ? "scale(1)" : "scale(0.8)",
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
                   setModalOpen(true);
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.color = cfg.accent;
-                  (e.currentTarget as HTMLElement).style.background = cfg.iconBg;
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.color = "#a8c3de";
-                  (e.currentTarget as HTMLElement).style.background = "transparent";
                 }}
               >
                 <Info size={12} />
