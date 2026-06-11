@@ -1,12 +1,15 @@
 "use client";
 
+import { useRef } from "react";
 import { useSSE } from "@/lib/useSSE";
 import { useMockSSE } from "@/lib/useMockSSE";
 import { useSensorStore } from "@/store/sensorStore";
 import { SensorReading } from "@/types/reading";
 import { SensorCard } from "./SensorCard";
 import { GasChart } from "./GasChart";
+import { DashboardSkeleton } from "./DashboardSkeleton";
 import { formatDate } from "@/lib/utils";
+import { toast } from "sonner";
 import {
   Thermometer,
   Droplets,
@@ -14,7 +17,6 @@ import {
   FlaskConical,
   Clock,
   BarChart3,
-  Wifi,
   ShieldCheck,
   ShieldX,
   Cpu,
@@ -52,42 +54,57 @@ export function LiveMonitoringPanel() {
   const { latestReading, chartData, setConnected, pushChartReading } =
     useSensorStore();
 
+  // Track previous prediction to fire toast only on change
+  const prevPredictionRef = useRef<string | null>(null);
+  const wasConnectedRef = useRef<boolean>(false);
+
   const handleReading = (reading: SensorReading) => {
     pushChartReading(reading);
     setConnected(true);
+
+    // Toast: reconnect
+    if (!wasConnectedRef.current) {
+      wasConnectedRef.current = true;
+      toast.success("Perangkat ESP32 terhubung", {
+        description: "Live stream aktif — data sedang masuk.",
+        duration: 3000,
+      });
+    }
+
+    // Toast: prediction change
+    if (prevPredictionRef.current !== null && prevPredictionRef.current !== reading.prediction) {
+      if (reading.prediction === "TIDAK LAYAK") {
+        toast.error("Peringatan: Kualitas Menurun!", {
+          description: `Deteksi AI: TIDAK LAYAK (${((reading.confidence ?? 0) * 100).toFixed(1)}% confidence)`,
+          duration: 5000,
+        });
+      } else {
+        toast.success("Status kembali normal", {
+          description: `Deteksi AI: LAYAK (${((reading.confidence ?? 0) * 100).toFixed(1)}% confidence)`,
+          duration: 4000,
+        });
+      }
+    }
+    prevPredictionRef.current = reading.prediction;
   };
-  const handleError = () => setConnected(false);
+
+  const handleError = () => {
+    setConnected(false);
+    if (wasConnectedRef.current) {
+      wasConnectedRef.current = false;
+      toast.warning("Koneksi terputus", {
+        description: "Mencoba menghubungkan kembali ke perangkat...",
+        duration: 4000,
+      });
+    }
+  };
 
   useSSE({ onReading: handleReading, onError: handleError, enabled: !DEMO_MODE });
   useMockSSE({ onReading: handleReading, enabled: DEMO_MODE });
 
-  /* ── Empty state ── */
+  /* ── Loading skeleton state ── */
   if (!latestReading) {
-    return (
-      <div
-        id="live-panel-empty"
-        className="flex flex-col items-center justify-center h-full gap-5"
-        style={{
-          background: "#ffffff",
-          border: "1px solid #e3e8ee",
-          borderRadius: "12px",
-          boxShadow: "rgba(0,55,112,0.06) 0 1px 3px",
-        }}
-      >
-        <div
-          className="w-14 h-14 flex items-center justify-center"
-          style={{ background: "rgba(83,58,253,0.06)", border: "1px solid rgba(83,58,253,0.12)", borderRadius: "12px" }}
-        >
-          <Wifi size={24} style={{ color: "#b9b9f9" }} />
-        </div>
-        <div className="text-center">
-          <p style={{ fontSize: "15px", fontWeight: 300, color: "#273951" }}>Menunggu data perangkat…</p>
-          <p style={{ fontSize: "13px", fontWeight: 300, color: "#64748d", marginTop: "4px" }}>
-            Pastikan ESP32 menyala dan terhubung ke jaringan.
-          </p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   const isLayak = latestReading.prediction === "LAYAK";
