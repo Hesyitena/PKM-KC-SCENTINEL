@@ -30,7 +30,7 @@ export function ReadingTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border">
-              {["Waktu", "Makanan", "MQ-3", "MQ-4", "MQ-135", "TGS-2602", "Suhu", "Lembap", "Hasil", "Keyakinan"].map(
+              {["Waktu", "Makanan", "MQ-3", "MQ-4", "MQ-135", "TGS-2602", "Suhu", "Lembap", "Hasil", "Confidence"].map(
                 (h) => (
                   <th
                     key={h}
