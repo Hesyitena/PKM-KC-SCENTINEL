@@ -12,13 +12,15 @@ export function Navbar() {
       id="dashboard-navbar"
       className="h-14 flex items-center justify-between flex-shrink-0"
       style={{
-        /* Stripe nav-bar-on-mesh: canvas white, hairline border */
-        background: "rgba(255,255,255,0.92)",
-        backdropFilter: "blur(12px)",
-        borderBottom: "1px solid #e3e8ee",
+        /* Refined translucent navbar */
+        background: "rgba(255, 255, 255, 0.85)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        borderBottom: "1px solid rgba(0,0,0,0.04)",
         paddingLeft: "24px",
         paddingRight: "24px",
-        boxShadow: "rgba(0,55,112,0.04) 0 1px 0",
+        boxShadow: "0 4px 20px -2px rgba(0,0,0,0.03)",
+        zIndex: 10,
       }}
     >
       {/* Left: brand context */}
