@@ -33,6 +33,7 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
+      {/* Sidebar handles mobile (fixed overlay) and desktop (static) internally */}
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Navbar />
@@ -46,3 +47,4 @@ export default function DashboardLayout({
     </div>
   );
 }
+
