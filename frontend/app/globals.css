@@ -90,31 +90,6 @@
   --radius:              0.75rem;
 }
 
-/* ── Dark mode overrides ── */
-html.dark {
-  --stripe-ink:              #e2e8f4;
-  --stripe-ink-secondary:    #b8c5d8;
-  --stripe-ink-mute:         #7a8fa8;
-  --stripe-canvas:           #111827;
-  --stripe-canvas-soft:      #0f172a;
-  --stripe-hairline:         #1e2d45;
-  --stripe-hairline-input:   #2d3f5a;
-  --shadow-1: rgba(0,0,0,0.3) 0 1px 3px;
-  --shadow-2: rgba(0,0,0,0.4) 0 8px 24px, rgba(0,0,0,0.2) 0 2px 6px;
-
-  /* Tailwind dark bridge */
-  --background:          222 47% 7%;
-  --foreground:          213 60% 90%;
-  --card:                222 40% 10%;
-  --card-foreground:     213 60% 90%;
-  --popover:             222 40% 10%;
-  --popover-foreground:  213 60% 90%;
-  --muted:               217 33% 14%;
-  --muted-foreground:    215 20% 55%;
-  --border:              217 33% 18%;
-  --input:               217 33% 20%;
-}
-
 /* ── Base styles ── */
 @layer base {
   * { @apply border-border; }
