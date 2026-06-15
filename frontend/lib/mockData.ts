@@ -8,10 +8,6 @@ export const LIVE_INTERVAL_MS = 1500;
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
-function hoursAgo(h: number): string {
-  return new Date(Date.now() - h * 60 * 60 * 1000).toISOString();
-}
-
 function minutesAgo(m: number): string {
   return new Date(Date.now() - m * 60 * 1000).toISOString();
 }
