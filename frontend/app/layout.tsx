@@ -1,12 +1,27 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans, Space_Grotesk, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 
-const inter = Inter({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-jakarta",
   display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-grotesk",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -29,16 +44,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
+      <body className={`${plusJakartaSans.variable} ${spaceGrotesk.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}>
         {children}
         <Toaster
           position="top-right"
           richColors
           toastOptions={{
             style: {
-              fontFamily: "Inter, system-ui, sans-serif",
+              fontFamily: "var(--font-jakarta), system-ui, sans-serif",
               fontSize: "13px",
-              fontWeight: 300,
+              fontWeight: 400,
             },
           }}
         />
