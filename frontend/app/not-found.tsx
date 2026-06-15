@@ -1,19 +1,30 @@
-import Link from "next/link";
+import Link from 'next/link'
+import { FileQuestion } from 'lucide-react'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center bg-background">
-      <p className="text-8xl font-black gradient-text">404</p>
-      <h2 className="text-xl font-semibold">Halaman Tidak Ditemukan</h2>
-      <p className="text-sm text-muted-foreground">
-        Halaman yang kamu cari tidak ada atau sudah dipindahkan.
-      </p>
-      <Link
-        href="/"
-        className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
-      >
-        Kembali ke Dashboard
-      </Link>
+    <div className="flex min-h-screen items-center justify-center bg-background p-6">
+      <div className="stripe-card-elevated max-w-md w-full p-8 text-center space-y-6">
+        <div className="flex justify-center">
+          <div className="rounded-full bg-primary/10 p-4">
+            <FileQuestion className="h-12 w-12 text-primary" />
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <h1 className="text-4xl font-display font-bold text-foreground">404</h1>
+          <h2 className="text-xl font-display font-semibold text-foreground">
+            Halaman Tidak Ditemukan
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Maaf, halaman yang Anda cari tidak dapat ditemukan.
+          </p>
+        </div>
+
+        <Link href="/" className="btn-primary inline-block">
+          Kembali ke Dashboard
+        </Link>
+      </div>
     </div>
-  );
+  )
 }
