@@ -4,10 +4,7 @@ import { useDevices } from "@/hooks/useDevices";
 import { formatRelativeTime } from "@/lib/utils";
 import {
   Cpu,
-  Wifi,
   WifiOff,
-  Clock,
-  Tag,
   Radio,
   Terminal,
   Globe,
