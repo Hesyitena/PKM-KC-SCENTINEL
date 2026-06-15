@@ -138,8 +138,8 @@ export function GasChart({ data, height = 300 }: GasChartProps) {
           <defs>
             {GAS_LINES.map((line) => (
               <linearGradient key={line.gradientId} id={line.gradientId} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%"  stopColor={line.color} stopOpacity={0.22} />
-                <stop offset="95%" stopColor={line.color} stopOpacity={0.01} />
+                <stop offset="5%"  stopColor={line.color} stopOpacity={0.28} />
+                <stop offset="95%" stopColor={line.color} stopOpacity={0.02} />
               </linearGradient>
             ))}
           </defs>
@@ -179,7 +179,7 @@ export function GasChart({ data, height = 300 }: GasChartProps) {
               dataKey={line.key}
               name={line.name}
               stroke={line.color}
-              strokeWidth={2.5}
+              strokeWidth={3}
               fill={`url(#${line.gradientId})`}
               dot={false}
               activeDot={{
