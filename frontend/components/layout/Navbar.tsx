@@ -28,7 +28,7 @@ export function Navbar() {
         style={{ paddingLeft: "20px", paddingRight: "20px" }}
       >
         {/* ── LEFT: hamburger (mobile only) + brand ── */}
-        <div className="flex items-center gap-3">
+<div className="flex items-center gap-4">
           {/* Hamburger mobile */}
           <button
             id="navbar-hamburger-btn"
@@ -47,8 +47,32 @@ export function Navbar() {
             <Menu size={17} />
           </button>
 
-          {/* Logo text — hidden on mobile since sidebar already has it */}
-          <div className="hidden lg:flex items-center gap-2.5">
+          {/* Logo PENS + Tulisan */}
+          <div className="flex items-center gap-3">
+            <Image
+              src="/Logo_PENS.png"
+              alt="Logo PENS"
+              width={48}
+              height={48}
+              className="flex-shrink-0"
+              priority
+            />
+            <span
+              style={{
+                fontSize: "14px",
+                fontWeight: 700,
+                fontFamily: "'Liberation Sans', 'Arial', sans-serif",
+                color: "#0d253d",
+                letterSpacing: "-0.2px",
+                lineHeight: "1.3",
+              }}
+            >
+              Politeknik Elektronika Negeri Surabaya
+            </span>
+          </div>
+
+          {/* SCENTINEL brand — hidden on small screens */}
+          <div className="hidden xl:flex items-center gap-2.5 ml-4 pl-4 border-l border-gray-200">
             <div
               className="w-6 h-6 flex items-center justify-center rounded-md flex-shrink-0"
               style={{ background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)" }}
@@ -74,7 +98,7 @@ export function Navbar() {
                   letterSpacing: "-0.1px",
                 }}
               >
-                · Monitoring Pembusukan Makanan
+                · Monitoring
               </span>
             </div>
           </div>
