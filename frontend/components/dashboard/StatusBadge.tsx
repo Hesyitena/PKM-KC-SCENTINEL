@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { PredictionLabel } from "@/types/reading";
-import { CheckCircle2, XCircle, Sparkles } from "lucide-react";
+import { CheckCircle2, XCircle } from "lucide-react";
 
 interface StatusBadgeProps {
   prediction: PredictionLabel;
