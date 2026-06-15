@@ -2,7 +2,7 @@
 
 import { Device } from "@/types/device";
 import { formatRelativeTime } from "@/lib/utils";
-import { Cpu, Wifi, WifiOff, Clock, Tag, Radio } from "lucide-react";
+import { Cpu, WifiOff, Clock, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DeviceStatusCardProps {
