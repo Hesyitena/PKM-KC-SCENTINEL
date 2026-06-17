@@ -6,6 +6,7 @@ GET  /readings/history   →  Paginated history (JWT)
 GET  /readings/export    →  Export CSV (JWT)
 """
 from datetime import datetime
+from typing import Annotated
 from fastapi import APIRouter, Query
 from fastapi.responses import StreamingResponse
 import io
@@ -43,9 +44,9 @@ async def submit_reading(
     summary="Get Latest Sensor Reading",
 )
 async def get_latest(
-    device_id: int | None = Query(None),
-    current_user: CurrentUser = ...,
-    db: DBSession = ...,
+    current_user: CurrentUser,
+    db: DBSession,
+    device_id: Annotated[int | None, Query()] = None,
 ):
     """Get the most recent sensor reading, optionally filtered by device."""
     service = ReadingService(db)
@@ -58,15 +59,15 @@ async def get_latest(
     summary="Get Reading History",
 )
 async def get_history(
-    device_id: int | None = Query(None),
-    start_date: datetime | None = Query(None),
-    end_date: datetime | None = Query(None),
-    prediction: PredictionLabel | None = Query(None),
-    food_name: str | None = Query(None),
-    limit: int = Query(50, ge=1, le=500),
-    offset: int = Query(0, ge=0),
-    current_user: CurrentUser = ...,
-    db: DBSession = ...,
+    current_user: CurrentUser,
+    db: DBSession,
+    device_id: Annotated[int | None, Query()] = None,
+    start_date: Annotated[datetime | None, Query()] = None,
+    end_date: Annotated[datetime | None, Query()] = None,
+    prediction: Annotated[PredictionLabel | None, Query()] = None,
+    food_name: Annotated[str | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=500)] = 50,
+    offset: Annotated[int, Query(ge=0)] = 0,
 ):
     """Get paginated sensor reading history with optional filters."""
     service = ReadingService(db)
@@ -100,11 +101,11 @@ async def delete_all_readings(
 
 @router.get("/export", summary="Export Readings as CSV")
 async def export_csv(
-    device_id: int | None = Query(None),
-    start_date: datetime | None = Query(None),
-    end_date: datetime | None = Query(None),
-    current_user: CurrentUser = ...,
-    db: DBSession = ...,
+    current_user: CurrentUser,
+    db: DBSession,
+    device_id: Annotated[int | None, Query()] = None,
+    start_date: Annotated[datetime | None, Query()] = None,
+    end_date: Annotated[datetime | None, Query()] = None,
 ):
     """Export sensor readings as a downloadable CSV file."""
     service = ReadingService(db)
