@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -15,8 +15,15 @@ export default function DashboardLayout({
 }) {
   const { token, setUser } = useAuthStore();
   const router = useRouter();
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+
     // Demo mode: inject user dummy agar token tidak null
     if (DEMO_MODE && !token) {
       setUser({ id: 1, username: "demo", created_at: new Date().toISOString() });
@@ -24,11 +31,17 @@ export default function DashboardLayout({
       useAuthStore.setState({ token: "demo-token" });
       return;
     }
+    
     if (!DEMO_MODE && !token) {
+      // Clear cookie just in case there's a desync between cookie and localStorage
+      document.cookie = "access_token=; path=/; max-age=0; SameSite=Strict";
       router.replace("/login");
     }
-  }, [token, router, setUser]);
+  }, [token, router, setUser, isHydrated]);
 
+  // Prevent rendering anything until client hydration is complete
+  if (!isHydrated) return null;
+  
   if (!DEMO_MODE && !token) return null;
 
   return (
