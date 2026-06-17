@@ -8,7 +8,7 @@ from app.main import app
 
 @pytest.mark.asyncio
 async def test_login_success():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore[arg-type]
         response = await client.post("/api/auth/login", json={
             "username": "admin",
             "password": "admin123"
@@ -22,7 +22,7 @@ async def test_login_success():
 
 @pytest.mark.asyncio
 async def test_login_invalid_credentials():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore[arg-type]
         response = await client.post("/api/auth/login", json={
             "username": "admin",
             "password": "wrongpassword"
@@ -32,6 +32,6 @@ async def test_login_invalid_credentials():
 
 @pytest.mark.asyncio
 async def test_get_me_without_token():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore[arg-type]
         response = await client.get("/api/auth/me")
     assert response.status_code == 401
