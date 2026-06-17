@@ -22,6 +22,7 @@ const geistMono = Geist_Mono({
   variable: "--font-mono",
   display: "swap",
   weight: ["400", "500", "600"],
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {
