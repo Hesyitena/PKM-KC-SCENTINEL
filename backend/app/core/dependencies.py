@@ -43,7 +43,7 @@ async def verify_esp32_api_key(
     api_key: Annotated[str | None, Security(api_key_header)],
 ) -> str:
     """Validate the static ESP32 API key from X-API-Key header."""
-    if api_key != settings.ESP32_API_KEY:
+    if not api_key or api_key != settings.ESP32_API_KEY:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid or missing API key",
