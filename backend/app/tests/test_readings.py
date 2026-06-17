@@ -15,7 +15,7 @@ async def test_submit_reading_invalid_api_key():
         "temperature": 27.5, "humidity": 65.0,
         "prediction": "LAYAK", "confidence": 0.95, "food_name": "Ayam"
     }
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore[arg-type]
         response = await client.post(
             "/api/readings/",
             json=payload,
@@ -32,7 +32,7 @@ async def test_submit_reading_valid_api_key():
         "temperature": 27.5, "humidity": 65.0,
         "prediction": "LAYAK", "confidence": 0.95, "food_name": "Ayam"
     }
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore[arg-type]
         response = await client.post(
             "/api/readings/",
             json=payload,
