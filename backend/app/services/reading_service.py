@@ -9,7 +9,7 @@ from datetime import datetime
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.reading import SensorReading
+from app.models.reading import SensorReading, PredictionLabel
 from app.repositories.reading_repository import ReadingRepository
 from app.repositories.device_repository import DeviceRepository
 from app.schemas.reading import (
@@ -93,7 +93,7 @@ class ReadingService:
         device_id: int | None,
         start_date: datetime | None,
         end_date: datetime | None,
-        prediction: str | None,
+        prediction: PredictionLabel | None,
         food_name: str | None,
         limit: int,
         offset: int,
