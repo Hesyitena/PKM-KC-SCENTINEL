@@ -15,7 +15,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "/api";
+const API_BASE = "/api";
 
 // Info baris helper
 function InfoRow({ label, value, mono = false }: { label: string; value: React.ReactNode; mono?: boolean }) {
