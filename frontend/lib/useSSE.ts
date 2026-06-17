@@ -2,9 +2,10 @@
 
 import { useEffect, useCallback, useRef } from "react";
 import { SensorReading } from "@/types/reading";
+import api from "@/lib/api";
 
 interface UseSSEOptions {
-  onReading?: (reading: SensorReading) => void;
+  onReading?: (reading: SensorReading, isLive?: boolean) => void;
   onError?: (error: Event) => void;
   enabled?: boolean;
 }
@@ -18,14 +19,33 @@ export function useSSE({
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectDelayRef = useRef(1000); // start at 1s, backoff up to 30s
 
+  const onReadingRef = useRef(onReading);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => { onReadingRef.current = onReading; }, [onReading]);
+  useEffect(() => { onErrorRef.current = onError; }, [onError]);
+
+  // Fetch latest reading immediately from REST API (before SSE connects)
+  useEffect(() => {
+    if (!enabled || typeof window === "undefined") return;
+    api.get<SensorReading>("/readings/latest")
+      .then((res) => {
+        onReadingRef.current?.(res.data, false);
+      })
+      .catch(() => {
+        // No data yet, silently ignore
+      });
+  }, [enabled]);
+
   const connect = useCallback(() => {
     if (!enabled || typeof window === "undefined") return;
 
     const token = localStorage.getItem("access_token");
-    const sseUrl = process.env.NEXT_PUBLIC_SSE_URL || "http://localhost/api/stream";
-    const url = token ? `${sseUrl}?token=${token}` : sseUrl;
+    if (!token) return; // Can't connect to SSE without a token
 
-    const es = new EventSource(url);
+    // Pass token as query param — EventSource cannot set custom headers
+    const sseUrl = `/api/stream?token=${encodeURIComponent(token)}`;
+    const es = new EventSource(sseUrl);
     eventSourceRef.current = es;
 
     es.addEventListener("connected", () => {
@@ -36,7 +56,7 @@ export function useSSE({
     es.addEventListener("reading", (event: MessageEvent) => {
       try {
         const reading: SensorReading = JSON.parse(event.data);
-        onReading?.(reading);
+        onReadingRef.current?.(reading, true);
       } catch (err) {
         console.error("[SSE] Failed to parse reading:", err);
       }
@@ -45,7 +65,7 @@ export function useSSE({
     es.onerror = (error) => {
       console.warn("[SSE] Error, reconnecting...");
       es.close();
-      onError?.(error);
+      onErrorRef.current?.(error);
 
       // Exponential backoff reconnect
       reconnectTimeoutRef.current = setTimeout(() => {
@@ -53,7 +73,7 @@ export function useSSE({
         connect();
       }, reconnectDelayRef.current);
     };
-  }, [enabled, onReading, onError]);
+  }, [enabled]);
 
   useEffect(() => {
     connect();
