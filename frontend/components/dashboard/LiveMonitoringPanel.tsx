@@ -87,16 +87,19 @@ export function LiveMonitoringPanel() {
   const prevPredictionRef = useRef<string | null>(null);
   const wasConnectedRef = useRef<boolean>(false);
 
-  const handleReading = (reading: SensorReading) => {
+  const handleReading = (reading: SensorReading, isLive = true) => {
     pushChartReading(reading);
-    setConnected(true);
+    
+    if (isLive) {
+      setConnected(true);
 
-    if (!wasConnectedRef.current) {
-      wasConnectedRef.current = true;
-      toast.success("Perangkat ESP32 terhubung", {
-        description: "Live stream aktif — data sedang masuk.",
-        duration: 3000,
-      });
+      if (!wasConnectedRef.current) {
+        wasConnectedRef.current = true;
+        toast.success("Perangkat ESP32 terhubung", {
+          description: "Live stream aktif — data sedang masuk.",
+          duration: 3000,
+        });
+      }
     }
 
     if (prevPredictionRef.current !== null && prevPredictionRef.current !== reading.prediction) {
