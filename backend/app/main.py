@@ -51,3 +51,13 @@ app.include_router(stream.router, prefix="/api", tags=["Realtime SSE"])
 async def health_check():
     """Health check endpoint."""
     return {"status": "ok", "service": "SCENTINEL API", "version": "1.0.0"}
+
+
+@app.get("/api", tags=["Root"])
+async def root():
+    """Root endpoint."""
+    return {
+        "message": "Welcome to SCENTINEL API",
+        "docs": "/api/docs",
+        "health": "/api/health"
+    }
