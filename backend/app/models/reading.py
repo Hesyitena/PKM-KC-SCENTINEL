@@ -4,10 +4,14 @@ Stores all sensor data and AI prediction results from ESP32 devices.
 """
 import enum
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 from sqlalchemy import String, Float, Enum, DateTime, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.database import Base
+
+if TYPE_CHECKING:
+    from app.models.device import Device
 
 
 class PredictionLabel(str, enum.Enum):
