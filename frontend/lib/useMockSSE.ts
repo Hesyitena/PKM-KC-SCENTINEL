@@ -15,7 +15,7 @@ import {
 const INIT_BATCH_DELAY_MS = 40;
 
 interface UseMockSSEOptions {
-  onReading?: (reading: SensorReading) => void;
+  onReading?: (reading: SensorReading, isLive?: boolean) => void;
   onError?: (error: Event) => void;
   enabled?: boolean;
 }
@@ -46,7 +46,7 @@ export function useMockSSE({
     liveTimerRef.current = setInterval(() => {
       const next = generateNextReading(latestRef.current);
       latestRef.current = next;
-      onReadingRef.current?.(next);
+      onReadingRef.current?.(next, true);
     }, LIVE_INTERVAL_MS);
   }, []);
 
@@ -61,7 +61,7 @@ export function useMockSSE({
       if (idx < initialBatch.length) {
         const reading = initialBatch[idx];
         latestRef.current = reading;
-        onReadingRef.current?.(reading);
+        onReadingRef.current?.(reading, false);
         idx++;
       } else {
         // Done with initial batch → clear and start live stream
