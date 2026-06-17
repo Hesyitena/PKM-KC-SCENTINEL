@@ -4,10 +4,14 @@ Represents ESP32 IoT devices registered in the system.
 """
 import enum
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 from sqlalchemy import String, Enum, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.database import Base
+
+if TYPE_CHECKING:
+    from app.models.reading import SensorReading
 
 
 class DeviceStatus(str, enum.Enum):
