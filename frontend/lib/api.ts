@@ -1,7 +1,7 @@
 // SCENTINEL - Axios API Layer
 import axios, { AxiosInstance, AxiosError } from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost/api";
+const BASE_URL = "/api";
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
