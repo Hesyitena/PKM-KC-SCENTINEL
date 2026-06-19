@@ -1,7 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { Settings, Info, Trash2, AlertTriangle, X, Loader2, ShieldAlert } from "lucide-react";
+import {
+  Settings,
+  Info,
+  Trash2,
+  AlertTriangle,
+  X,
+  Loader2,
+  ShieldAlert,
+  Cpu,
+  Wifi,
+  BarChart3,
+  Database,
+  Monitor,
+  Activity,
+  HardDrive,
+  Shield,
+} from "lucide-react";
 import api from "@/lib/api";
 import { toast } from "sonner";
 
@@ -23,7 +39,6 @@ function DeleteAllModal({
     setIsDeleting(true);
     try {
       if (DEMO_MODE) {
-        // Demo mode: simulasikan success
         await new Promise((r) => setTimeout(r, 1200));
         onSuccess(247);
         return;
@@ -37,13 +52,11 @@ function DeleteAllModal({
   };
 
   return (
-    /* Backdrop */
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(13, 37, 61, 0.55)", backdropFilter: "blur(4px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      {/* Modal */}
       <div
         className="relative w-full max-w-md rounded-2xl p-6 animate-fade-in"
         style={{
@@ -52,7 +65,6 @@ function DeleteAllModal({
           border: "1px solid rgba(234,34,97,0.20)",
         }}
       >
-        {/* Close button */}
         <button
           id="delete-modal-close"
           onClick={onClose}
@@ -62,7 +74,6 @@ function DeleteAllModal({
           <X size={15} />
         </button>
 
-        {/* Icon */}
         <div
           className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
           style={{ background: "rgba(234,34,97,0.08)", border: "1px solid rgba(234,34,97,0.18)" }}
@@ -70,7 +81,6 @@ function DeleteAllModal({
           <ShieldAlert size={22} style={{ color: "#ea2261" }} />
         </div>
 
-        {/* Title */}
         <h2 className="text-lg font-semibold text-foreground mb-1">
           Hapus Semua Data Pembacaan
         </h2>
@@ -79,7 +89,6 @@ function DeleteAllModal({
           riwayat pembacaan sensor dari database. Data yang dihapus tidak dapat dipulihkan.
         </p>
 
-        {/* Warning list */}
         <div
           className="rounded-xl p-4 mb-5 space-y-2"
           style={{ background: "rgba(234,34,97,0.04)", border: "1px solid rgba(234,34,97,0.14)" }}
@@ -96,7 +105,6 @@ function DeleteAllModal({
           ))}
         </div>
 
-        {/* Confirmation input */}
         <div className="space-y-2 mb-5">
           <label className="text-xs font-medium text-muted-foreground">
             Ketik <code className="px-1.5 py-0.5 rounded bg-muted text-foreground font-mono text-[11px]">{REQUIRED}</code> untuk konfirmasi
@@ -118,7 +126,6 @@ function DeleteAllModal({
           />
         </div>
 
-        {/* Buttons */}
         <div className="flex gap-3">
           <button
             id="delete-modal-cancel"
@@ -155,9 +162,145 @@ function DeleteAllModal({
   );
 }
 
+/* ── Toggle switch component ── */
+function Toggle({ checked, onChange, id }: { checked: boolean; onChange: () => void; id: string }) {
+  return (
+    <button
+      id={id}
+      role="switch"
+      aria-checked={checked}
+      onClick={onChange}
+      className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 flex-shrink-0"
+      style={{
+        background: checked
+          ? "linear-gradient(135deg, #533afd, #4434d4)"
+          : "#d1d5db",
+        boxShadow: checked
+          ? "0 2px 8px rgba(83,58,253,0.30), inset 0 1px 0 rgba(255,255,255,0.15)"
+          : "inset 0 1px 3px rgba(0,0,0,0.10)",
+      }}
+    >
+      <span
+        className="inline-block h-4.5 w-4.5 rounded-full transition-transform duration-200"
+        style={{
+          width: "18px",
+          height: "18px",
+          background: "#ffffff",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
+          transform: checked ? "translateX(22px)" : "translateX(3px)",
+        }}
+      />
+    </button>
+  );
+}
+
+/* ── Settings card wrapper ── */
+function SettingsCard({
+  id,
+  icon: Icon,
+  iconColor,
+  iconBg,
+  title,
+  subtitle,
+  children,
+  delay,
+}: {
+  id: string;
+  icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>;
+  iconColor: string;
+  iconBg: string;
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+  delay?: string;
+}) {
+  return (
+    <div
+      id={id}
+      className={`rounded-2xl p-6 animate-fade-in ${delay ?? ""}`}
+      style={{
+        background: "rgba(255,255,255,0.95)",
+        backdropFilter: "blur(16px)",
+        border: "1px solid #e8edf3",
+        boxShadow: "0 1px 4px rgba(0,55,112,0.06), 0 8px 24px rgba(0,55,112,0.04)",
+      }}
+    >
+      <div className="flex items-center gap-3 mb-5">
+        <div
+          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{
+            background: iconBg,
+            border: `1px solid ${iconColor}22`,
+          }}
+        >
+          <Icon size={16} style={{ color: iconColor }} />
+        </div>
+        <div>
+          <h3 className="font-semibold text-foreground" style={{ fontSize: "15px", letterSpacing: "-0.2px" }}>
+            {title}
+          </h3>
+          {subtitle && (
+            <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+          )}
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/* ── Info grid item ── */
+function InfoGridItem({
+  icon: Icon,
+  iconColor,
+  iconBg,
+  label,
+  value,
+  mono = false,
+}: {
+  icon: React.ComponentType<{ size?: number; style?: React.CSSProperties }>;
+  iconColor: string;
+  iconBg: string;
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
+  return (
+    <div
+      className="flex items-center gap-3 px-4 py-3 rounded-xl"
+      style={{
+        background: "rgba(248,250,252,0.8)",
+        border: "1px solid #f1f5f9",
+      }}
+    >
+      <div
+        className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+        style={{
+          background: iconBg,
+          border: `1px solid ${iconColor}18`,
+        }}
+      >
+        <Icon size={14} style={{ color: iconColor }} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+          {label}
+        </p>
+        <p className={`text-sm font-semibold text-foreground mt-0.5 ${mono ? "font-mono" : ""}`}>
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const [showModal, setShowModal] = useState(false);
   const [lastDeletedCount, setLastDeletedCount] = useState<number | null>(null);
+
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [chartAnimation, setChartAnimation] = useState(true);
+  const [chartPoints, setChartPoints] = useState("60");
 
   const handleDeleteSuccess = (count: number) => {
     setLastDeletedCount(count);
@@ -177,103 +320,412 @@ export default function SettingsPage() {
         />
       )}
 
-      {/* Wrapper */}
       <div className="h-full overflow-y-auto scrollbar-hide p-6 lg:p-10 flex justify-center">
         <div className="w-full max-w-3xl space-y-6">
-          {/* Header */}
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              <span className="gradient-text">Pengaturan</span>
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Konfigurasi sistem SCENTINEL
+
+          {/* ─── Header ──────────────────────────────────────── */}
+          <div className="animate-fade-in">
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold tracking-tight">
+                <span className="gradient-text">Pengaturan</span>
+              </h1>
+              <span
+                className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                style={{
+                  background: "rgba(83,58,253,0.08)",
+                  border: "1px solid rgba(83,58,253,0.15)",
+                  color: "#533afd",
+                }}
+              >
+                v1.0.0
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1.5">
+              Konfigurasi tampilan, monitoring, dan manajemen data sistem SCENTINEL
             </p>
           </div>
 
-          {/* System info */}
-          <div id="settings-info-card" className="glass-card p-6">
-            <div className="flex items-center gap-2 mb-5">
-              <Info size={16} className="text-primary" />
-              <h3 className="font-semibold">Informasi Sistem</h3>
+          {/* ─── System Info ─────────────────────────────────── */}
+          <SettingsCard
+            id="settings-info-card"
+            icon={Info}
+            iconColor="#533afd"
+            iconBg="rgba(83,58,253,0.08)"
+            title="Informasi Sistem"
+            subtitle="Detail perangkat dan konfigurasi SCENTINEL"
+            delay="delay-75"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <InfoGridItem
+                icon={Activity}
+                iconColor="#533afd"
+                iconBg="rgba(83,58,253,0.08)"
+                label="Nama Sistem"
+                value="SCENTINEL"
+                mono
+              />
+              <InfoGridItem
+                icon={Shield}
+                iconColor="#059669"
+                iconBg="rgba(16,185,129,0.08)"
+                label="Status"
+                value="Aktif"
+              />
+              <InfoGridItem
+                icon={Cpu}
+                iconColor="#d97706"
+                iconBg="rgba(245,158,11,0.08)"
+                label="Tipe Sensor"
+                value="MQ-3, MQ-4, MQ-135, TGS-2602, DHT22"
+              />
+              <InfoGridItem
+                icon={Cpu}
+                iconColor="#ea2261"
+                iconBg="rgba(234,34,97,0.07)"
+                label="Model AI"
+                value="Edge Classification (ESP32)"
+              />
+              <InfoGridItem
+                icon={Wifi}
+                iconColor="#0ea5e9"
+                iconBg="rgba(14,165,233,0.08)"
+                label="Komunikasi"
+                value="REST API + SSE Realtime"
+              />
+              <InfoGridItem
+                icon={BarChart3}
+                iconColor="#8b5cf6"
+                iconBg="rgba(139,92,246,0.08)"
+                label="Program"
+                value="PKM-KC 2026"
+              />
             </div>
-            <div className="space-y-3 text-sm">
-              {[
-                { label: "Nama Sistem", value: "SCENTINEL v1.0.0" },
-                { label: "Tipe Sensor", value: "MQ-3, MQ-4, MQ-135, TGS-2602, DHT22" },
-                { label: "Model AI", value: "Edge Classification (ESP32 Lokal)" },
-                { label: "Komunikasi", value: "REST API + SSE Realtime" },
-                { label: "Program", value: "PKM-KC 2026" },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex items-center justify-between py-2 border-b border-border/50">
-                  <span className="text-muted-foreground">{label}</span>
-                  <span className="font-medium">{value}</span>
+          </SettingsCard>
+
+          {/* ─── Tampilan & Monitoring ───────────────────────── */}
+          <SettingsCard
+            id="settings-display-card"
+            icon={Monitor}
+            iconColor="#0ea5e9"
+            iconBg="rgba(14,165,233,0.08)"
+            title="Tampilan & Monitoring"
+            subtitle="Sesuaikan preferensi tampilan dashboard"
+            delay="delay-100"
+          >
+            <div className="space-y-1">
+              {/* Auto-refresh */}
+              <div
+                className="flex items-center justify-between py-4 px-4 rounded-xl transition-colors duration-150"
+                style={{ background: "rgba(248,250,252,0.6)" }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: "rgba(16,185,129,0.08)",
+                      border: "1px solid rgba(16,185,129,0.12)",
+                    }}
+                  >
+                    <Wifi size={14} style={{ color: "#059669" }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Auto-refresh Data</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Otomatis memperbarui data sensor secara realtime
+                    </p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
+                <Toggle
+                  id="settings-auto-refresh"
+                  checked={autoRefresh}
+                  onChange={() => setAutoRefresh(!autoRefresh)}
+                />
+              </div>
 
-          {/* API config */}
-          <div className="glass-card p-6 border-primary/20">
-            <div className="flex items-center gap-2 mb-3">
-              <Settings size={16} className="text-primary" />
-              <h3 className="font-semibold">Konfigurasi API</h3>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Pengaturan API key ESP32 dan konfigurasi lanjutan hanya dapat diubah
-              melalui file{" "}
-              <code className="px-1.5 py-0.5 bg-muted rounded text-primary text-xs">.env</code>{" "}
-              di server backend.
-            </p>
-          </div>
+              {/* Chart animation */}
+              <div
+                className="flex items-center justify-between py-4 px-4 rounded-xl transition-colors duration-150"
+                style={{ background: "transparent" }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: "rgba(83,58,253,0.08)",
+                      border: "1px solid rgba(83,58,253,0.12)",
+                    }}
+                  >
+                    <BarChart3 size={14} style={{ color: "#533afd" }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Animasi Chart</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Efek animasi pada grafik sensor gas realtime
+                    </p>
+                  </div>
+                </div>
+                <Toggle
+                  id="settings-chart-animation"
+                  checked={chartAnimation}
+                  onChange={() => setChartAnimation(!chartAnimation)}
+                />
+              </div>
 
-          {/* ─── Danger Zone ─────────────────────────────────────── */}
+              {/* Chart data points */}
+              <div
+                className="flex items-center justify-between py-4 px-4 rounded-xl transition-colors duration-150"
+                style={{ background: "rgba(248,250,252,0.6)" }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: "rgba(245,158,11,0.08)",
+                      border: "1px solid rgba(245,158,11,0.12)",
+                    }}
+                  >
+                    <Database size={14} style={{ color: "#d97706" }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Titik Data Chart</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Jumlah maksimum titik data yang ditampilkan
+                    </p>
+                  </div>
+                </div>
+                <select
+                  id="settings-chart-points"
+                  value={chartPoints}
+                  onChange={(e) => setChartPoints(e.target.value)}
+                  className="px-3 py-1.5 rounded-lg text-sm font-medium border focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
+                  style={{
+                    background: "#ffffff",
+                    borderColor: "#e2e8f0",
+                    color: "#0d253d",
+                    minWidth: "80px",
+                  }}
+                >
+                  <option value="30">30</option>
+                  <option value="60">60</option>
+                  <option value="120">120</option>
+                </select>
+              </div>
+            </div>
+          </SettingsCard>
+
+          {/* ─── Manajemen Data ──────────────────────────────── */}
+          <SettingsCard
+            id="settings-data-card"
+            icon={HardDrive}
+            iconColor="#8b5cf6"
+            iconBg="rgba(139,92,246,0.08)"
+            title="Manajemen Data"
+            subtitle="Ringkasan penyimpanan data sensor"
+            delay="delay-150"
+          >
+            <div className="space-y-4">
+              {/* Stats row */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: "Total Data", value: "1,247", sub: "pembacaan" },
+                  { label: "Data Tertua", value: "12 Jun", sub: "2026" },
+                  { label: "Storage", value: "2.4", sub: "MB" },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="text-center px-3 py-3 rounded-xl"
+                    style={{
+                      background: "rgba(248,250,252,0.8)",
+                      border: "1px solid #f1f5f9",
+                    }}
+                  >
+                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      {item.label}
+                    </p>
+                    <p
+                      className="text-xl font-bold text-foreground mt-1"
+                      style={{ fontFeatureSettings: '"tnum" 1', letterSpacing: "-0.5px" }}
+                    >
+                      {item.value}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{item.sub}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Storage bar */}
+              <div className="px-4 py-3 rounded-xl" style={{ background: "rgba(248,250,252,0.8)", border: "1px solid #f1f5f9" }}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-muted-foreground">Penggunaan Database</span>
+                  <span className="text-xs font-semibold text-foreground" style={{ fontFeatureSettings: '"tnum" 1' }}>
+                    2.4 MB / 100 MB
+                  </span>
+                </div>
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.05)" }}>
+                  <div
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{
+                      width: "2.4%",
+                      minWidth: "24px",
+                      background: "linear-gradient(90deg, #818cf8, #533afd)",
+                      boxShadow: "0 0 8px rgba(83,58,253,0.25)",
+                    }}
+                  />
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2">
+                  Kapasitas database masih sangat lega — estimasi muat ±40.000 pembacaan lagi
+                </p>
+              </div>
+            </div>
+          </SettingsCard>
+
+          {/* ─── API Configuration ───────────────────────────── */}
+          <SettingsCard
+            id="settings-api-card"
+            icon={Settings}
+            iconColor="#533afd"
+            iconBg="rgba(83,58,253,0.08)"
+            title="Konfigurasi API"
+            subtitle="Endpoint dan autentikasi perangkat ESP32"
+            delay="delay-225"
+          >
+            <div className="space-y-3">
+              <div
+                className="flex items-center gap-3 px-4 py-3 rounded-xl"
+                style={{
+                  background: "rgba(248,250,252,0.8)",
+                  border: "1px solid #f1f5f9",
+                }}
+              >
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: "rgba(16,185,129,0.08)",
+                    border: "1px solid rgba(16,185,129,0.12)",
+                  }}
+                >
+                  <Wifi size={14} style={{ color: "#059669" }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Endpoint
+                  </p>
+                  <p className="text-sm font-semibold font-mono text-foreground mt-0.5">
+                    POST /api/readings
+                  </p>
+                </div>
+              </div>
+
+              <div
+                className="flex items-center gap-3 px-4 py-3 rounded-xl"
+                style={{
+                  background: "rgba(248,250,252,0.8)",
+                  border: "1px solid #f1f5f9",
+                }}
+              >
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: "rgba(234,34,97,0.07)",
+                    border: "1px solid rgba(234,34,97,0.12)",
+                  }}
+                >
+                  <Shield size={14} style={{ color: "#ea2261" }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Autentikasi
+                  </p>
+                  <p className="text-sm font-semibold font-mono text-foreground mt-0.5">
+                    X-API-Key: {"<ESP32_API_KEY>"}
+                  </p>
+                </div>
+              </div>
+
+              <div
+                className="px-4 py-3 rounded-xl"
+                style={{
+                  background: "rgba(248,250,252,0.8)",
+                  border: "1px solid #f1f5f9",
+                }}
+              >
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  API key dan konfigurasi lanjutan hanya dapat diubah melalui file{" "}
+                  <code
+                    className="px-1.5 py-0.5 rounded text-[11px] font-mono"
+                    style={{
+                      background: "rgba(83,58,253,0.08)",
+                      color: "#533afd",
+                      border: "1px solid rgba(83,58,253,0.12)",
+                    }}
+                  >
+                    .env
+                  </code>{" "}
+                  di server backend.
+                </p>
+              </div>
+            </div>
+          </SettingsCard>
+
+          {/* ─── Danger Zone ─────────────────────────────────── */}
           <div
             id="settings-danger-zone"
-            className="rounded-2xl p-6"
+            className="rounded-2xl p-6 animate-fade-in delay-300"
             style={{
-              background: "rgba(234,34,97,0.03)",
-              border: "1px solid rgba(234,34,97,0.20)",
+              background: "rgba(234,34,97,0.02)",
+              border: "1px solid rgba(234,34,97,0.15)",
             }}
           >
-            <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle size={16} style={{ color: "#ea2261" }} />
-              <h3 className="font-semibold" style={{ color: "#be185d" }}>
-                Danger Zone
-              </h3>
-            </div>
-            <p className="text-xs text-muted-foreground mb-5">
-              Tindakan di bawah ini bersifat <strong>permanen</strong> dan tidak dapat dibatalkan.
-            </p>
-
-            <div className="flex items-center justify-between gap-4 py-4 border-t border-red-100">
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{
+                  background: "rgba(234,34,97,0.08)",
+                  border: "1px solid rgba(234,34,97,0.15)",
+                }}
+              >
+                <AlertTriangle size={16} style={{ color: "#ea2261" }} />
+              </div>
               <div>
+                <h3 className="font-semibold" style={{ fontSize: "15px", color: "#be185d", letterSpacing: "-0.2px" }}>
+                  Danger Zone
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Tindakan permanen yang tidak dapat dibatalkan
+                </p>
+              </div>
+            </div>
+
+            <div
+              className="flex items-center justify-between gap-4 p-4 rounded-xl"
+              style={{
+                background: "rgba(255,255,255,0.80)",
+                border: "1px solid rgba(234,34,97,0.12)",
+              }}
+            >
+              <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground">
                   Hapus Semua Data Pembacaan
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Mengosongkan seluruh tabel <code className="px-1 py-0.5 bg-muted rounded text-xs">sensor_readings</code> dari database.
+                  Mengosongkan tabel{" "}
+                  <code className="px-1 py-0.5 rounded text-[11px] font-mono" style={{ background: "rgba(234,34,97,0.06)", color: "#be185d" }}>
+                    sensor_readings
+                  </code>
                 </p>
                 {lastDeletedCount !== null && (
-                  <p className="text-xs mt-1.5" style={{ color: "#ea2261" }}>
-                    ✓ Terakhir dihapus: {lastDeletedCount} data
+                  <p className="text-xs mt-1.5 font-medium" style={{ color: "#ea2261" }}>
+                    Terakhir dihapus: {lastDeletedCount} data
                   </p>
                 )}
               </div>
               <button
                 id="danger-delete-all-btn"
                 onClick={() => setShowModal(true)}
-                className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200"
+                className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5"
                 style={{
                   background: "linear-gradient(135deg, #ea2261, #be185d)",
                   boxShadow: "0 2px 8px rgba(234,34,97,0.30)",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 14px rgba(234,34,97,0.45)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = "";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 8px rgba(234,34,97,0.30)";
                 }}
               >
                 <Trash2 size={14} />
@@ -281,6 +733,7 @@ export default function SettingsPage() {
               </button>
             </div>
           </div>
+
         </div>
       </div>
     </>
