@@ -1,10 +1,10 @@
 "use client";
 
 import { useSensorStore } from "@/store/sensorStore";
-import { Activity, Zap } from "lucide-react";
+import { Activity, Thermometer, Droplets, ShieldCheck, ShieldX } from "lucide-react";
 
 export function DashboardHeader() {
-  const { isConnected } = useSensorStore();
+  const { latestReading } = useSensorStore();
 
   const today = new Date().toLocaleDateString("id-ID", {
     weekday: "long",
@@ -13,25 +13,33 @@ export function DashboardHeader() {
     year: "numeric",
   });
 
+  const isLayak = latestReading?.prediction === "LAYAK";
+
   return (
     <div
-      className="flex-shrink-0 flex items-center justify-between px-6 py-3.5 animate-fade-in"
+      className="flex-shrink-0 flex items-center justify-between px-6 py-3.5 animate-fade-in relative"
       style={{
-        borderBottom: "1px solid #f0f4f8",
-        background: "linear-gradient(to right, rgba(255,255,255,0.95), rgba(249,250,255,0.95))",
-        backdropFilter: "blur(12px)",
+        background: "linear-gradient(to right, rgba(255,255,255,0.98), rgba(248,250,255,0.98))",
+        backdropFilter: "blur(16px)",
       }}
     >
-      {/* Left: Title + subtitle */}
-      <div className="flex items-center gap-3">
+      <div
+        className="absolute bottom-0 inset-x-0 h-px"
+        style={{
+          background: "linear-gradient(90deg, transparent 5%, rgba(83,58,253,0.10) 35%, rgba(16,185,129,0.10) 65%, transparent 95%)",
+        }}
+      />
+
+      {/* Left: Title + icon */}
+      <div className="flex items-center gap-3.5">
         <div
-          className="w-9 h-9 flex items-center justify-center rounded-xl flex-shrink-0"
+          className="w-10 h-10 flex items-center justify-center rounded-xl flex-shrink-0 animate-glow-pulse"
           style={{
             background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)",
-            boxShadow: "0 4px 12px rgba(83,58,253,0.30)",
+            boxShadow: "0 4px 16px rgba(83,58,253,0.30), inset 0 1px 0 rgba(255,255,255,0.15)",
           }}
         >
-          <Activity size={16} color="#fff" />
+          <Activity size={17} color="#fff" strokeWidth={2} />
         </div>
         <div>
           <h1
@@ -51,63 +59,93 @@ export function DashboardHeader() {
         </div>
       </div>
 
-      {/* Right: Connection status + date */}
-      <div className="flex items-center gap-2.5">
-        {/* Connection pill */}
-        <div
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-300"
-          style={
-            isConnected
-              ? {
-                  background: "linear-gradient(135deg, #ecfdf5, #d1fae5)",
-                  border: "1px solid #a7f3d0",
-                  boxShadow: "0 2px 8px rgba(16,185,129,0.15)",
-                }
-              : {
-                  background: "linear-gradient(135deg, #fff7ed, #ffedd5)",
-                  border: "1px solid #fed7aa",
-                }
-          }
-        >
-          {isConnected ? (
-            <>
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
-              </span>
-              <span style={{ fontSize: "11px", fontWeight: 600, color: "#065f46", letterSpacing: "0.02em" }}>
-                Terhubung
-              </span>
-            </>
-          ) : (
-            <>
-              <Zap size={10} color="#c2410c" />
-              <span style={{ fontSize: "11px", fontWeight: 600, color: "#c2410c", letterSpacing: "0.02em" }}>
-                Menunggu...
-              </span>
-            </>
-          )}
-        </div>
-
-        {/* Date chip */}
-        <div
-          className="hidden sm:flex items-center px-3 py-1.5 rounded-full"
-          style={{
-            background: "#f8fafc",
-            border: "1px solid #e8edf3",
-          }}
-        >
-          <p
+      {/* Center: Quick sensor stats (visible on md+) */}
+      {latestReading && (
+        <div className="hidden md:flex items-center gap-2">
+          <div
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
             style={{
-              fontSize: "12px",
-              fontWeight: 500,
-              color: "#475569",
-              letterSpacing: "-0.1px",
+              background: "rgba(245,158,11,0.06)",
+              border: "1px solid rgba(245,158,11,0.15)",
             }}
           >
-            {today}
-          </p>
+            <Thermometer size={12} style={{ color: "#d97706" }} />
+            <span
+              style={{
+                fontSize: "12px",
+                fontWeight: 600,
+                color: "#b45309",
+                fontFeatureSettings: '"tnum" 1',
+              }}
+            >
+              {latestReading.temperature.toFixed(1)}°C
+            </span>
+          </div>
+
+          <div
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
+            style={{
+              background: "rgba(83,58,253,0.05)",
+              border: "1px solid rgba(83,58,253,0.12)",
+            }}
+          >
+            <Droplets size={12} style={{ color: "#533afd" }} />
+            <span
+              style={{
+                fontSize: "12px",
+                fontWeight: 600,
+                color: "#4434d4",
+                fontFeatureSettings: '"tnum" 1',
+              }}
+            >
+              {latestReading.humidity.toFixed(1)}%
+            </span>
+          </div>
+
+          <div
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
+            style={{
+              background: isLayak ? "rgba(16,185,129,0.06)" : "rgba(234,34,97,0.06)",
+              border: `1px solid ${isLayak ? "rgba(16,185,129,0.18)" : "rgba(234,34,97,0.18)"}`,
+            }}
+          >
+            {isLayak ? (
+              <ShieldCheck size={12} style={{ color: "#059669" }} />
+            ) : (
+              <ShieldX size={12} style={{ color: "#ea2261" }} />
+            )}
+            <span
+              style={{
+                fontSize: "11px",
+                fontWeight: 700,
+                color: isLayak ? "#065f46" : "#9f1239",
+                letterSpacing: "0.02em",
+              }}
+            >
+              {latestReading.prediction}
+            </span>
+          </div>
         </div>
+      )}
+
+      {/* Right: Date */}
+      <div
+        className="hidden sm:flex items-center px-3.5 py-1.5 rounded-full"
+        style={{
+          background: "#f8fafc",
+          border: "1px solid #e8edf3",
+        }}
+      >
+        <p
+          style={{
+            fontSize: "12px",
+            fontWeight: 500,
+            color: "#475569",
+            letterSpacing: "-0.1px",
+          }}
+        >
+          {today}
+        </p>
       </div>
     </div>
   );
