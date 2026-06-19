@@ -168,47 +168,46 @@ export function LiveMonitoringPanel() {
     conf >= 0.92 ? "Akurasi Tinggi" : conf >= 0.75 ? "Akurasi Sedang" : "Akurasi Rendah";
 
   return (
-    <div id="live-monitoring-panel" className="flex flex-col gap-3 h-full min-h-0">
+    <div id="live-monitoring-panel" className="flex flex-col gap-4 h-full min-h-0">
 
       {/* ══ STATUS CARD ══ */}
       <div
-        className="flex-shrink-0 flex items-stretch overflow-hidden"
+        className="flex-shrink-0 flex flex-col md:flex-row items-stretch overflow-hidden animate-slide-up"
         style={{
           background: S.bgGrad,
           border: `1px solid ${S.border}`,
-          borderRadius: "20px",
+          borderRadius: "22px",
           boxShadow: S.shadow,
         }}
       >
         {/* LEFT: Confidence Gauge zone */}
         <div
-          className="flex flex-col items-center justify-center px-6 py-5 flex-shrink-0"
+          className="flex flex-col items-center justify-center px-8 py-6 md:flex-shrink-0 border-b md:border-b-0 md:border-r relative"
           style={{
-            borderRight: `1px solid ${S.divider}`,
-            minWidth: "168px",
+            borderColor: S.divider,
+            minWidth: "170px",
             background: `radial-gradient(ellipse at 50% 30%, ${S.accentSoft} 0%, transparent 70%)`,
           }}
         >
           <div className="relative">
             <ConfidenceGauge value={conf} isLayak={isLayak} />
-            {/* Center text overlay */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span
                 style={{
                   fontSize: "9px",
                   fontWeight: 700,
-                  letterSpacing: "0.12em",
+                  letterSpacing: "0.14em",
                   textTransform: "uppercase",
                   color: S.confLabel,
-                  opacity: 0.75,
-                  marginBottom: "1px",
+                  opacity: 0.7,
+                  marginBottom: "2px",
                 }}
               >
-                Conf.
+                Confidence
               </span>
               <span
                 style={{
-                  fontSize: "28px",
+                  fontSize: "30px",
                   fontWeight: 800,
                   letterSpacing: "-1.5px",
                   fontFeatureSettings: '"tnum" 1',
@@ -220,9 +219,8 @@ export function LiveMonitoringPanel() {
               </span>
             </div>
           </div>
-          {/* Accuracy label chip */}
           <div
-            className="mt-2 px-3 py-0.5 rounded-full"
+            className="mt-3 px-4 py-1 rounded-full"
             style={{
               background: S.accentMid,
               border: `1px solid ${S.divider}`,
@@ -231,9 +229,9 @@ export function LiveMonitoringPanel() {
             <span
               style={{
                 fontSize: "10px",
-                fontWeight: 600,
+                fontWeight: 700,
                 color: S.textSub,
-                letterSpacing: "0.03em",
+                letterSpacing: "0.04em",
               }}
             >
               {accuracyLabel}
@@ -242,10 +240,9 @@ export function LiveMonitoringPanel() {
         </div>
 
         {/* RIGHT: Prediction result */}
-        <div className="flex-1 flex flex-col justify-center px-7 py-5">
-          {/* Chip label */}
+        <div className="flex-1 flex flex-col justify-center px-6 md:px-8 py-6">
           <div
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full w-fit mb-4"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full w-fit mb-5"
             style={{
               background: S.accentSoft,
               border: `1px solid ${S.divider}`,
@@ -257,7 +254,7 @@ export function LiveMonitoringPanel() {
                 fontSize: "9px",
                 fontWeight: 700,
                 color: S.accent,
-                letterSpacing: "0.10em",
+                letterSpacing: "0.12em",
                 textTransform: "uppercase",
               }}
             >
@@ -265,30 +262,29 @@ export function LiveMonitoringPanel() {
             </span>
           </div>
 
-          {/* Icon + Prediction text */}
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-5 mb-5">
             <div
               className="flex items-center justify-center flex-shrink-0"
               style={{
                 background: S.iconGrad,
-                borderRadius: "18px",
-                width: "56px",
-                height: "56px",
+                borderRadius: "20px",
+                width: "60px",
+                height: "60px",
                 boxShadow: S.iconShadow,
               }}
             >
               {isLayak
-                ? <ShieldCheck size={28} color="#fff" strokeWidth={1.7} />
-                : <ShieldX     size={28} color="#fff" strokeWidth={1.7} />
+                ? <ShieldCheck size={30} color="#fff" strokeWidth={1.7} />
+                : <ShieldX     size={30} color="#fff" strokeWidth={1.7} />
               }
             </div>
 
             <div>
               <p
                 style={{
-                  fontSize: "36px",
+                  fontSize: "38px",
                   fontWeight: 800,
-                  letterSpacing: "-1.5px",
+                  letterSpacing: "-2px",
                   color: S.text,
                   lineHeight: 1,
                 }}
@@ -301,7 +297,7 @@ export function LiveMonitoringPanel() {
                     fontSize: "13px",
                     fontWeight: 400,
                     color: "#94a3b8",
-                    marginTop: "5px",
+                    marginTop: "6px",
                   }}
                 >
                   Sampel:{" "}
@@ -313,16 +309,15 @@ export function LiveMonitoringPanel() {
             </div>
           </div>
 
-          {/* Footer: timestamp */}
           <div
-            className="flex items-center gap-2 pt-3"
+            className="flex items-center gap-2 pt-4"
             style={{ borderTop: `1px solid ${S.divider}` }}
           >
             <div
-              className="w-1.5 h-1.5 rounded-full"
+              className="w-2 h-2 rounded-full"
               style={{
                 background: S.accent,
-                boxShadow: `0 0 6px ${S.accent}`,
+                boxShadow: `0 0 8px ${S.accent}`,
                 animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite",
               }}
             />
@@ -349,7 +344,7 @@ export function LiveMonitoringPanel() {
       </div>
 
       {/* ══ SENSOR CARDS ══ */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5 flex-shrink-0">
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 flex-shrink-0">
         <SensorCard id="card-mq3"         label="MQ-3 Alkohol"  value={latestReading.mq3}         icon={<Wind size={13} />}         color="primary"  sublabel="ADC" />
         <SensorCard id="card-mq4"         label="MQ-4 Metana"   value={latestReading.mq4}         icon={<Wind size={13} />}         color="fresh"    sublabel="ADC" />
         <SensorCard id="card-mq135"       label="MQ-135 Udara"  value={latestReading.mq135}       icon={<FlaskConical size={13} />} color="amber"    sublabel="ADC" />
@@ -367,20 +362,20 @@ export function LiveMonitoringPanel() {
           boxShadow: "0 1px 4px rgba(0,55,112,0.06), 0 0 0 0.5px rgba(0,0,0,0.04)",
         }}
       >
-        {/* Chart header */}
         <div
-          className="flex items-center justify-between px-5 py-3 flex-shrink-0"
+          className="flex items-center justify-between px-5 py-3.5 flex-shrink-0"
           style={{ borderBottom: "1px solid #f1f5f9" }}
         >
           <div className="flex items-center gap-3">
             <div
-              className="w-8 h-8 flex items-center justify-center rounded-xl"
+              className="w-9 h-9 flex items-center justify-center rounded-xl"
               style={{
-                background: "linear-gradient(135deg, rgba(83,58,253,0.10), rgba(83,58,253,0.05))",
+                background: "linear-gradient(135deg, rgba(83,58,253,0.12), rgba(83,58,253,0.05))",
                 border: "1px solid rgba(83,58,253,0.15)",
+                boxShadow: "0 2px 8px rgba(83,58,253,0.08)",
               }}
             >
-              <BarChart3 size={15} style={{ color: "#533afd" }} />
+              <BarChart3 size={16} style={{ color: "#533afd" }} />
             </div>
             <div>
               <h3 style={{ fontSize: "14px", fontWeight: 600, color: "#0d253d", letterSpacing: "-0.3px" }}>
@@ -392,9 +387,8 @@ export function LiveMonitoringPanel() {
             </div>
           </div>
 
-          {/* Live badge */}
           <div
-            className="flex items-center gap-1.5 px-3 py-1"
+            className="flex items-center gap-1.5 px-3 py-1.5"
             style={{
               background: "#ecfdf5",
               border: "1px solid #a7f3d0",
@@ -414,8 +408,7 @@ export function LiveMonitoringPanel() {
           </div>
         </div>
 
-        {/* Chart body */}
-        <div className="px-3 py-2 flex-1 min-h-0">
+        <div className="px-3 py-3 flex-1 min-h-0">
           <GasChart data={chartData} height="100%" />
         </div>
       </div>
