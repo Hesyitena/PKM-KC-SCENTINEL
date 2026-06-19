@@ -165,7 +165,7 @@ export function SensorCard({
           boxShadow: isHovered
             ? `0 12px 32px ${cfg.glow}, 0 2px 8px rgba(0,55,112,0.06)`
             : "0 1px 4px rgba(0,55,112,0.06), 0 0 0 0.5px rgba(0,0,0,0.04)",
-          transform: isHovered ? "translateY(-3px) scale(1.01)" : "translateY(0) scale(1)",
+          transform: isHovered ? "translateY(-2px) scale(1.01)" : "translateY(0) scale(1)",
           transition: "all 0.25s cubic-bezier(0.16,1,0.3,1)",
         }}
         onMouseEnter={() => setIsHovered(true)}
@@ -271,7 +271,7 @@ export function SensorCard({
         {/* Progress track */}
         <div
           style={{
-            height: "5px",
+            height: "6px",
             background: "rgba(0,0,0,0.05)",
             borderRadius: "9999px",
             overflow: "hidden",
