@@ -14,7 +14,7 @@ export default function DashboardPage() {
       <DashboardHeader />
 
       {/* ══ Live monitoring panel — fills remaining height ══ */}
-      <div className="flex-1 min-h-0 overflow-hidden px-6 py-5">
+      <div className="flex-1 min-h-0 overflow-hidden px-4 lg:px-6 py-4 lg:py-5">
         <LiveMonitoringPanel />
       </div>
     </div>
