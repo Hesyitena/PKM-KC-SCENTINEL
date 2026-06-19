@@ -32,13 +32,11 @@ export function Sidebar() {
 
   const initials = user?.username?.slice(0, 2).toUpperCase() ?? "??";
 
-  // Close sidebar on route change (mobile)
   useEffect(() => {
     closeSidebar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  // Close on Escape key
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeSidebar();
@@ -49,49 +47,61 @@ export function Sidebar() {
 
   return (
     <>
-      {/* ── Mobile overlay backdrop ── */}
       {sidebarOpen && (
         <div
           id="sidebar-backdrop"
           className="fixed inset-0 z-30 lg:hidden animate-fade-in"
-          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(2px)" }}
+          style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(3px)" }}
           onClick={closeSidebar}
           aria-hidden="true"
         />
       )}
 
-      {/* ── Sidebar panel ── */}
       <aside
         id="dashboard-sidebar"
         className={cn(
-          "w-64 flex-shrink-0 flex flex-col h-full relative overflow-hidden",
-          /* Mobile: fixed overlay, slide in/out */
+          "w-[260px] flex-shrink-0 flex flex-col h-full relative overflow-hidden",
           "fixed inset-y-0 left-0 z-40",
-          /* Desktop lg+: static in flex layout, always visible */
           "lg:static lg:z-auto lg:translate-x-0",
-          "transition-transform duration-300 ease-in-out",
-          /* Mobile visibility */
+          "transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
         style={{
           background:
-            "linear-gradient(145deg, hsl(227 68% 18%) 0%, hsl(230 70% 28%) 40%, hsl(220 60% 38%) 100%)",
-          borderRight: "1px solid rgba(255,255,255,0.06)",
+            "linear-gradient(165deg, hsl(227 68% 15%) 0%, hsl(230 72% 24%) 45%, hsl(225 58% 34%) 100%)",
+          borderRight: "1px solid rgba(255,255,255,0.05)",
         }}
       >
-        {/* Top glow */}
+        {/* Subtle noise texture overlay */}
         <div
-          className="absolute top-0 left-0 right-0 h-56 pointer-events-none"
+          className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Ccircle cx='1' cy='1' r='0.6'/%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        />
+
+        {/* Top ambient glow */}
+        <div
+          className="absolute top-0 left-0 right-0 h-48 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse 140% 90% at 50% -10%, rgba(255,255,255,0.15) 0%, transparent 65%)",
+              "radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255,255,255,0.12) 0%, transparent 60%)",
+          }}
+        />
+
+        {/* Bottom ambient glow */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 100% 60% at 50% 120%, rgba(83,58,253,0.10) 0%, transparent 50%)",
           }}
         />
 
         {/* Logo + mobile close button */}
         <div
-          className="px-6 py-5 flex-shrink-0 flex items-center justify-between"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
+          className="relative px-5 py-5 flex-shrink-0 flex items-center justify-between"
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
         >
           <div className="flex items-center justify-center flex-1">
             <Image
@@ -102,7 +112,7 @@ export function Sidebar() {
               quality={100}
               className="object-contain w-full h-auto"
               style={{
-                maxHeight: "80px",
+                maxHeight: "72px",
                 filter: "grayscale(100%) invert(100%) brightness(200%)",
                 mixBlendMode: "screen",
                 opacity: 0.92,
@@ -111,21 +121,24 @@ export function Sidebar() {
             />
           </div>
 
-          {/* Close button — mobile only */}
           <button
             id="sidebar-close-btn"
             type="button"
             aria-label="Tutup menu navigasi"
             onClick={closeSidebar}
-            className="lg:hidden flex items-center justify-center w-7 h-7 rounded-lg ml-2 flex-shrink-0 transition-all duration-200"
-            style={{ color: "rgba(255,255,255,0.55)", background: "rgba(255,255,255,0.08)" }}
+            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-xl ml-2 flex-shrink-0 transition-all duration-200"
+            style={{
+              color: "rgba(255,255,255,0.5)",
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLElement).style.color = "#ffffff";
-              (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.15)";
+              (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.12)";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.55)";
-              (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.08)";
+              (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.5)";
+              (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)";
             }}
           >
             <X size={14} />
@@ -133,12 +146,12 @@ export function Sidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        <nav className="relative flex-1 px-3 py-5 space-y-1 overflow-y-auto">
           <p
-            className="text-[10px] font-semibold uppercase tracking-widest px-3 mb-3"
-            style={{ color: "rgba(255,255,255,0.6)", letterSpacing: "0.1em" }}
+            className="text-[10px] font-bold uppercase tracking-widest px-3 mb-3"
+            style={{ color: "rgba(255,255,255,0.35)", letterSpacing: "0.14em" }}
           >
-            Menu
+            Navigasi
           </p>
 
           {navItems.map((item, i) => {
@@ -152,60 +165,74 @@ export function Sidebar() {
                 href={item.href}
                 id={`nav-${item.label.toLowerCase()}`}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 group relative",
+                  "flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm transition-all duration-200 group relative",
                   "animate-fade-in"
                 )}
                 style={{
-                  animationDelay: `${i * 50}ms`,
+                  animationDelay: `${i * 60}ms`,
                   ...(isActive
                     ? {
-                        background: "rgba(255,255,255,0.12)",
-                        border: "1px solid rgba(255,255,255,0.2)",
+                        background: "rgba(255,255,255,0.13)",
+                        border: "1px solid rgba(255,255,255,0.16)",
                         color: "#ffffff",
-                        fontWeight: 500,
+                        fontWeight: 600,
                         boxShadow:
-                          "inset 0 1px 0 rgba(255,255,255,0.05), 0 4px 12px rgba(0,0,0,0.1)",
+                          "inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 16px rgba(0,0,0,0.12)",
                       }
                     : {
-                        color: "rgba(255,255,255,0.75)",
+                        color: "rgba(255,255,255,0.6)",
                         border: "1px solid transparent",
+                        fontWeight: 500,
                       }),
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
                     (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.95)";
-                    (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)";
-                    (e.currentTarget as HTMLElement).style.transform = "translateX(4px)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.07)";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isActive) {
-                    (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.75)";
+                    (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.6)";
                     (e.currentTarget as HTMLElement).style.background = "transparent";
-                    (e.currentTarget as HTMLElement).style.transform = "translateX(0)";
                   }
                 }}
               >
-                {/* Active stripe on left */}
                 {isActive && (
                   <span
-                    className="absolute left-0 top-2 bottom-2 w-1 rounded-r"
+                    className="absolute left-0 top-2.5 bottom-2.5 w-[3px] rounded-r-full"
                     style={{
-                      background: "#ffffff",
-                      boxShadow: "2px 0 8px rgba(255,255,255,0.4)",
+                      background: "linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.6) 100%)",
+                      boxShadow: "2px 0 12px rgba(255,255,255,0.3)",
                     }}
                   />
                 )}
 
-                <item.icon size={16} />
+                <span
+                  className="flex items-center justify-center w-7 h-7 rounded-lg flex-shrink-0 transition-all duration-200"
+                  style={
+                    isActive
+                      ? {
+                          background: "rgba(255,255,255,0.12)",
+                          border: "1px solid rgba(255,255,255,0.15)",
+                        }
+                      : {
+                          background: "transparent",
+                          border: "1px solid transparent",
+                        }
+                  }
+                >
+                  <item.icon size={15} />
+                </span>
+
                 <span style={{ letterSpacing: "-0.1px" }}>{item.label}</span>
 
                 {isActive && (
                   <span
-                    className="ml-auto w-1.5 h-1.5 rounded-full"
+                    className="ml-auto w-1.5 h-1.5 rounded-full animate-breathe"
                     style={{
                       background: "#ffffff",
-                      boxShadow: "0 0 8px rgba(255,255,255,0.6)",
+                      boxShadow: "0 0 8px rgba(255,255,255,0.5)",
                     }}
                   />
                 )}
@@ -216,57 +243,61 @@ export function Sidebar() {
 
         {/* User section */}
         <div
-          className="px-3 py-4 flex-shrink-0"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
+          className="relative px-3 py-4 flex-shrink-0"
+          style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
         >
-          {/* User info */}
           <div
-            className="flex items-center gap-3 mb-2 px-3 py-2.5 rounded-lg"
+            className="flex items-center gap-3 mb-2.5 px-3 py-3 rounded-xl transition-all duration-200"
             style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.12)",
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.10)",
             }}
           >
-            {/* Avatar */}
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
               style={{
-                background: "rgba(255,255,255,0.15)",
-                border: "1px solid rgba(255,255,255,0.25)",
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+                background: "linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08))",
+                border: "1px solid rgba(255,255,255,0.22)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12)",
               }}
             >
               {initials}
             </div>
             <div className="flex-1 min-w-0">
               <p
-                className="text-sm font-medium truncate"
-                style={{ color: "rgba(255,255,255,0.90)", letterSpacing: "-0.1px" }}
+                className="text-sm font-semibold truncate"
+                style={{ color: "rgba(255,255,255,0.92)", letterSpacing: "-0.1px" }}
               >
                 {user?.username}
               </p>
               <p
-                className="text-[10px] uppercase tracking-wider mt-0.5"
-                style={{ color: "rgba(255,255,255,0.55)", letterSpacing: "0.08em" }}
+                className="text-[10px] font-medium uppercase tracking-wider mt-0.5"
+                style={{ color: "rgba(255,255,255,0.40)", letterSpacing: "0.1em" }}
               >
-                SCENTINEL
+                Operator
               </p>
             </div>
           </div>
 
-          {/* Logout */}
           <button
             onClick={logout}
             id="sidebar-logout-btn"
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200 group"
-            style={{ color: "rgba(255,255,255,0.65)", fontSize: "13px" }}
+            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm transition-all duration-200 group"
+            style={{
+              color: "rgba(255,255,255,0.50)",
+              fontSize: "13px",
+              fontWeight: 500,
+              border: "1px solid transparent",
+            }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.color = "#ea2261";
-              (e.currentTarget as HTMLElement).style.background = "rgba(234,34,97,0.08)";
+              (e.currentTarget as HTMLElement).style.color = "#f87171";
+              (e.currentTarget as HTMLElement).style.background = "rgba(248,113,113,0.08)";
+              (e.currentTarget as HTMLElement).style.borderColor = "rgba(248,113,113,0.15)";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.65)";
+              (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.50)";
               (e.currentTarget as HTMLElement).style.background = "transparent";
+              (e.currentTarget as HTMLElement).style.borderColor = "transparent";
             }}
           >
             <LogOut size={14} />
