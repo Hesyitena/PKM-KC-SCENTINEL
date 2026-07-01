@@ -184,6 +184,7 @@ export const MOCK_INITIAL_CHART_DATA: SensorReading[] = (() => {
       tgs2602:  parseFloat(Math.max(20,  base.tgs2602 + Math.sin(t + 0.8) * amp.tgs2602 + noise()).toFixed(1)),
       temperature: parseFloat((base.temperature + Math.sin(t + 1.6) * amp.temperature + (Math.random() - 0.5) * 0.6).toFixed(1)),
       humidity:    parseFloat((base.humidity    + Math.sin(t + 3.0) * amp.humidity    + (Math.random() - 0.5) * 2.0).toFixed(1)),
+      is_syncing:  true, // Simulasi bahwa data awal ini adalah sinkronisasi dari memori internal/SD Card
     };
     points.push(reading);
   }
