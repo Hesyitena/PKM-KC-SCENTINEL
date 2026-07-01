@@ -58,3 +58,5 @@ htmlcov/
 coverage.xml
 *.cover
 
+.qoder
+.agents
