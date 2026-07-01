@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Protected routes (require auth)
-const PROTECTED_PATHS = ["/", "/history", "/devices", "/profile", "/settings"];
+// Admin-only routes (full dashboard)
+const ADMIN_PATHS = ["/", "/history", "/devices", "/profile", "/settings"];
+// Viewer-only routes
+const VIEWER_PATHS = ["/monitor"];
+// All protected routes (require auth)
+const PROTECTED_PATHS = [...ADMIN_PATHS, ...VIEWER_PATHS];
 // Auth routes (redirect if already logged in)
 const AUTH_PATHS = ["/login"];
 
@@ -27,6 +31,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (isAuthPath && token) {
+    // Default redirect to root; actual role-based routing handled client-side
     return NextResponse.redirect(new URL("/", request.url));
   }
 
