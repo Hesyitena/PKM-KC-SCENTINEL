@@ -29,7 +29,7 @@ class AuthService:
             )
 
         access_token = create_access_token(
-            data={"sub": user.username, "user_id": user.id},
+            data={"sub": user.username, "user_id": user.id, "role": user.role.value},
             expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
         )
         return TokenResponse(
@@ -37,6 +37,7 @@ class AuthService:
             token_type="bearer",
             user_id=user.id,
             username=user.username,
+            role=user.role.value,
         )
 
     async def get_user_by_id(self, user_id: int) -> UserResponse:
@@ -46,6 +47,7 @@ class AuthService:
         return UserResponse.model_validate(user)
 
     async def create_user(self, payload: UserCreate) -> UserResponse:
+        from app.models.user import UserRole
         existing = await self.repo.get_by_username(payload.username)
         if existing:
             raise HTTPException(
@@ -55,6 +57,7 @@ class AuthService:
         user = User(
             username=payload.username,
             password_hash=hash_password(payload.password),
+            role=UserRole(payload.role.upper()),
         )
         created = await self.repo.create(user)
         return UserResponse.model_validate(created)

@@ -15,8 +15,10 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
     user_id: int
     username: str
+    role: str  # "ADMIN" | "VIEWER"
 
 
 class TokenPayload(BaseModel):
     sub: str  # username
     user_id: int
+    role: str
