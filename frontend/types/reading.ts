@@ -14,6 +14,7 @@ export interface SensorReading {
   confidence: number;
   food_name: string | null;
   device_id: number;
+  is_syncing?: boolean;
 }
 
 export interface ReadingLatest extends SensorReading {
