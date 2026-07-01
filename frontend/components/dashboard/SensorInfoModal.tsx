@@ -3,8 +3,9 @@
 // SCENTINEL - Sensor Info Modal
 // Pop-up window yang muncul saat tombol ⓘ diklik pada SensorCard
 
-import { useEffect, useCallback } from "react";
-import { X, Info } from "lucide-react";
+import { useEffect, useCallback, useState } from "react";
+import { createPortal } from "react-dom";
+import { Info } from "lucide-react";
 
 interface SensorInfoModalProps {
   isOpen: boolean;
@@ -31,6 +32,12 @@ export function SensorInfoModal({
     [onClose]
   );
 
+  // Ensure we only access document.body after hydration (Next.js SSR safe)
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (isOpen) {
       document.addEventListener("keydown", handleKeyDown);
@@ -43,9 +50,9 @@ export function SensorInfoModal({
     };
   }, [isOpen, handleKeyDown]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const modal = (
     /* Backdrop */
     <div
       id="sensor-info-modal-backdrop"
@@ -77,7 +84,7 @@ export function SensorInfoModal({
 
         {/* Header */}
         <div
-          className="flex items-center justify-between px-5 py-4"
+          className="flex items-center px-5 py-4"
           style={{ borderBottom: "1px solid #f0f4f8" }}
         >
           <div className="flex items-center gap-3">
@@ -114,30 +121,6 @@ export function SensorInfoModal({
               </h2>
             </div>
           </div>
-
-          {/* Close button */}
-          <button
-            id="sensor-info-modal-close-btn"
-            type="button"
-            aria-label="Tutup"
-            onClick={onClose}
-            className="flex items-center justify-center w-7 h-7 rounded-lg transition-all duration-150 flex-shrink-0"
-            style={{
-              color: "#64748d",
-              background: "#f6f9fc",
-              border: "1px solid #e3e8ee",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "#e3e8ee";
-              (e.currentTarget as HTMLElement).style.color = "#0d253d";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "#f6f9fc";
-              (e.currentTarget as HTMLElement).style.color = "#64748d";
-            }}
-          >
-            <X size={13} />
-          </button>
         </div>
 
         {/* Description body */}
@@ -184,4 +167,6 @@ export function SensorInfoModal({
       </div>
     </div>
   );
+
+  return createPortal(modal, document.body);
 }
