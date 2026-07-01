@@ -8,12 +8,14 @@ export function saveAuth(data: TokenResponse): void {
   localStorage.setItem(TOKEN_KEY, data.access_token);
   // Simpan juga di cookies untuk dibaca middleware Next.js
   document.cookie = `${TOKEN_KEY}=${data.access_token}; path=/; max-age=86400; SameSite=Strict`;
-  
+
+  // Simpan user lengkap beserta role
   localStorage.setItem(
     USER_KEY,
     JSON.stringify({
       id: data.user_id,
       username: data.username,
+      role: data.role,
     })
   );
 }

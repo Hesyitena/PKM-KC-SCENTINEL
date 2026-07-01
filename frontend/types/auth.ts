@@ -1,4 +1,6 @@
 // SCENTINEL - Auth Types
+export type UserRole = "ADMIN" | "VIEWER";
+
 export interface LoginRequest {
   username: string;
   password: string;
@@ -9,11 +11,13 @@ export interface TokenResponse {
   token_type: "bearer";
   user_id: number;
   username: string;
+  role: UserRole;
 }
 
 export interface User {
   id: number;
   username: string;
+  role: UserRole;
   created_at: string;
 }
 

@@ -37,6 +37,7 @@ export const useAuthStore = create<AuthState>()(
             user: {
               id: data.user_id,
               username: data.username,
+              role: data.role,
               created_at: new Date().toISOString(),
             },
             isLoading: false,
