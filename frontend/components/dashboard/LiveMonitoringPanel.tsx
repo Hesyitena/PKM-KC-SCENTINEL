@@ -22,64 +22,6 @@ import {
 
 const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
-/* ── Premium SVG Confidence Gauge ── */
-function ConfidenceGauge({ value, isLayak }: { value: number; isLayak: boolean }) {
-  const R = 52;
-  const C = 2 * Math.PI * R;
-  const sweep = C * 0.78; // ~280° arc
-  const offset = sweep * (1 - value);
-  const size = 136;
-  const center = size / 2;
-
-  const colorA = isLayak ? "#34d399" : "#f87171";
-  const colorB = isLayak ? "#10b981" : "#ea2261";
-  const glowColor = isLayak ? "rgba(16,185,129,0.45)" : "rgba(234,34,97,0.45)";
-  const trackColor = isLayak ? "rgba(16,185,129,0.10)" : "rgba(234,34,97,0.10)";
-  const gradId = isLayak ? "gaugeGradL" : "gaugeGradS";
-  const startAngle = -C * 0.11; // rotate to start at ~-140deg
-
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} fill="none">
-      <defs>
-        <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor={colorA} />
-          <stop offset="100%" stopColor={colorB} />
-        </linearGradient>
-        <filter id="glow-gauge" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-          <feMerge>
-            <feMergeNode in="coloredBlur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      {/* Track */}
-      <circle
-        cx={center} cy={center} r={R}
-        stroke={trackColor}
-        strokeWidth="9"
-        strokeDasharray={`${sweep} ${C - sweep}`}
-        strokeDashoffset={startAngle}
-        strokeLinecap="round"
-      />
-      {/* Active arc */}
-      <circle
-        cx={center} cy={center} r={R}
-        stroke={`url(#${gradId})`}
-        strokeWidth="9"
-        strokeDasharray={`${sweep} ${C - sweep}`}
-        strokeDashoffset={startAngle + offset}
-        strokeLinecap="round"
-        filter="url(#glow-gauge)"
-        style={{
-          transition: "stroke-dashoffset 1.4s cubic-bezier(0.16,1,0.3,1)",
-          filter: `drop-shadow(0 0 8px ${glowColor})`,
-        }}
-      />
-    </svg>
-  );
-}
-
 export function LiveMonitoringPanel() {
   const { latestReading, chartData, setConnected, pushChartReading } =
     useSensorStore();
@@ -89,7 +31,7 @@ export function LiveMonitoringPanel() {
 
   const handleReading = (reading: SensorReading, isLive = true) => {
     pushChartReading(reading);
-    
+
     if (isLive) {
       setConnected(true);
 
@@ -105,12 +47,12 @@ export function LiveMonitoringPanel() {
     if (prevPredictionRef.current !== null && prevPredictionRef.current !== reading.prediction) {
       if (reading.prediction === "TIDAK LAYAK") {
         toast.error("Peringatan: Kualitas Menurun!", {
-          description: `Deteksi AI: TIDAK LAYAK (${((reading.confidence ?? 0) * 100).toFixed(1)}% confidence)`,
+          description: "Deteksi AI: TIDAK LAYAK — segera periksa sampel.",
           duration: 5000,
         });
       } else {
         toast.success("Status kembali normal", {
-          description: `Deteksi AI: LAYAK (${((reading.confidence ?? 0) * 100).toFixed(1)}% confidence)`,
+          description: "Deteksi AI: LAYAK — kualitas sampel baik.",
           duration: 4000,
         });
       }
@@ -137,20 +79,16 @@ export function LiveMonitoringPanel() {
   }
 
   const isLayak = latestReading.prediction === "LAYAK";
-  const conf = latestReading.confidence ?? 0;
-  const confPct = Math.round(conf * 100);
 
   const S = {
     bgGrad: isLayak
       ? "linear-gradient(135deg, #f0fdf8 0%, #ffffff 60%)"
       : "linear-gradient(135deg, #fff5f5 0%, #ffffff 60%)",
-    border:     isLayak ? "#a7f3d0" : "#fecdd3",
-    borderGlow: isLayak ? "rgba(16,185,129,0.15)" : "rgba(234,34,97,0.12)",
-    text:       isLayak ? "#065f46" : "#9f1239",
-    textSub:    isLayak ? "#047857" : "#be123c",
-    accent:     isLayak ? "#10b981" : "#ea2261",
+    border: isLayak ? "#a7f3d0" : "#fecdd3",
+    text: isLayak ? "#065f46" : "#9f1239",
+    textSub: isLayak ? "#047857" : "#be123c",
+    accent: isLayak ? "#10b981" : "#ea2261",
     accentSoft: isLayak ? "rgba(16,185,129,0.10)" : "rgba(234,34,97,0.09)",
-    accentMid:  isLayak ? "rgba(16,185,129,0.20)" : "rgba(234,34,97,0.18)",
     shadow: isLayak
       ? "0 1px 3px rgba(0,55,112,0.06), 0 8px 32px rgba(16,185,129,0.12), 0 0 0 1px rgba(16,185,129,0.10)"
       : "0 1px 3px rgba(0,55,112,0.06), 0 8px 32px rgba(234,34,97,0.10), 0 0 0 1px rgba(234,34,97,0.10)",
@@ -160,19 +98,15 @@ export function LiveMonitoringPanel() {
     iconShadow: isLayak
       ? "0 8px 24px rgba(16,185,129,0.40)"
       : "0 8px 24px rgba(234,34,97,0.35)",
-    confLabel: isLayak ? "#10b981" : "#ea2261",
-    divider:   isLayak ? "rgba(16,185,129,0.20)" : "rgba(234,34,97,0.18)",
+    divider: isLayak ? "rgba(16,185,129,0.20)" : "rgba(234,34,97,0.18)",
   };
-
-  const accuracyLabel =
-    conf >= 0.92 ? "Akurasi Tinggi" : conf >= 0.75 ? "Akurasi Sedang" : "Akurasi Rendah";
 
   return (
     <div id="live-monitoring-panel" className="flex flex-col gap-4 h-full min-h-0">
 
-      {/* ══ STATUS CARD ══ */}
+      {/* ══ STATUS CARD — Prediction (left) + Sensor Grid 3x2 (right) ══ */}
       <div
-        className="flex-shrink-0 flex flex-col md:flex-row items-stretch overflow-hidden animate-slide-up"
+        className="flex-shrink-0 flex flex-col lg:flex-row items-stretch overflow-hidden animate-slide-up"
         style={{
           background: S.bgGrad,
           border: `1px solid ${S.border}`,
@@ -180,86 +114,55 @@ export function LiveMonitoringPanel() {
           boxShadow: S.shadow,
         }}
       >
-        {/* LEFT: Confidence Gauge zone */}
+        {/* LEFT: Prediction result */}
         <div
-          className="flex flex-col items-center justify-center px-8 py-6 md:flex-shrink-0 border-b md:border-b-0 md:border-r relative"
-          style={{
-            borderColor: S.divider,
-            minWidth: "170px",
-            background: `radial-gradient(ellipse at 50% 30%, ${S.accentSoft} 0%, transparent 70%)`,
-          }}
+          className="flex-1 flex flex-col justify-center px-6 md:px-8 py-6 lg:pr-6 border-b lg:border-b-0 lg:border-r"
+          style={{ borderColor: S.divider, minWidth: "260px" }}
         >
-          <div className="relative">
-            <ConfidenceGauge value={conf} isLayak={isLayak} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <div className="flex flex-wrap items-center gap-2 mb-5">
+            <div
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full w-fit"
+              style={{
+                background: S.accentSoft,
+                border: `1px solid ${S.divider}`,
+              }}
+            >
+              <Cpu size={9} color={S.accent} />
               <span
                 style={{
                   fontSize: "9px",
                   fontWeight: 700,
-                  letterSpacing: "0.14em",
+                  color: S.accent,
+                  letterSpacing: "0.12em",
                   textTransform: "uppercase",
-                  color: S.confLabel,
-                  opacity: 0.7,
-                  marginBottom: "2px",
                 }}
               >
-                Confidence
-              </span>
-              <span
-                style={{
-                  fontSize: "30px",
-                  fontWeight: 800,
-                  letterSpacing: "-1.5px",
-                  fontFeatureSettings: '"tnum" 1',
-                  color: S.text,
-                  lineHeight: 1,
-                }}
-              >
-                {confPct}%
+                Hasil Deteksi Edge AI
               </span>
             </div>
-          </div>
-          <div
-            className="mt-3 px-4 py-1 rounded-full"
-            style={{
-              background: S.accentMid,
-              border: `1px solid ${S.divider}`,
-            }}
-          >
-            <span
-              style={{
-                fontSize: "10px",
-                fontWeight: 700,
-                color: S.textSub,
-                letterSpacing: "0.04em",
-              }}
-            >
-              {accuracyLabel}
-            </span>
-          </div>
-        </div>
-
-        {/* RIGHT: Prediction result */}
-        <div className="flex-1 flex flex-col justify-center px-6 md:px-8 py-6">
-          <div
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full w-fit mb-5"
-            style={{
-              background: S.accentSoft,
-              border: `1px solid ${S.divider}`,
-            }}
-          >
-            <Cpu size={9} color={S.accent} />
-            <span
-              style={{
-                fontSize: "9px",
-                fontWeight: 700,
-                color: S.accent,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-              }}
-            >
-              Hasil Deteksi Edge AI
-            </span>
+            
+            {latestReading.is_syncing && (
+              <div
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full w-fit animate-pulse"
+                style={{
+                  background: "rgba(139, 92, 246, 0.1)",
+                  border: "1px solid rgba(139, 92, 246, 0.2)",
+                }}
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                <span
+                  style={{
+                    fontSize: "9px",
+                    fontWeight: 800,
+                    color: "#8b5cf6",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  SD CARD SYNC
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-5 mb-5">
@@ -341,16 +244,18 @@ export function LiveMonitoringPanel() {
             </span>
           </div>
         </div>
-      </div>
 
-      {/* ══ SENSOR CARDS ══ */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 flex-shrink-0">
-        <SensorCard id="card-mq3"         label="MQ-3 Alkohol"  value={latestReading.mq3}         icon={<Wind size={13} />}         color="primary"  sublabel="ADC" />
-        <SensorCard id="card-mq4"         label="MQ-4 Metana"   value={latestReading.mq4}         icon={<Wind size={13} />}         color="fresh"    sublabel="ADC" />
-        <SensorCard id="card-mq135"       label="MQ-135 Udara"  value={latestReading.mq135}       icon={<FlaskConical size={13} />} color="amber"    sublabel="ADC" />
-        <SensorCard id="card-tgs2602"     label="TGS-2602 VOC"  value={latestReading.tgs2602}     icon={<FlaskConical size={13} />} color="spoiled"  sublabel="ADC" />
-        <SensorCard id="card-temperature" label="Suhu"          value={latestReading.temperature} icon={<Thermometer size={13} />}  color="amber"    unit="°C"  max={50} />
-        <SensorCard id="card-humidity"    label="Kelembapan"    value={latestReading.humidity}    icon={<Droplets size={13} />}     color="primary"  unit="%" max={100} />
+        {/* RIGHT: 3x2 Sensor Grid */}
+        <div className="flex-shrink-0 p-4 lg:w-[55%] xl:w-[58%]">
+          <div className="grid grid-cols-3 grid-rows-2 gap-3 h-full">
+            <SensorCard id="card-mq3"         label="MQ-3 Alkohol"  value={latestReading.mq3}         icon={<Wind size={13} />}         color="primary"  sublabel="ADC" />
+            <SensorCard id="card-mq4"         label="MQ-4 Metana"   value={latestReading.mq4}         icon={<Wind size={13} />}         color="fresh"    sublabel="ADC" />
+            <SensorCard id="card-mq135"       label="MQ-135 Udara"  value={latestReading.mq135}       icon={<FlaskConical size={13} />} color="amber"    sublabel="ADC" />
+            <SensorCard id="card-tgs2602"     label="TGS-2602 VOC"  value={latestReading.tgs2602}     icon={<FlaskConical size={13} />} color="spoiled"  sublabel="ADC" />
+            <SensorCard id="card-temperature" label="Suhu"          value={latestReading.temperature} icon={<Thermometer size={13} />}  color="amber"    unit="°C"  max={50} />
+            <SensorCard id="card-humidity"    label="Kelembapan"    value={latestReading.humidity}    icon={<Droplets size={13} />}     color="primary"  unit="%" max={100} />
+          </div>
+        </div>
       </div>
 
       {/* ══ CHART ══ */}
@@ -387,25 +292,7 @@ export function LiveMonitoringPanel() {
             </div>
           </div>
 
-          <div
-            className="flex items-center gap-1.5 px-3 py-1.5"
-            style={{
-              background: "#ecfdf5",
-              border: "1px solid #a7f3d0",
-              color: "#065f46",
-              fontSize: "10px",
-              fontWeight: 600,
-              letterSpacing: "0.06em",
-              borderRadius: "9999px",
-              textTransform: "uppercase",
-            }}
-          >
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
-            </span>
-            Live
-          </div>
+
         </div>
 
         <div className="px-3 py-3 flex-1 min-h-0">
