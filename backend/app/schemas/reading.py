@@ -19,6 +19,7 @@ class ReadingCreate(BaseModel):
     prediction: PredictionLabel
     confidence: float = Field(..., ge=0.0, le=1.0, description="Model confidence 0-1")
     food_name: str | None = Field(None, max_length=150)
+    is_syncing: bool = Field(False, description="True if data is from SD Card offline storage")
 
 
 class ReadingResponse(BaseModel):
@@ -33,6 +34,7 @@ class ReadingResponse(BaseModel):
     prediction: PredictionLabel
     confidence: float
     food_name: str | None = None
+    is_syncing: bool = False
     device_id: int
 
     model_config = {"from_attributes": True}
