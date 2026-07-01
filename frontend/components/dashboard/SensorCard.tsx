@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import { Info } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import { SensorInfoModal } from "./SensorInfoModal";
 
 interface SensorCardProps {
@@ -289,28 +289,32 @@ export function SensorCard({
           />
         </div>
 
-        {/* Info button — bottom right on hover */}
+        {/* Info button — always visible, bottom-right tucked below the progress bar */}
         {tipText && (
           <button
             id={`${id}-info-btn`}
             type="button"
             aria-label={`Info ${label}`}
-            className="absolute bottom-3 right-3 flex items-center justify-center w-5 h-5 rounded-full transition-all duration-200"
+            className="absolute right-3 flex items-center justify-center w-6 h-6 rounded-full transition-all duration-200 hover:scale-110"
             style={{
+              bottom: "8px",
               color: cfg.iconColor,
               background: cfg.accentSoft,
               border: `1px solid ${cfg.accentBorder}`,
-              opacity: isHovered ? 1 : 0,
-              transform: isHovered ? "scale(1)" : "scale(0.7)",
-              transition: "all 0.2s ease",
-              pointerEvents: isHovered ? "auto" : "none",
+              zIndex: 2,
             }}
             onClick={(e) => {
               e.stopPropagation();
               setModalOpen(true);
             }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = cfg.accentBorder;
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = cfg.accentSoft;
+            }}
           >
-            <Info size={10} />
+            <CircleAlert size={13} strokeWidth={2} />
           </button>
         )}
       </div>
