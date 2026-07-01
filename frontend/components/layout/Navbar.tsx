@@ -3,19 +3,37 @@
 import { useSensorStore } from "@/store/sensorStore";
 import { useUIStore } from "@/store/uiStore";
 import { formatRelativeTime } from "@/lib/utils";
-import { Clock, Menu, Radio, WifiOff } from "lucide-react";
+import { CalendarDays, Clock, Menu, Radio, WifiOff } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
+
+const PAGE_TITLES: Record<string, string> = {
+  "/": "Live Monitoring",
+  "/history": "Riwayat Pengujian",
+  "/devices": "Perangkat",
+  "/profile": "Profil",
+  "/settings": "Pengaturan",
+};
 
 export function Navbar() {
   const { isConnected, lastUpdatedAt } = useSensorStore();
   const { toggleSidebar } = useUIStore();
 
+  const today = new Date().toLocaleDateString("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const pathname = usePathname();
+  const pageTitle = PAGE_TITLES[pathname] ?? "SCENTINEL";
+
   return (
     <header
       id="dashboard-navbar"
-      className="flex-shrink-0"
+      className="flex-shrink-0 h-14"
       style={{
-        background: "rgba(255, 255, 255, 0.96)",
+        background: "rgba(255,255,255,0.97)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         borderBottom: "1px solid #edf0f5",
@@ -24,89 +42,79 @@ export function Navbar() {
       }}
     >
       <div
-        className="h-14 flex items-center justify-between"
+        className="h-full flex items-center justify-between gap-4"
         style={{ paddingLeft: "20px", paddingRight: "20px" }}
       >
-        {/* ── LEFT: hamburger (mobile only) + brand ── */}
-<div className="flex items-center gap-4">
-          {/* Hamburger mobile */}
+        {/* ── LEFT: hamburger + logo + divider + page title ── */}
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Hamburger — mobile only */}
           <button
             id="navbar-hamburger-btn"
             type="button"
             aria-label="Buka menu navigasi"
             onClick={toggleSidebar}
-            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-150"
+            className="lg:hidden flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-150"
             style={{ color: "#64748d" }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "#f6f9fc";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "transparent";
-            }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#f6f9fc")}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}
           >
             <Menu size={17} />
           </button>
 
-          {/* Logo PENS + Tulisan */}
-          <div className="flex items-center gap-3">
-            <Image
-              src="/Logo_PENS.png"
-              alt="Logo PENS"
-              width={48}
-              height={48}
-              className="flex-shrink-0"
-              priority
-            />
+          {/* PENS logo + name */}
+          <div className="flex items-center gap-2.5 flex-shrink-0">
+            <Image src="/Logo_PENS.png" alt="Logo PENS" width={36} height={36} priority />
             <span
+              className="hidden sm:block"
               style={{
-                fontSize: "14px",
+                fontSize: "13px",
                 fontWeight: 700,
-                fontFamily: "'Liberation Sans', 'Arial', sans-serif",
                 color: "#0d253d",
                 letterSpacing: "-0.2px",
-                lineHeight: "1.3",
+                lineHeight: 1.3,
               }}
             >
               Politeknik Elektronika Negeri Surabaya
             </span>
           </div>
 
-          {/* SCENTINEL brand — hidden on small screens */}
-          <div className="hidden xl:flex items-center gap-2.5 ml-4 pl-4 border-l border-gray-200">
+          {/* Divider */}
+          <div className="hidden sm:block h-6 w-px bg-gray-200 flex-shrink-0" />
+
+          {/* SCENTINEL icon + page title */}
+          <div className="flex items-center gap-2 min-w-0">
             <div
-              className="w-6 h-6 flex items-center justify-center rounded-md flex-shrink-0"
+              className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-md"
               style={{ background: "linear-gradient(135deg, #533afd 0%, #4434d4 100%)" }}
             >
               <Radio size={12} color="#fff" />
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 min-w-0">
               <span
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  color: "#0d253d",
-                  letterSpacing: "-0.2px",
-                }}
+                className="hidden md:block flex-shrink-0"
+                style={{ fontSize: "12.5px", fontWeight: 600, color: "#0d253d", letterSpacing: "-0.2px" }}
               >
                 SCENTINEL
               </span>
               <span
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 300,
-                  color: "#94a3b8",
-                  letterSpacing: "-0.1px",
-                }}
+                className="hidden md:block flex-shrink-0"
+                style={{ fontSize: "12.5px", fontWeight: 300, color: "#cbd5e1" }}
               >
-                · Monitoring
+                ·
               </span>
+              <h1
+                id="navbar-page-title"
+                className="truncate"
+                style={{ fontSize: "13px", fontWeight: 600, color: "#533afd", letterSpacing: "-0.2px" }}
+              >
+                {pageTitle}
+              </h1>
             </div>
           </div>
         </div>
 
         {/* ── RIGHT: last update + connection badge ── */}
-        <div className="flex items-center gap-2">
-          {/* Last update pill */}
+        <div className="flex items-center gap-2 flex-shrink-0">
           {lastUpdatedAt && (
             <div
               className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full"
@@ -116,7 +124,6 @@ export function Navbar() {
                 color: "#64748d",
                 fontSize: "11.5px",
                 fontWeight: 300,
-                letterSpacing: "-0.1px",
               }}
             >
               <Clock size={10} />
@@ -124,7 +131,22 @@ export function Navbar() {
             </div>
           )}
 
-          {/* Connection status badge */}
+          {/* Date pill */}
+          <div
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full"
+            style={{
+              background: "#f6f9fc",
+              border: "1px solid #e3e8ee",
+              color: "#475569",
+              fontSize: "11.5px",
+              fontWeight: 500,
+            }}
+          >
+            <CalendarDays size={10} style={{ color: "#94a3b8" }} />
+            <span>{today}</span>
+          </div>
+
+
           <div
             id="sse-status-indicator"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-300"
@@ -136,7 +158,6 @@ export function Navbar() {
                     color: "#059669",
                     fontSize: "11.5px",
                     fontWeight: 500,
-                    letterSpacing: "0.01em",
                     boxShadow: "0 2px 8px rgba(16,185,129,0.15)",
                   }
                 : {
