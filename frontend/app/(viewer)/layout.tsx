@@ -7,8 +7,6 @@ import { Cpu, Loader2 } from "lucide-react";
 
 const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
-/** Berapa lama kita tunggu Zustand persist restore sebelum fallback redirect (ms) */
-const HYDRATION_TIMEOUT_MS = 2000;
 
 export default function ViewerLayout({
   children,
