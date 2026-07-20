@@ -367,11 +367,11 @@ function DataChip({
   const cfg = SENSOR_COLOR_CONFIG[color];
   return (
     <div
-      className="flex flex-col items-center justify-center gap-3 rounded-2xl h-full"
+      className="flex flex-col items-center justify-center gap-3 rounded-3xl h-full"
       style={{
         background: "rgba(255,255,255,0.85)",
         border: "1px solid #e8edf3",
-        boxShadow: "0 1px 4px rgba(0,55,112,0.05)",
+        boxShadow: SHADOW,
       }}
     >
       <div
