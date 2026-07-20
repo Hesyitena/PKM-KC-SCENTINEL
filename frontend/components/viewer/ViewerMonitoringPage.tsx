@@ -108,9 +108,6 @@ export function ViewerMonitoringPage() {
     predBorder: isLayak ? "#d8f3e6" : "#f8dde1",
     predText: isLayak ? "#065f46" : "#9f1239",
     accent: isLayak ? "#10b981" : "#ea2261",
-    shadow: isLayak
-      ? "0 2px 8px rgba(0,0,0,0.04), 0 16px 48px rgba(16,185,129,0.14), 0 0 0 1px rgba(16,185,129,0.12)"
-      : "0 2px 8px rgba(0,0,0,0.04), 0 16px 48px rgba(234,34,97,0.12), 0 0 0 1px rgba(234,34,97,0.12)",
     iconGrad: isLayak
       ? "linear-gradient(135deg, #34d399 0%, #10b981 100%)"
       : "linear-gradient(135deg, #f87171 0%, #ea2261 100%)",
