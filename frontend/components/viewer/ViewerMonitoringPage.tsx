@@ -23,7 +23,6 @@ import { useAuth } from "@/hooks/useAuth";
 
 const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SHADOW = "0 1px 2px rgba(15,23,42,0.04), 0 12px 32px rgba(15,23,42,0.06)";
 
 export function ViewerMonitoringPage() {
