@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   ShieldX,
   Cpu,
-  Wifi,
   LogOut,
 } from "lucide-react";
 
@@ -149,18 +148,17 @@ export function ViewerMonitoringPage() {
       className="flex flex-col w-full h-full overflow-hidden"
       style={{ background: S.pageBg }}
     >
-      {/* ── Top bar ── */}
       <header
         id="viewer-header"
         className="flex-shrink-0 flex items-center justify-between px-6 py-3"
         style={{
-          background: "rgba(255,255,255,0.80)",
+          background: "rgba(255,255,255,0.85)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(0,0,0,0.06)",
+          boxShadow: SHADOW,
         }}
       >
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-8">
           {/* Scentinel Logo */}
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10">
@@ -173,7 +171,7 @@ export function ViewerMonitoringPage() {
               />
             </div>
             <div>
-              <p style={{ fontSize: "15px", fontWeight: 700, color: "#0d253d", letterSpacing: "-0.4px" }}>
+              <p style={{ fontSize: "14px", fontWeight: 600, color: "#0f172a", letterSpacing: "-0.2px" }}>
                 SCENTINEL
               </p>
               <p style={{ fontSize: "10px", fontWeight: 500, color: "#94a3b8", letterSpacing: "0.05em" }}>
@@ -181,9 +179,6 @@ export function ViewerMonitoringPage() {
               </p>
             </div>
           </div>
-
-          {/* Divider */}
-          <div className="hidden sm:block w-px h-8 bg-slate-200" />
 
           {/* PENS Logo */}
           <div className="hidden sm:flex items-center gap-3">
@@ -197,44 +192,33 @@ export function ViewerMonitoringPage() {
               />
             </div>
             <div>
-              <p style={{ fontSize: "12px", fontWeight: 700, color: "#0d253d", lineHeight: "1.2" }}>
+              <p style={{ fontSize: "11px", fontWeight: 600, color: "#0f172a", lineHeight: "1.3" }}>
                 Politeknik Elektronika<br />Negeri Surabaya
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
           {/* Real-time Clock */}
           {time && (
-            <div className="hidden md:flex flex-col items-end mr-2 text-right">
-              <p className="text-[12px] font-bold text-slate-700">
+            <div className="hidden md:flex flex-col items-end mr-1 text-right">
+              <p style={{ fontSize: "12px", fontWeight: 600, color: "#334155", letterSpacing: "-0.1px" }}>
                 {time.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
               </p>
-              <p className="text-[10px] font-bold text-slate-500 mt-0.5 tracking-wide">
+              <p style={{ fontSize: "10px", fontWeight: 500, color: "#94a3b8", letterSpacing: "0.04em", marginTop: "2px" }}>
                 {time.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" }).replace(/\./g, ":")} WIB
               </p>
             </div>
           )}
 
-          {/* Live indicator */}
-          <div
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-            style={{
-              background: "rgba(16,185,129,0.10)",
-              border: "1px solid rgba(16,185,129,0.25)",
-            }}
-          >
+          {/* Live indicator — quiet, hero card carries the main energy */}
+          <div className="flex items-center gap-1.5">
             <div
-              className="w-2 h-2 rounded-full"
-              style={{
-                background: "#10b981",
-                boxShadow: "0 0 8px #10b981",
-                animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite",
-              }}
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: "#10b981", animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite" }}
             />
-            <Wifi size={12} color="#059669" />
-            <span style={{ fontSize: "11px", fontWeight: 600, color: "#047857" }}>
+            <span style={{ fontSize: "10px", fontWeight: 600, color: "#94a3b8", letterSpacing: "0.08em" }}>
               LIVE
             </span>
           </div>
@@ -242,7 +226,7 @@ export function ViewerMonitoringPage() {
           {/* Logout Button */}
           <button
             onClick={logout}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors duration-200"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors duration-200"
             title="Keluar"
           >
             <LogOut size={14} />
