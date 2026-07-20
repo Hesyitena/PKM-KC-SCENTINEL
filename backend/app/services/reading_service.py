@@ -94,7 +94,6 @@ class ReadingService:
         start_date: datetime | None,
         end_date: datetime | None,
         prediction: PredictionLabel | None,
-        food_name: str | None,
         limit: int,
         offset: int,
     ) -> PaginatedReadings:
@@ -103,7 +102,6 @@ class ReadingService:
             start_date=start_date,
             end_date=end_date,
             prediction=prediction,
-            food_name=food_name,
             limit=limit,
             offset=offset,
         )

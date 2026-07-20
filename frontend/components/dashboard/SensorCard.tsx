@@ -33,7 +33,7 @@ export const SENSOR_TOOLTIPS: Record<string, string> = {
 };
 
 /* ── Color tokens per sensor type ── */
-const colorConfig = {
+export const SENSOR_COLOR_CONFIG = {
   default: {
     accent: "#64748d",
     accentSoft: "rgba(100,116,141,0.10)",
@@ -140,7 +140,7 @@ export function SensorCard({
   max,
   tooltip,
 }: SensorCardProps) {
-  const cfg = colorConfig[color];
+  const cfg = SENSOR_COLOR_CONFIG[color];
   const numVal = typeof value === "number" ? value : parseFloat(value as string) || 0;
   const effectiveMax = max ?? Math.max(numVal * 1.5, 1);
   const barPct = Math.min(1, Math.max(0.02, numVal / effectiveMax));

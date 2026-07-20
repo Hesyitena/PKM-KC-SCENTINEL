@@ -9,7 +9,7 @@ from app.models.reading import PredictionLabel
 
 class ReadingCreate(BaseModel):
     """Payload sent by ESP32 via POST /api/readings"""
-    device_id: int
+    device_id: int = 1
     mq3: float = Field(..., ge=0, description="MQ-3 alcohol sensor ADC value")
     mq4: float = Field(..., ge=0, description="MQ-4 methane sensor ADC value")
     mq135: float = Field(..., ge=0, description="MQ-135 air quality sensor ADC value")
@@ -18,7 +18,6 @@ class ReadingCreate(BaseModel):
     humidity: float = Field(..., ge=0, le=100, description="Relative humidity percentage")
     prediction: PredictionLabel
     confidence: float = Field(..., ge=0.0, le=1.0, description="Model confidence 0-1")
-    food_name: str | None = Field(None, max_length=150)
     is_syncing: bool = Field(False, description="True if data is from SD Card offline storage")
 
 
@@ -33,7 +32,6 @@ class ReadingResponse(BaseModel):
     humidity: float
     prediction: PredictionLabel
     confidence: float
-    food_name: str | None = None
     is_syncing: bool = False
     device_id: int
 
@@ -52,7 +50,6 @@ class ReadingHistoryParams(BaseModel):
     start_date: datetime | None = None
     end_date: datetime | None = None
     prediction: PredictionLabel | None = None
-    food_name: str | None = None
     limit: int = Field(50, ge=1, le=500)
     offset: int = Field(0, ge=0)
 

@@ -13,7 +13,7 @@ async def test_submit_reading_invalid_api_key():
         "device_id": 1,
         "mq3": 123.4, "mq4": 200.1, "mq135": 310.5, "tgs2602": 150.0,
         "temperature": 27.5, "humidity": 65.0,
-        "prediction": "LAYAK", "confidence": 0.95, "food_name": "Ayam"
+        "prediction": "LAYAK", "confidence": 0.95
     }
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore[arg-type]
         response = await client.post(
@@ -30,7 +30,7 @@ async def test_submit_reading_valid_api_key():
         "device_id": 1,
         "mq3": 123.4, "mq4": 200.1, "mq135": 310.5, "tgs2602": 150.0,
         "temperature": 27.5, "humidity": 65.0,
-        "prediction": "LAYAK", "confidence": 0.95, "food_name": "Ayam"
+        "prediction": "LAYAK", "confidence": 0.95
     }
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore[arg-type]
         response = await client.post(

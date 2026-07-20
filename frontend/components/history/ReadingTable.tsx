@@ -43,7 +43,7 @@ export function ReadingTable({
                 borderBottom: "1px solid #e2e8f0",
               }}
             >
-              {["Waktu", "Makanan", "MQ-3", "MQ-4", "MQ-135", "TGS-2602", "Suhu", "Lembap", "Hasil", "Confidence"].map(
+              {["Waktu", "MQ-3", "MQ-4", "MQ-135", "TGS-2602", "Suhu", "Lembap", "Hasil", "Confidence"].map(
                 (h) => (
                   <th
                     key={h}
@@ -59,7 +59,7 @@ export function ReadingTable({
           <tbody>
             {readings.length === 0 ? (
               <tr>
-                <td colSpan={10} className="text-center py-16">
+                <td colSpan={9} className="text-center py-16">
                   <div className="flex flex-col items-center gap-3">
                     <div
                       className="w-12 h-12 rounded-2xl flex items-center justify-center"
@@ -96,7 +96,7 @@ export function ReadingTable({
                   <td className="px-4 py-3 whitespace-nowrap text-xs text-slate-500 font-medium" style={{ fontFeatureSettings: '"tnum" 1' }}>
                     {formatDate(r.timestamp)}
                   </td>
-                  <td className="px-4 py-3 font-semibold text-slate-700">{r.food_name ?? "—"}</td>
+
                   <td className="px-4 py-3 tabular-nums text-slate-600">{r.mq3.toFixed(1)}</td>
                   <td className="px-4 py-3 tabular-nums text-slate-600">{r.mq4.toFixed(1)}</td>
                   <td className="px-4 py-3 tabular-nums text-slate-600">{r.mq135.toFixed(1)}</td>

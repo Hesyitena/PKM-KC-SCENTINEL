@@ -1,7 +1,7 @@
 "use client";
 
 import { ReadingHistoryParams, PredictionLabel } from "@/types/reading";
-import { Search, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
 interface DateFilterProps {
   params: ReadingHistoryParams;
@@ -59,24 +59,6 @@ export function DateFilter({ params, onChange, onReset }: DateFilterProps) {
           <option value="LAYAK">LAYAK</option>
           <option value="TIDAK LAYAK">TIDAK LAYAK</option>
         </select>
-      </div>
-
-      {/* Food name search */}
-      <div className="flex flex-col gap-1.5 flex-1 min-w-[160px]">
-        <label className="text-xs text-muted-foreground uppercase tracking-wider">
-          Nama Makanan
-        </label>
-        <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
-            id="filter-food-name"
-            type="text"
-            placeholder="Cari makanan..."
-            value={params.food_name ?? ""}
-            onChange={(e) => onChange({ food_name: e.target.value || undefined })}
-            className="w-full pl-9 pr-3 py-2 rounded-lg bg-muted border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
-          />
-        </div>
       </div>
 
       {/* Reset button */}

@@ -65,7 +65,6 @@ async def get_history(
     start_date: Annotated[datetime | None, Query()] = None,
     end_date: Annotated[datetime | None, Query()] = None,
     prediction: Annotated[PredictionLabel | None, Query()] = None,
-    food_name: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=500)] = 50,
     offset: Annotated[int, Query(ge=0)] = 0,
 ):
@@ -76,7 +75,6 @@ async def get_history(
         start_date=start_date,
         end_date=end_date,
         prediction=prediction,
-        food_name=food_name,
         limit=limit,
         offset=offset,
     )

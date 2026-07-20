@@ -1,12 +1,11 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, ReactNode } from "react";
 import { useSSE } from "@/lib/useSSE";
 import { useMockSSE } from "@/lib/useMockSSE";
 import { useSensorStore } from "@/store/sensorStore";
 import { SensorReading } from "@/types/reading";
-import { SensorCard } from "@/components/dashboard/SensorCard";
-import { GasChart } from "@/components/dashboard/GasChart";
+import { SENSOR_COLOR_CONFIG } from "@/components/dashboard/SensorCard";
 import { toast } from "sonner";
 import {
   Thermometer,
@@ -16,7 +15,6 @@ import {
   ShieldCheck,
   ShieldX,
   Cpu,
-  BarChart3,
   Wifi,
   LogOut,
 } from "lucide-react";
@@ -28,8 +26,7 @@ const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 export function ViewerMonitoringPage() {
   const { logout } = useAuth();
-  const { latestReading, chartData, setConnected, pushChartReading } =
-    useSensorStore();
+  const { latestReading, setConnected, pushChartReading } = useSensorStore();
 
   const [time, setTime] = useState<Date | null>(null);
 
@@ -121,11 +118,28 @@ export function ViewerMonitoringPage() {
       ? "0 8px 32px rgba(16,185,129,0.45)"
       : "0 8px 32px rgba(234,34,97,0.40)",
     divider: isLayak ? "rgba(16,185,129,0.20)" : "rgba(234,34,97,0.18)",
-    // Full page background
+    // Full page background — richer than the dashboard variant since this
+    // is read from across a room, not up close
     pageBg: isLayak
-      ? "linear-gradient(160deg, #f0fdf8 0%, #f8fafc 40%, #f0fdf4 100%)"
-      : "linear-gradient(160deg, #fff5f5 0%, #f8fafc 40%, #fff1f2 100%)",
+      ? "linear-gradient(160deg, #eafdf6 0%, #f8fafc 45%, #e7fbf1 100%)"
+      : "linear-gradient(160deg, #fff0f0 0%, #f8fafc 45%, #ffe9ec 100%)",
   };
+
+  const sensorTape: {
+    id: string;
+    label: string;
+    value: number;
+    unit?: string;
+    icon: ReactNode;
+    color: keyof typeof SENSOR_COLOR_CONFIG;
+  }[] = [
+    { id: "card-mq3", label: "MQ-3 Alkohol", value: latestReading.mq3, icon: <Wind size={26} />, color: "primary" },
+    { id: "card-mq4", label: "MQ-4 Metana", value: latestReading.mq4, icon: <Wind size={26} />, color: "fresh" },
+    { id: "card-mq135", label: "MQ-135 Udara", value: latestReading.mq135, icon: <FlaskConical size={26} />, color: "amber" },
+    { id: "card-tgs2602", label: "TGS-2602 VOC", value: latestReading.tgs2602, icon: <FlaskConical size={26} />, color: "spoiled" },
+    { id: "card-temperature", label: "Suhu", value: latestReading.temperature, unit: "°C", icon: <Thermometer size={26} />, color: "amber" },
+    { id: "card-humidity", label: "Kelembapan", value: latestReading.humidity, unit: "%", icon: <Droplets size={26} />, color: "primary" },
+  ];
 
   return (
     <div
@@ -236,209 +250,185 @@ export function ViewerMonitoringPage() {
       </header>
 
       {/* ── Main content ── */}
-      <div className="flex-1 flex flex-col min-h-0 p-4 lg:p-5 gap-4">
+      <div className="flex-1 flex flex-col min-h-0 px-4 lg:px-6 py-4 gap-4">
 
-        {/* ── Status + Sensor Grid (top section) ── */}
+        {/* ── Hero: verdict is the thesis of this screen ── */}
         <div
-          className="flex-shrink-0 flex flex-col lg:flex-row items-stretch overflow-hidden"
+          key={latestReading.prediction}
+          className="flex-shrink-0 relative overflow-hidden animate-fade-in-scale"
           style={{
             background: S.predBg,
             border: `1px solid ${S.predBorder}`,
-            borderRadius: "24px",
+            borderRadius: "28px",
             boxShadow: S.shadow,
           }}
         >
-          {/* LEFT: Big prediction display */}
-          <div
-            className="flex flex-col justify-center px-8 py-6 lg:pr-8"
-            style={{
-              borderBottom: `1px solid ${S.divider}`,
-              borderRight: "none",
-              minWidth: "280px",
-            }}
-          >
-            {/* AI badge */}
-            <div className="flex items-center gap-2 mb-6">
-              <div
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full"
-                style={{
-                  background: S.accentSoft,
-                  border: `1px solid ${S.divider}`,
-                }}
-              >
-                <Cpu size={10} color={S.accent} />
-                <span style={{
-                  fontSize: "9px",
-                  fontWeight: 700,
-                  color: S.accent,
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                }}>
-                  Hasil Deteksi Edge AI
-                </span>
-              </div>
+          <div className="relative flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16 px-8 py-9 lg:py-12">
+            <SentinelRing isLayak={isLayak} accent={S.accent} iconGrad={S.iconGrad} iconShadow={S.iconShadow} />
 
-              {latestReading.is_syncing && (
+            <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+              {/* AI badge row */}
+              <div className="flex items-center gap-2 mb-4">
                 <div
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full animate-pulse"
-                  style={{
-                    background: "rgba(139,92,246,0.10)",
-                    border: "1px solid rgba(139,92,246,0.20)",
-                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full"
+                  style={{ background: S.accentSoft, border: `1px solid ${S.divider}` }}
                 >
-                  <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                  <span style={{
-                    fontSize: "9px",
-                    fontWeight: 800,
-                    color: "#8b5cf6",
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                  }}>
-                    SD SYNC
+                  <Cpu size={10} color={S.accent} />
+                  <span style={{ fontSize: "9px", fontWeight: 700, color: S.accent, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                    Hasil Deteksi Edge AI
                   </span>
                 </div>
-              )}
-            </div>
 
-            {/* Big icon + prediction text */}
-            <div className="flex items-center gap-6 mb-6">
-              <div
-                className="flex items-center justify-center flex-shrink-0"
-                style={{
-                  background: S.iconGrad,
-                  borderRadius: "24px",
-                  width: "80px",
-                  height: "80px",
-                  boxShadow: S.iconShadow,
-                }}
-              >
-                {isLayak
-                  ? <ShieldCheck size={40} color="#fff" strokeWidth={1.5} />
-                  : <ShieldX size={40} color="#fff" strokeWidth={1.5} />
-                }
+                {latestReading.is_syncing && (
+                  <div
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full animate-pulse"
+                    style={{ background: "rgba(139,92,246,0.10)", border: "1px solid rgba(139,92,246,0.20)" }}
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                    <span style={{ fontSize: "9px", fontWeight: 800, color: "#8b5cf6", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                      SD SYNC
+                    </span>
+                  </div>
+                )}
               </div>
 
-              <div>
-                <p style={{
-                  fontSize: "44px",
-                  fontWeight: 900,
-                  letterSpacing: "-2.5px",
+              {/* Giant verdict — readable from across the room */}
+              <p
+                style={{
+                  fontFamily: "var(--font-grotesk)",
+                  fontSize: "clamp(56px, 8vw, 128px)",
+                  fontWeight: 800,
+                  letterSpacing: "-4px",
+                  lineHeight: 0.95,
                   color: S.predText,
-                  lineHeight: 1,
-                  textShadow: `0 2px 16px ${S.accentSoft}`,
-                }}>
-                  {latestReading.prediction}
-                </p>
-                {latestReading.food_name && (
-                  <p style={{ fontSize: "14px", fontWeight: 400, color: "#94a3b8", marginTop: "8px" }}>
-                    Sampel:{" "}
-                    <span style={{ fontWeight: 600, color: S.predSub }}>
-                      {latestReading.food_name}
+                  textShadow: `0 4px 28px ${S.accentSoft}`,
+                }}
+              >
+                {latestReading.prediction}
+              </p>
+
+              {/* Confidence + timestamp */}
+              <div className="flex items-center gap-4 mt-6">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ background: S.accent, boxShadow: `0 0 8px ${S.accent}`, animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite" }}
+                  />
+                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>
+                    Diperbarui{" "}
+                    <span style={{ fontWeight: 600, color: "#273951", fontFamily: "var(--font-mono)" }}>
+                      {new Date(latestReading.timestamp).toLocaleTimeString("id-ID", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })}
                     </span>
-                  </p>
+                  </span>
+                </div>
+
+                {latestReading.confidence !== undefined && (
+                  <div
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-full"
+                    style={{ background: S.accentSoft, border: `1px solid ${S.divider}` }}
+                  >
+                    <span style={{ fontSize: "12px", fontWeight: 700, color: S.predText }}>
+                      {(latestReading.confidence * 100).toFixed(1)}%
+                    </span>
+                    <span style={{ fontSize: "10px", color: "#94a3b8" }}>keyakinan</span>
+                  </div>
                 )}
               </div>
             </div>
-
-            {/* Confidence + timestamp */}
-            <div
-              className="flex items-center justify-between pt-4"
-              style={{ borderTop: `1px solid ${S.divider}` }}
-            >
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-2 h-2 rounded-full"
-                  style={{
-                    background: S.accent,
-                    boxShadow: `0 0 8px ${S.accent}`,
-                    animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite",
-                  }}
-                />
-                <span style={{ fontSize: "11px", color: "#94a3b8" }}>
-                  Diperbarui{" "}
-                  <span style={{ fontWeight: 600, color: "#273951", fontFamily: "var(--font-mono)" }}>
-                    {new Date(latestReading.timestamp).toLocaleTimeString("id-ID", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit",
-                    })}
-                  </span>
-                </span>
-              </div>
-
-              {latestReading.confidence !== undefined && (
-                <div
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-full"
-                  style={{
-                    background: S.accentSoft,
-                    border: `1px solid ${S.divider}`,
-                  }}
-                >
-                  <span style={{ fontSize: "11px", fontWeight: 700, color: S.predText }}>
-                    {(latestReading.confidence * 100).toFixed(1)}%
-                  </span>
-                  <span style={{ fontSize: "10px", color: "#94a3b8" }}>keyakinan</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* RIGHT: 3x2 Sensor Grid */}
-          <div
-            className="flex-1 p-4"
-            style={{ borderLeft: `1px solid ${S.divider}` }}
-          >
-            <div className="grid grid-cols-3 grid-rows-2 gap-3 h-full">
-              <SensorCard id="card-mq3"         label="MQ-3 Alkohol"  value={latestReading.mq3}         icon={<Wind size={13} />}         color="primary"  sublabel="ADC" />
-              <SensorCard id="card-mq4"         label="MQ-4 Metana"   value={latestReading.mq4}         icon={<Wind size={13} />}         color="fresh"    sublabel="ADC" />
-              <SensorCard id="card-mq135"       label="MQ-135 Udara"  value={latestReading.mq135}       icon={<FlaskConical size={13} />} color="amber"    sublabel="ADC" />
-              <SensorCard id="card-tgs2602"     label="TGS-2602 VOC"  value={latestReading.tgs2602}     icon={<FlaskConical size={13} />} color="spoiled"  sublabel="ADC" />
-              <SensorCard id="card-temperature" label="Suhu"          value={latestReading.temperature} icon={<Thermometer size={13} />}  color="amber"    unit="°C" max={50} />
-              <SensorCard id="card-humidity"    label="Kelembapan"    value={latestReading.humidity}    icon={<Droplets size={13} />}     color="primary"  unit="%" max={100} />
-            </div>
           </div>
         </div>
 
-        {/* ── Chart (bottom, fills remaining height) ── */}
+        {/* ── Data tape: glanceable sensor readout, filling remaining screen ── */}
         <div
-          className="rounded-2xl border flex flex-col flex-1 min-h-0 overflow-hidden"
-          style={{
-            background: "rgba(255,255,255,0.92)",
-            backdropFilter: "blur(8px)",
-            borderColor: "#e8edf3",
-            boxShadow: "0 1px 4px rgba(0,55,112,0.06), 0 0 0 0.5px rgba(0,0,0,0.04)",
-          }}
+          className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4 min-h-0"
+          style={{ gridAutoRows: "1fr" }}
         >
-          <div
-            className="flex items-center justify-between px-5 py-3.5 flex-shrink-0"
-            style={{ borderBottom: "1px solid #f1f5f9" }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="w-9 h-9 flex items-center justify-center rounded-xl"
-                style={{
-                  background: "linear-gradient(135deg, rgba(83,58,253,0.12), rgba(83,58,253,0.05))",
-                  border: "1px solid rgba(83,58,253,0.15)",
-                  boxShadow: "0 2px 8px rgba(83,58,253,0.08)",
-                }}
-              >
-                <BarChart3 size={16} style={{ color: "#533afd" }} />
-              </div>
-              <div>
-                <h1 style={{ fontSize: "14px", fontWeight: 600, color: "#0d253d", letterSpacing: "-0.3px" }}>
-                  Grafik Sensor Gas
-                </h1>
-                <p style={{ fontSize: "11px", fontWeight: 400, color: "#94a3b8" }}>
-                  {chartData.length} titik data · Realtime
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="px-3 py-3 flex-1 min-h-0">
-            <GasChart data={chartData} height="100%" />
-          </div>
+          {sensorTape.map((s) => (
+            <DataChip key={s.id} {...s} />
+          ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Signature element: the "sentinel" — concentric rings breathing outward
+ * from the verdict icon, standing in for the device continuously sensing
+ * the air. Doubles as a state-change cue since it remounts (and re-plays)
+ * whenever the prediction flips.
+ */
+function SentinelRing({
+  isLayak,
+  accent,
+  iconGrad,
+  iconShadow,
+}: {
+  isLayak: boolean;
+  accent: string;
+  iconGrad: string;
+  iconShadow: string;
+}) {
+  return (
+    <div className="relative flex items-center justify-center flex-shrink-0" style={{ width: 176, height: 176 }}>
+      <div className="absolute inset-0 rounded-full animate-breathe" style={{ border: `2px solid ${accent}`, opacity: 0.14 }} />
+      <div className="absolute inset-5 rounded-full animate-breathe delay-300" style={{ border: `2px solid ${accent}`, opacity: 0.22 }} />
+      <div className="absolute inset-10 rounded-full animate-breathe delay-500" style={{ border: `2px solid ${accent}`, opacity: 0.32 }} />
+      <div
+        className="relative flex items-center justify-center rounded-full"
+        style={{ width: 108, height: 108, background: iconGrad, boxShadow: iconShadow }}
+      >
+        {isLayak
+          ? <ShieldCheck size={50} color="#fff" strokeWidth={1.5} />
+          : <ShieldX size={50} color="#fff" strokeWidth={1.5} />
+        }
+      </div>
+    </div>
+  );
+}
+
+/* ── Compact glanceable sensor readout for the data tape ── */
+function DataChip({
+  label,
+  value,
+  unit,
+  icon,
+  color,
+}: {
+  label: string;
+  value: number;
+  unit?: string;
+  icon: ReactNode;
+  color: keyof typeof SENSOR_COLOR_CONFIG;
+}) {
+  const cfg = SENSOR_COLOR_CONFIG[color];
+  return (
+    <div
+      className="flex flex-col items-center justify-center gap-3 rounded-2xl h-full"
+      style={{
+        background: "rgba(255,255,255,0.85)",
+        border: "1px solid #e8edf3",
+        boxShadow: "0 1px 4px rgba(0,55,112,0.05)",
+      }}
+    >
+      <div
+        className="flex items-center justify-center flex-shrink-0 rounded-2xl"
+        style={{ width: 56, height: 56, background: cfg.iconBg, color: cfg.iconColor }}
+      >
+        {icon}
+      </div>
+      <div className="min-w-0 text-center">
+        <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "#94a3b8" }}>
+          {label}
+        </p>
+        <p style={{ fontFamily: "var(--font-mono)", fontSize: "34px", fontWeight: 700, letterSpacing: "-0.5px", color: cfg.value }}>
+          {value.toFixed(1)}
+          {unit && <span style={{ fontSize: "16px", fontWeight: 500, marginLeft: "2px", opacity: 0.7 }}>{unit}</span>}
+        </p>
       </div>
     </div>
   );
@@ -452,7 +442,7 @@ function ViewerSkeleton() {
       <div className="h-14 rounded-xl bg-slate-100 flex-shrink-0" />
       {/* Status card skeleton */}
       <div className="h-48 rounded-2xl bg-slate-100 flex-shrink-0" />
-      {/* Chart skeleton */}
+      {/* Data tape skeleton */}
       <div className="flex-1 rounded-2xl bg-slate-100" />
     </div>
   );

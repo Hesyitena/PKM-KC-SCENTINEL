@@ -12,7 +12,6 @@ export interface SensorReading {
   humidity: number;
   prediction: PredictionLabel;
   confidence: number;
-  food_name: string | null;
   device_id: number;
   is_syncing?: boolean;
 }
@@ -33,7 +32,6 @@ export interface ReadingHistoryParams {
   start_date?: string;
   end_date?: string;
   prediction?: PredictionLabel;
-  food_name?: string;
   limit?: number;
   offset?: number;
 }
@@ -48,5 +46,4 @@ export interface ReadingCreate {
   humidity: number;
   prediction: PredictionLabel;
   confidence: number;
-  food_name?: string;
 }

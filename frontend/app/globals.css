@@ -16,6 +16,10 @@
 
 /* ── Design Tokens (from DESIGN.md) ── */
 :root {
+  /* Font variables (replaces next/font/google CSS var injection) */
+  --font-jakarta: "Plus Jakarta Sans";
+  --font-grotesk: "Space Grotesk";
+  --font-mono:    "Geist Mono";
   /* Brand */
   --stripe-primary:          #533afd;
   --stripe-primary-deep:     #4434d4;

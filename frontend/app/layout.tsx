@@ -1,29 +1,6 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Space_Grotesk, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-jakarta",
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-grotesk",
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
-});
-
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
-  weight: ["400", "500", "600"],
-  adjustFontFallback: false,
-});
 
 export const metadata: Metadata = {
   title: "SCENTINEL — Food Spoilage Detection System",
@@ -45,7 +22,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className={`${plusJakartaSans.variable} ${spaceGrotesk.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="font-sans antialiased bg-background text-foreground">
         {children}
         <Toaster
           position="top-right"

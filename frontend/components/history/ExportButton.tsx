@@ -17,7 +17,6 @@ const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 function readingToCSVRow(r: Record<string, unknown>): string {
   return [
     r.timestamp,
-    r.food_name ?? "",
     r.mq3,
     r.mq4,
     r.mq135,
@@ -42,7 +41,6 @@ export function ExportButton({ startDate, endDate }: ExportButtonProps) {
         /* ── Demo mode: generate CSV from in-memory chart data ── */
         const headers = [
           "Waktu",
-          "Makanan",
           "MQ-3",
           "MQ-4",
           "MQ-135",

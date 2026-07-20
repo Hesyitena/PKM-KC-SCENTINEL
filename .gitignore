@@ -59,5 +59,12 @@ htmlcov/
 coverage.xml
 *.cover
 
-.qoder
-.agents
+# AI
+.agents/
+.clinerules
+.cursor/
+.cursorrules
+.copilot-instructions.md
+.opencode/
+.windsurf/
+.qoder/

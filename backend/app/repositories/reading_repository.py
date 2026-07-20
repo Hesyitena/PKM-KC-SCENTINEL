@@ -47,7 +47,6 @@ class ReadingRepository:
         start_date: datetime | None = None,
         end_date: datetime | None = None,
         prediction: PredictionLabel | None = None,
-        food_name: str | None = None,
         limit: int = 50,
         offset: int = 0,
     ) -> tuple[list[SensorReading], int]:
@@ -61,8 +60,6 @@ class ReadingRepository:
             filters.append(SensorReading.timestamp <= end_date)
         if prediction:
             filters.append(SensorReading.prediction == prediction)
-        if food_name:
-            filters.append(SensorReading.food_name.ilike(f"%{food_name}%"))
 
         where_clause = and_(*filters) if filters else True
 

@@ -194,21 +194,6 @@ export function LiveMonitoringPanel() {
               >
                 {latestReading.prediction}
               </p>
-              {latestReading.food_name && (
-                <p
-                  style={{
-                    fontSize: "13px",
-                    fontWeight: 400,
-                    color: "#94a3b8",
-                    marginTop: "6px",
-                  }}
-                >
-                  Sampel:{" "}
-                  <span style={{ fontWeight: 600, color: S.textSub }}>
-                    {latestReading.food_name}
-                  </span>
-                </p>
-              )}
             </div>
           </div>
 

@@ -48,7 +48,6 @@ export function useReadingHistory(params: ReadingHistoryParams) {
     if (DEMO_MODE) {
       const result = getMockHistory(params.offset ?? 0, params.limit ?? 20, {
         prediction: params.prediction,
-        food_name: params.food_name,
       });
       setData(result);
       setIsLoading(false);

@@ -5,7 +5,7 @@ Stores all sensor data and AI prediction results from ESP32 devices.
 import enum
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
-from sqlalchemy import String, Float, Enum, DateTime, ForeignKey, Integer, Boolean
+from sqlalchemy import Float, Enum, DateTime, ForeignKey, Integer, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.database import Base
@@ -46,7 +46,6 @@ class SensorReading(Base):
         nullable=False,
     )
     confidence: Mapped[float] = mapped_column(Float, nullable=False)  # 0.0 - 1.0
-    food_name: Mapped[str | None] = mapped_column(String(150), nullable=True)
     is_syncing: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # Foreign key

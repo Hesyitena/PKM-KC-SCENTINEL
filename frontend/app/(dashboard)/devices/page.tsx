@@ -256,8 +256,7 @@ export default function DevicesPage() {
   "temperature": 28.3,
   "humidity": 67.1,
   "prediction": "LAYAK",   // atau "TIDAK LAYAK"
-  "confidence": 0.9412,
-  "food_name": "Ayam Segar" // opsional
+  "confidence": 0.9412
 }`}</CodeBlock>
                 </div>
               </div>

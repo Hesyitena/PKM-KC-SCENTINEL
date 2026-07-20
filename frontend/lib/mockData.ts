@@ -38,7 +38,6 @@ export const MOCK_LATEST_READING: ReadingLatest = {
   humidity: 67.1,
   prediction: "LAYAK",
   confidence: 0.9412,
-  food_name: "Ayam Segar",
   device_id: 1,
   device_name: "SCENTINEL-Node-01",
   device_serial: "SCN-2026-001",
@@ -82,7 +81,6 @@ export function generateNextReading(prev: SensorReading): SensorReading {
 
 // ─── Riwayat Pembacaan (untuk halaman History) ────────────────────────────────
 
-const FOOD_SAMPLES = ["Ayam Segar", "Daging Sapi", "Ikan Nila", "Tahu", "Tempe", "Susu Murni"];
 const PREDICTIONS: Array<{ prediction: "LAYAK" | "TIDAK LAYAK"; confidence: [number, number] }> = [
   { prediction: "LAYAK",       confidence: [0.88, 0.99] },
   { prediction: "LAYAK",       confidence: [0.82, 0.97] },
@@ -114,7 +112,6 @@ function buildHistoryItem(id: number, minsAgo: number): SensorReading {
     humidity:    randomBetween(55, 80),
     prediction:  p.prediction,
     confidence,
-    food_name: FOOD_SAMPLES[id % FOOD_SAMPLES.length],
     device_id: 1,
   };
 }
@@ -127,17 +124,12 @@ const ALL_HISTORY: SensorReading[] = Array.from({ length: 60 }, (_, i) =>
 export function getMockHistory(
   offset = 0,
   limit = 20,
-  filters: { prediction?: string; food_name?: string } = {}
+  filters: { prediction?: string } = {}
 ): PaginatedReadings {
   let filtered = [...ALL_HISTORY];
 
   if (filters.prediction) {
     filtered = filtered.filter((r) => r.prediction === filters.prediction);
-  }
-  if (filters.food_name) {
-    filtered = filtered.filter((r) =>
-      r.food_name?.toLowerCase().includes(filters.food_name!.toLowerCase())
-    );
   }
 
   return {
