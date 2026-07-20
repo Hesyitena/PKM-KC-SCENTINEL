@@ -24,6 +24,9 @@ import { useAuth } from "@/hooks/useAuth";
 
 const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const SHADOW = "0 1px 2px rgba(15,23,42,0.04), 0 12px 32px rgba(15,23,42,0.06)";
+
 export function ViewerMonitoringPage() {
   const { logout } = useAuth();
   const { latestReading, setConnected, pushChartReading } = useSensorStore();
@@ -101,9 +104,9 @@ export function ViewerMonitoringPage() {
   const S = {
     // Status card colors
     predBg: isLayak
-      ? "linear-gradient(135deg, #f0fdf8 0%, #ecfdf5 100%)"
-      : "linear-gradient(135deg, #fff5f5 0%, #fff1f2 100%)",
-    predBorder: isLayak ? "#a7f3d0" : "#fecdd3",
+      ? "linear-gradient(160deg, #f3fdf9 0%, #fafcfb 60%)"
+      : "linear-gradient(160deg, #fef4f4 0%, #fbfafa 60%)",
+    predBorder: isLayak ? "#d8f3e6" : "#f8dde1",
     predText: isLayak ? "#065f46" : "#9f1239",
     predSub: isLayak ? "#047857" : "#be123c",
     accent: isLayak ? "#10b981" : "#ea2261",
@@ -115,14 +118,13 @@ export function ViewerMonitoringPage() {
       ? "linear-gradient(135deg, #34d399 0%, #10b981 100%)"
       : "linear-gradient(135deg, #f87171 0%, #ea2261 100%)",
     iconShadow: isLayak
-      ? "0 8px 32px rgba(16,185,129,0.45)"
-      : "0 8px 32px rgba(234,34,97,0.40)",
+      ? "0 8px 24px rgba(16,185,129,0.30)"
+      : "0 8px 24px rgba(234,34,97,0.28)",
     divider: isLayak ? "rgba(16,185,129,0.20)" : "rgba(234,34,97,0.18)",
-    // Full page background — richer than the dashboard variant since this
-    // is read from across a room, not up close
+    // Full page background — quiet status tint, not a loud gradient
     pageBg: isLayak
-      ? "linear-gradient(160deg, #eafdf6 0%, #f8fafc 45%, #e7fbf1 100%)"
-      : "linear-gradient(160deg, #fff0f0 0%, #f8fafc 45%, #ffe9ec 100%)",
+      ? "linear-gradient(160deg, #f6fdfa 0%, #fafbfc 100%)"
+      : "linear-gradient(160deg, #fdf7f7 0%, #fafbfc 100%)",
   };
 
   const sensorTape: {
