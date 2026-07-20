@@ -107,9 +107,7 @@ export function ViewerMonitoringPage() {
       : "linear-gradient(160deg, #fef4f4 0%, #fbfafa 60%)",
     predBorder: isLayak ? "#d8f3e6" : "#f8dde1",
     predText: isLayak ? "#065f46" : "#9f1239",
-    predSub: isLayak ? "#047857" : "#be123c",
     accent: isLayak ? "#10b981" : "#ea2261",
-    accentSoft: isLayak ? "rgba(16,185,129,0.10)" : "rgba(234,34,97,0.09)",
     shadow: isLayak
       ? "0 2px 8px rgba(0,0,0,0.04), 0 16px 48px rgba(16,185,129,0.14), 0 0 0 1px rgba(16,185,129,0.12)"
       : "0 2px 8px rgba(0,0,0,0.04), 0 16px 48px rgba(234,34,97,0.12), 0 0 0 1px rgba(234,34,97,0.12)",
@@ -119,7 +117,6 @@ export function ViewerMonitoringPage() {
     iconShadow: isLayak
       ? "0 8px 24px rgba(16,185,129,0.30)"
       : "0 8px 24px rgba(234,34,97,0.28)",
-    divider: isLayak ? "rgba(16,185,129,0.20)" : "rgba(234,34,97,0.18)",
     // Full page background — quiet status tint, not a loud gradient
     pageBg: isLayak
       ? "linear-gradient(160deg, #f6fdfa 0%, #fafbfc 100%)"
@@ -245,36 +242,27 @@ export function ViewerMonitoringPage() {
           style={{
             background: S.predBg,
             border: `1px solid ${S.predBorder}`,
-            borderRadius: "28px",
-            boxShadow: S.shadow,
+            borderRadius: "24px",
+            boxShadow: SHADOW,
           }}
         >
-          <div className="relative flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16 px-8 py-9 lg:py-12">
+          <div className="relative flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16 px-8 py-10 lg:py-14">
             <SentinelRing isLayak={isLayak} accent={S.accent} iconGrad={S.iconGrad} iconShadow={S.iconShadow} />
 
             <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
-              {/* AI badge row */}
-              <div className="flex items-center gap-2 mb-4">
-                <div
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full"
-                  style={{ background: S.accentSoft, border: `1px solid ${S.divider}` }}
-                >
-                  <Cpu size={10} color={S.accent} />
-                  <span style={{ fontSize: "9px", fontWeight: 700, color: S.accent, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                    Hasil Deteksi Edge AI
-                  </span>
-                </div>
-
+              {/* Status row — one quiet line, not two competing badges */}
+              <div className="flex items-center gap-1.5 mb-4" style={{ color: "#94a3b8" }}>
+                <Cpu size={12} color="#533afd" />
+                <span style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  Hasil Deteksi Edge AI
+                </span>
                 {latestReading.is_syncing && (
-                  <div
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full animate-pulse"
-                    style={{ background: "rgba(139,92,246,0.10)", border: "1px solid rgba(139,92,246,0.20)" }}
-                  >
-                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                    <span style={{ fontSize: "9px", fontWeight: 800, color: "#8b5cf6", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                      SD SYNC
+                  <>
+                    <span style={{ opacity: 0.4 }}>·</span>
+                    <span style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                      SD Sync
                     </span>
-                  </div>
+                  </>
                 )}
               </div>
 
@@ -283,45 +271,34 @@ export function ViewerMonitoringPage() {
                 style={{
                   fontFamily: "var(--font-grotesk)",
                   fontSize: "clamp(56px, 8vw, 128px)",
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: "-4px",
                   lineHeight: 0.95,
                   color: S.predText,
-                  textShadow: `0 4px 28px ${S.accentSoft}`,
                 }}
               >
                 {latestReading.prediction}
               </p>
 
-              {/* Confidence + timestamp */}
-              <div className="flex items-center gap-4 mt-6">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-2 h-2 rounded-full"
-                    style={{ background: S.accent, boxShadow: `0 0 8px ${S.accent}`, animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite" }}
-                  />
-                  <span style={{ fontSize: "12px", color: "#94a3b8" }}>
-                    Diperbarui{" "}
-                    <span style={{ fontWeight: 600, color: "#273951", fontFamily: "var(--font-mono)" }}>
-                      {new Date(latestReading.timestamp).toLocaleTimeString("id-ID", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                      })}
-                    </span>
+              {/* Confidence + timestamp — one quiet line */}
+              <div className="flex items-center gap-2 mt-6" style={{ fontSize: "12px", color: "#94a3b8" }}>
+                <span>
+                  Diperbarui{" "}
+                  <span style={{ fontWeight: 600, color: "#334155", fontFamily: "var(--font-mono)" }}>
+                    {new Date(latestReading.timestamp).toLocaleTimeString("id-ID", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    })}
                   </span>
-                </div>
-
+                </span>
                 {latestReading.confidence !== undefined && (
-                  <div
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-full"
-                    style={{ background: S.accentSoft, border: `1px solid ${S.divider}` }}
-                  >
-                    <span style={{ fontSize: "12px", fontWeight: 700, color: S.predText }}>
-                      {(latestReading.confidence * 100).toFixed(1)}%
+                  <>
+                    <span style={{ opacity: 0.4 }}>·</span>
+                    <span style={{ fontWeight: 600, color: S.predText }}>
+                      {(latestReading.confidence * 100).toFixed(1)}% keyakinan
                     </span>
-                    <span style={{ fontSize: "10px", color: "#94a3b8" }}>keyakinan</span>
-                  </div>
+                  </>
                 )}
               </div>
             </div>
@@ -360,17 +337,16 @@ function SentinelRing({
   iconShadow: string;
 }) {
   return (
-    <div className="relative flex items-center justify-center flex-shrink-0" style={{ width: 176, height: 176 }}>
-      <div className="absolute inset-0 rounded-full animate-breathe" style={{ border: `2px solid ${accent}`, opacity: 0.14 }} />
-      <div className="absolute inset-5 rounded-full animate-breathe delay-300" style={{ border: `2px solid ${accent}`, opacity: 0.22 }} />
-      <div className="absolute inset-10 rounded-full animate-breathe delay-500" style={{ border: `2px solid ${accent}`, opacity: 0.32 }} />
+    <div className="relative flex items-center justify-center flex-shrink-0" style={{ width: 160, height: 160 }}>
+      <div className="absolute inset-0 rounded-full animate-breathe" style={{ border: `1px solid ${accent}`, opacity: 0.16 }} />
+      <div className="absolute inset-8 rounded-full animate-breathe delay-300" style={{ border: `1px solid ${accent}`, opacity: 0.26 }} />
       <div
         className="relative flex items-center justify-center rounded-full"
-        style={{ width: 108, height: 108, background: iconGrad, boxShadow: iconShadow }}
+        style={{ width: 104, height: 104, background: iconGrad, boxShadow: iconShadow }}
       >
         {isLayak
-          ? <ShieldCheck size={50} color="#fff" strokeWidth={1.5} />
-          : <ShieldX size={50} color="#fff" strokeWidth={1.5} />
+          ? <ShieldCheck size={46} color="#fff" strokeWidth={1.5} />
+          : <ShieldX size={46} color="#fff" strokeWidth={1.5} />
         }
       </div>
     </div>
