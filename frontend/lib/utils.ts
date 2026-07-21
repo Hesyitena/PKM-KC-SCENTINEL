@@ -20,10 +20,6 @@ export function formatConfidence(confidence: number): string {
   return `${(confidence * 100).toFixed(1)}%`;
 }
 
-export function formatSensorValue(value: number, decimals: number = 1): string {
-  return value.toFixed(decimals);
-}
-
 export function isOnline(lastSeen: string | null, thresholdSeconds: number = 120): boolean {
   if (!lastSeen) return false;
   const diff = (Date.now() - new Date(lastSeen).getTime()) / 1000;

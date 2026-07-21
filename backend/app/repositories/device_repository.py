@@ -47,13 +47,6 @@ class DeviceRepository:
             device.status = DeviceStatus.ONLINE
             await self.db.flush()
 
-    async def mark_offline(self, device_id: int) -> None:
-        result = await self.db.execute(select(Device).where(Device.id == device_id))
-        device = result.scalar_one_or_none()
-        if device:
-            device.status = DeviceStatus.OFFLINE
-            await self.db.flush()
-
     async def delete(self, device: Device) -> None:
         await self.db.delete(device)
         await self.db.flush()

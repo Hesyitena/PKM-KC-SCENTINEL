@@ -5,7 +5,6 @@ import { create } from "zustand";
 interface UIState {
   sidebarOpen: boolean;
   toggleSidebar: () => void;
-  openSidebar: () => void;
   closeSidebar: () => void;
 }
 
