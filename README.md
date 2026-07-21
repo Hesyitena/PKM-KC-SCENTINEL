@@ -1,6 +1,6 @@
 # 🌿 SCENTINEL — Food Spoilage Detection System
 
-> Sistem Monitoring IoT Berbasis Edge AI untuk Deteksi Dini Pembusukan Makanan  
+> Sistem Monitoring IoT Berbasis Edge AI untuk Deteksi Dini Pembusukan Makanan
 > **Program PKM-KC 2026**
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
@@ -17,16 +17,20 @@ ESP32 (Edge AI)
     │ MQ-3, MQ-4, MQ-135, TGS-2602 + DHT22
     │ Model klasifikasi lokal (LAYAK / TIDAK LAYAK)
     │
-    ▼ HTTP POST /api/readings (X-API-Key)
+    ▼ HTTP POST /api/readings  (header X-API-Key)
 FastAPI Backend
-    │ PostgreSQL (SQLAlchemy Async + Alembic)
-    │ JWT Auth untuk dashboard
-    │ SSE untuk realtime push
+    │ routers/ → services/ → repositories/ → models/
+    │ PostgreSQL (SQLAlchemy 2.0 async + Alembic)
+    │ JWT auth untuk dashboard, API Key statis untuk ESP32
+    │ SSE (sse-starlette) untuk realtime push
     │
-    ▼ REST API + Server-Sent Events
-Next.js Dashboard
+    ▼ REST API + Server-Sent Events  (lewat Nginx reverse proxy)
+Next.js 15 Dashboard
     │ Live monitoring, history, device management
+    │ Role-based routing: ADMIN (dashboard penuh) / VIEWER (kiosk /monitor)
 ```
+
+Dua jalur otentikasi terpisah menyentuh router `readings` yang sama: ESP32 pakai `X-API-Key` (device auth), dashboard/pengguna pakai `Authorization: Bearer <jwt>`. Keduanya sengaja tidak digabung.
 
 ---
 
@@ -34,92 +38,60 @@ Next.js Dashboard
 
 ```
 scentinel/
-├── backend/          # FastAPI + SQLAlchemy + Alembic
-├── frontend/         # Next.js 15 App Router + TypeScript
-├── nginx/            # Reverse proxy config
+├── backend/          # FastAPI + SQLAlchemy async + Alembic — lihat backend/README.md
+├── frontend/         # Next.js 15 App Router + TypeScript — lihat frontend/README.md
+├── nginx/            # Reverse proxy (fronting backend + frontend)
+├── hardware/         # Firmware ESP32 (contoh produksi + tes koneksi)
+├── ml/               # Training model + pengumpulan data untuk edge classifier
+│   ├── data_collection/   # Sketch .ino pengambil data + serial_logger.py
+│   ├── datasets/          # Dataset hasil logging (CSV)
+│   ├── models/            # Model terlatih (di-.gitignore, kecuali kode training)
+│   └── notebooks/         # train_model.ipynb
 ├── docker-compose.yml
+├── Makefile          # make up / down / rebuild / logs / restart / clean
 ├── .env.example
 └── README.md
 ```
 
 ---
 
-## 🚀 Quick Start (Development)
+## 🚀 Quick Start (Docker — canonical)
 
 ### Prerequisites
 - Docker & Docker Compose
-- Node.js 20+ (untuk dev frontend)
-- Python 3.11+ (untuk dev backend)
+- Node.js 20+ (hanya jika mau dev frontend standalone di luar Docker)
+- Python 3.11+ (hanya jika mau dev backend standalone di luar Docker)
 
-### 1. Clone & Setup Environment
+### 1. Setup Environment
 
 ```bash
-# Copy environment template
 cp .env.example .env
-# Edit .env sesuai kebutuhan
+# Edit .env: isi SECRET_KEY, ESP32_API_KEY, dan kredensial Postgres
 ```
 
-### 2. Jalankan Sistem (Daily Development Workflow)
+### 2. Jalankan Seluruh Stack
 
-> ⚠️ **PENTING:** Selalu jalankan perintah `npm run dev` dari **dalam folder `frontend/`**, bukan dari root project.
-
-Jalankan dua terminal secara bersamaan:
-
-**Terminal 1 — Backend & Database (Docker):**
 ```bash
-# Pastikan kamu di folder root project: .../scentinel/
-docker-compose up backend
+make up          # docker-compose up -d
 ```
 
-**Terminal 2 — Frontend (Local):**
-```bash
-# Masuk ke folder frontend dulu!
-cd ~/Documents/PKM-KC_2026/WEBSITE/scentinel/frontend
-npm run dev
-```
-
-Buka browser di **http://localhost:3000**
+Container `backend` otomatis menjalankan `alembic upgrade head` lalu `python -m app.database.seed` sebelum start `uvicorn` — tidak perlu migrasi/seed manual di jalur Docker.
 
 | Service | URL |
 |---------|-----|
-| Dashboard | http://localhost:3000 |
-| API Docs | http://localhost:8000/docs |
+| Dashboard (via Nginx) | http://localhost:8081 |
 | Backend API | http://localhost:8000/api |
-
----
-
-### Cara Mematikan
-
-**Frontend:** Tekan `Ctrl+C` di Terminal 2.
-
-**Backend & Database:** Tekan `Ctrl+C` di Terminal 1, lalu:
-```bash
-docker-compose down
-```
-
----
-
-### Troubleshooting: Error `KeyError: 'ContainerConfig'`
-
-Jika `docker-compose up` gagal dengan error ini, artinya ada *container* lama yang nyangkut. Jalankan perintah ini untuk membersihkannya:
+| Swagger UI | http://localhost:8000/api/docs |
+| ReDoc | http://localhost:8000/api/redoc |
+| PostgreSQL (host) | `localhost:5433` → container `5432` |
 
 ```bash
-# Lihat container yang ada
-docker ps -a
-
-# Hapus semua container lama (ganti ID sesuai output di atas)
-docker rm -f <CONTAINER_ID>
-
-# Jalankan ulang
-docker-compose up backend
+make logs         # follow logs semua service
+make down         # docker-compose down
+make rebuild       # down + up --build (setelah ubah Dockerfile/deps)
+make restart       # docker-compose restart
+make clean        # docker image prune -f
 ```
-
----
-
-> **Catatan:** Jika ini adalah **pertama kalinya** menjalankan project ini di komputer baru, jalankan dulu:
-> ```bash
-> docker-compose up --build
-> ```
 
 ### 3. Login Default
 
@@ -128,45 +100,43 @@ docker-compose up backend
 | admin | admin123 | ADMIN |
 | viewer | viewer123 | VIEWER |
 
-> ⚠️ **Wajib ganti password setelah pertama login!**
+> ⚠️ **Wajib ganti password setelah login pertama.** ADMIN dapat akses dashboard penuh (`/`, `/history`, `/devices`, `/profile`, `/settings`); VIEWER dikunci ke tampilan kiosk full-screen `/monitor` (lihat `frontend/middleware.ts`).
 
 ---
 
-## 🔧 Development Setup
+## 🔧 Development Setup (tanpa Docker per-service)
 
-### Backend (tanpa Docker)
+Berguna saat iterasi cepat di satu sisi (mis. UI) sambil backend tetap jalan di Docker.
+
+### Backend
 
 ```bash
 cd backend
-
-# Buat virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
+python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 
-# Setup database (PostgreSQL harus running)
-# Edit DATABASE_URL_LOCAL di .env
+# Pastikan PostgreSQL jalan & DATABASE_URL di .env mengarah kesana
+# (localhost:5433 kalau pakai `db` service docker-compose, localhost:5432 kalau native)
 alembic upgrade head
 python -m app.database.seed
 
-# Jalankan development server
 uvicorn app.main:app --reload --port 8000
 ```
 
-### Frontend (tanpa Docker)
+### Frontend
+
+> ⚠️ Selalu jalankan `npm run dev` dari **dalam folder `frontend/`**, bukan dari root.
 
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Jalankan development server
 npm run dev
 # Buka http://localhost:3000
 ```
+
+**Mode Demo (tanpa backend sama sekali):** set `NEXT_PUBLIC_DEMO_MODE=true` di `frontend/.env.local`. Frontend akan memakai `lib/useMockSSE.ts` (simulasi SSE ~2 detik interval), auth store diisi user dummy, dan middleware auth di-bypass. Set `false` untuk integrasi nyata ke backend. Lihat detail di [frontend/README.md](frontend/README.md).
+
+Detail lengkap masing-masing bagian ada di [backend/README.md](backend/README.md) dan [frontend/README.md](frontend/README.md).
 
 ---
 
@@ -189,77 +159,79 @@ Content-Type: application/json
   "humidity": 65.0,
   "prediction": "LAYAK",
   "confidence": 0.9523,
-  "food_name": "Ayam"
+  "is_syncing": false
 }
 ```
+
+`is_syncing: true` menandakan data dikirim belakangan dari penyimpanan offline (SD Card), bukan pembacaan real-time.
 
 **Response `201 Created`:**
 ```json
 {
   "id": 42,
   "timestamp": "2026-05-31T14:30:00Z",
+  "mq3": 123.4,
+  "mq4": 200.1,
+  "mq135": 310.5,
+  "tgs2602": 150.0,
+  "temperature": 27.5,
+  "humidity": 65.0,
   "prediction": "LAYAK",
   "confidence": 0.9523,
-  ...
+  "is_syncing": false,
+  "device_id": 1
 }
 ```
 
-### Contoh Kode ESP32 (Arduino)
+### Firmware
 
-```cpp
-#include <WiFi.h>
-#include <HTTPClient.h>
-#include <ArduinoJson.h>
-
-const char* SERVER_URL = "http://your-server/api/readings";
-const char* API_KEY = "esp32-static-api-key";
-
-void submitReading(float mq3, float mq4, float mq135, float tgs2602,
-                   float temp, float hum, String prediction, float confidence) {
-  HTTPClient http;
-  http.begin(SERVER_URL);
-  http.addHeader("Content-Type", "application/json");
-  http.addHeader("X-API-Key", API_KEY);
-
-  StaticJsonDocument<512> doc;
-  doc["device_id"] = 1;
-  doc["mq3"] = mq3;
-  doc["mq4"] = mq4;
-  doc["mq135"] = mq135;
-  doc["tgs2602"] = tgs2602;
-  doc["temperature"] = temp;
-  doc["humidity"] = hum;
-  doc["prediction"] = prediction;
-  doc["confidence"] = confidence;
-  doc["food_name"] = "Ayam";
-
-  String body;
-  serializeJson(doc, body);
-
-  int code = http.POST(body);
-  Serial.printf("HTTP Response: %d\n", code);
-  http.end();
-}
-```
+- `hardware/scentinel_esp32_example.ino` — sketch produksi: baca sensor, jalankan model edge, POST ke `/api/readings`. Flag `DATA_COLLECTION_MODE` menentukan apakah sketch sedang mode logging data (ke Serial/SD) atau mode kirim hasil inferensi ke backend.
+- `hardware/test_koneksi.ino` — sketch minimal untuk uji koneksi WiFi + endpoint sebelum flashing firmware penuh.
+- `ml/data_collection/` — sketch `.ino` khusus pengumpulan data (`sensor_data_logger.ino`, `sensor_wifi_logger.ino`) + `serial_logger.py` yang menangkap output serial ESP32 ke CSV untuk training. Pipeline training ada di `ml/notebooks/train_model.ipynb`; model hasil training inilah yang di-flash sebagai edge classifier ke ESP32.
 
 ---
 
-## 🗄️ Database Schema (ERD)
+## 🗄️ Database Schema
 
 ```
 users
   id, username, password_hash, role (ADMIN|VIEWER), created_at
 
 devices
-  id, device_name, serial_number, firmware_version,
+  id, device_name, serial_number (unique), firmware_version,
   last_seen, status (ONLINE|OFFLINE)
 
 sensor_readings
-  id, timestamp, device_id (FK),
+  id, timestamp, device_id (FK → devices.id, cascade delete),
   mq3, mq4, mq135, tgs2602,
   temperature, humidity,
-  prediction (LAYAK|TIDAK LAYAK), confidence, food_name
+  prediction (LAYAK|TIDAK LAYAK), confidence (0.0-1.0), is_syncing
 ```
+
+---
+
+## 🔑 API Reference
+
+Semua endpoint di-mount dengan prefix `/api` (lihat `backend/app/main.py`).
+
+| Method | Path | Auth | Deskripsi |
+|--------|------|------|-----------|
+| POST | `/api/auth/login` | — | Login dashboard, kembalikan JWT |
+| GET | `/api/auth/me` | JWT | Profil user aktif |
+| POST | `/api/auth/change-password` | JWT | Ubah password |
+| GET | `/api/devices` | JWT | Daftar semua perangkat |
+| GET | `/api/devices/{id}` | JWT | Detail satu perangkat |
+| POST | `/api/devices/` | JWT | Daftarkan perangkat baru |
+| PUT | `/api/devices/{id}` | JWT | Update data perangkat |
+| DELETE | `/api/devices/{id}` | JWT | Hapus perangkat |
+| POST | `/api/readings/` | API Key | Submit reading dari ESP32 |
+| GET | `/api/readings/latest` | JWT | Reading terbaru (opsional filter `device_id`) |
+| GET | `/api/readings/history` | JWT | Riwayat paginated (`device_id`, `start_date`, `end_date`, `prediction`, `limit`, `offset`) |
+| DELETE | `/api/readings/all` | JWT | Hapus SEMUA reading (tidak bisa dibatalkan) |
+| GET | `/api/readings/export` | JWT | Export CSV (opsional filter) |
+| GET | `/api/stream` | — | SSE realtime push ke dashboard |
+
+Swagger interaktif selalu jadi sumber kebenaran paling akurat: http://localhost:8000/api/docs.
 
 ---
 
@@ -275,91 +247,50 @@ sudo usermod -aG docker $USER
 newgrp docker
 
 # 3. Clone repository
-git clone https://github.com/your-org/scentinel.git
+git clone <url-repo-anda>.git
 cd scentinel
 
 # 4. Setup environment
 cp .env.example .env
-nano .env  # Isi SECRET_KEY, ESP32_API_KEY, dll
+nano .env  # Isi SECRET_KEY, ESP32_API_KEY, kredensial Postgres, dll — WAJIB ganti default
 
 # 5. Build & jalankan
-docker-compose up -d --build
+make rebuild      # atau: docker-compose up -d --build
 
 # 6. Cek status
 docker-compose ps
-docker-compose logs -f backend
-
-# 7. Setup Alembic migrations
-docker-compose exec backend alembic upgrade head
-docker-compose exec backend python -m app.database.seed
+make logs
 ```
+
+Migrasi Alembic dan seed database berjalan otomatis lewat entrypoint container `backend` (lihat `docker-compose.yml`) — tidak perlu dijalankan manual setelah deploy.
 
 ### Konfigurasi Domain & HTTPS (Certbot)
 
 ```bash
-# Install Certbot
 sudo apt install certbot python3-certbot-nginx -y
-
-# Dapatkan SSL certificate
 sudo certbot --nginx -d yourdomain.com
-
-# Auto-renew
 sudo certbot renew --dry-run
 ```
 
 ---
 
-## 🔑 API Reference
-
-| Method | Path | Auth | Deskripsi |
-|--------|------|------|-----------|
-| POST | `/api/auth/login` | — | Login dashboard |
-| GET | `/api/auth/me` | JWT | Info user aktif |
-| POST | `/api/auth/change-password` | JWT | Ubah password |
-| GET | `/api/devices/` | JWT | Daftar perangkat |
-| GET | `/api/devices/{id}` | JWT | Detail perangkat |
-| POST | `/api/devices/` | JWT (ADMIN) | Daftarkan perangkat |
-| POST | `/api/readings/` | API Key | Submit dari ESP32 |
-| GET | `/api/readings/latest` | JWT | Pembacaan terbaru |
-| GET | `/api/readings/history` | JWT | Riwayat (paginated) |
-| GET | `/api/readings/export` | JWT | Export CSV |
-| GET | `/api/stream` | — | SSE realtime |
-
----
-
-## 🗓️ Roadmap Implementasi
-
-### Phase 1: Development (Minggu 1-2)
-- [x] Setup project structure
-- [x] Backend: Models, Schemas, Repositories, Services, Routers
-- [x] Frontend: Layout, Auth, Dashboard komponen dasar
-- [x] Docker Compose setup
-
-### Phase 2: Integrasi (Minggu 3)
-- [ ] Koneksi ESP32 ke backend (uji POST /readings)
-- [ ] Verifikasi SSE realtime di dashboard
-- [ ] Uji end-to-end flow sensor → dashboard
-
-### Phase 3: Polish (Minggu 4)
-- [ ] UI/UX refinement untuk presentasi
-- [ ] Testing (pytest backend, unit tests frontend)
-- [ ] Dokumentasi API lengkap
-
-### Phase 4: Deployment (Minggu 5)
-- [ ] Deploy ke VPS / server lab
-- [ ] Setup HTTPS dengan Let's Encrypt
-- [ ] Load testing & monitoring
-- [ ] Persiapan demo PKP2 & PIMNAS
-
----
-
 ## 📊 Best Practices PKM-KC
 
-1. **Keamanan**: Ganti semua default secret keys sebelum demo
-2. **Data**: Selalu seed database dengan data sampel yang realistis sebelum presentasi
-3. **Backup**: Backup PostgreSQL secara rutin (`pg_dump`)
-4. **Demo Mode**: Siapkan data dummy yang menarik untuk PIMNAS
-5. **Dokumentasi**: Update README setiap ada perubahan signifikan
+1. **Keamanan** — ganti `SECRET_KEY`, `ESP32_API_KEY`, dan password default sebelum demo/deploy publik.
+2. **Data** — seed database dengan data sampel realistis sebelum presentasi.
+3. **Backup** — backup PostgreSQL rutin (`pg_dump`), terutama sebelum sesi demo.
+4. **Demo Mode** — gunakan `NEXT_PUBLIC_DEMO_MODE=true` di frontend saat perlu tampil tanpa bergantung koneksi backend/hardware live.
+5. **Dokumentasi** — update README ini serta `backend/README.md` / `frontend/README.md` setiap ada perubahan arsitektur signifikan.
+
+---
+
+## 📚 Referensi Lanjutan
+
+- `AGENTS.md` — panduan paling detail (Bahasa Indonesia): model data, internal komponen, utilitas design-system, konvensi kode. Catatan: nomor port di dalamnya sudah usang — pakai port pada README ini.
+- `DESIGN.md` — spesifikasi UI/design-system.
+- `scentinel_blueprint.md` — blueprint awal proyek.
+- [backend/README.md](backend/README.md) — detail backend FastAPI.
+- [frontend/README.md](frontend/README.md) — detail frontend Next.js.
 
 ---
 
@@ -372,4 +303,3 @@ sudo certbot renew --dry-run
 ## 📄 Lisensi
 
 MIT License — PKM-KC 2026
-# PKM-KC-SCENTINEL
