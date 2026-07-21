@@ -11,7 +11,7 @@ def generate_csv_content(readings: list[SensorReading]) -> str:
     """Convert a list of SensorReading objects to a CSV string."""
     output = io.StringIO()
     fieldnames = [
-        "id", "timestamp",
+        "id", "timestamp", "device_id",
         "mq3", "mq4", "mq135", "tgs2602",
         "temperature", "humidity",
         "prediction", "confidence",
@@ -23,7 +23,7 @@ def generate_csv_content(readings: list[SensorReading]) -> str:
         writer.writerow({
             "id": r.id,
             "timestamp": r.timestamp.isoformat() if r.timestamp else "",
-
+            "device_id": r.device_id,
             "mq3": r.mq3,
             "mq4": r.mq4,
             "mq135": r.mq135,

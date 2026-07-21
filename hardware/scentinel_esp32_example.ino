@@ -175,7 +175,6 @@ void loop() {
   doc["humidity"] = hum;
   doc["prediction"] = prediction;
   doc["confidence"] = confidence;
-  doc["food_name"] = "Sampel Daging Sapi"; // Boleh dikosongkan/dihapus
   
   // Payload untuk Live Data
   doc["is_syncing"] = false;

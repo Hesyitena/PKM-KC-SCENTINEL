@@ -9,7 +9,7 @@ from app.models.reading import PredictionLabel
 
 class ReadingCreate(BaseModel):
     """Payload sent by ESP32 via POST /api/readings"""
-    device_id: int = 1
+    device_id: int
     mq3: float = Field(..., ge=0, description="MQ-3 alcohol sensor ADC value")
     mq4: float = Field(..., ge=0, description="MQ-4 methane sensor ADC value")
     mq135: float = Field(..., ge=0, description="MQ-135 air quality sensor ADC value")

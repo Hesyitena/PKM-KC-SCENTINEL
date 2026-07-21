@@ -96,7 +96,6 @@ export function ReadingTable({
                   <td className="px-4 py-3 whitespace-nowrap text-xs text-slate-500 font-medium" style={{ fontFeatureSettings: '"tnum" 1' }}>
                     {formatDate(r.timestamp)}
                   </td>
-
                   <td className="px-4 py-3 tabular-nums text-slate-600">{r.mq3.toFixed(1)}</td>
                   <td className="px-4 py-3 tabular-nums text-slate-600">{r.mq4.toFixed(1)}</td>
                   <td className="px-4 py-3 tabular-nums text-slate-600">{r.mq135.toFixed(1)}</td>
