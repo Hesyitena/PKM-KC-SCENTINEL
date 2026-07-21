@@ -1,6 +1,33 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "sonner";
+
+/* Fonts live in ./fonts rather than coming from next/font/google: the build
+   container has no route to fonts.googleapis.com, and the VIEWER kiosk runs on
+   the ESP32's LAN with no internet either. Variable woff2, one file per family
+   covering the whole weight range. */
+const plusJakartaSans = localFont({
+  src: "./fonts/PlusJakartaSans-Variable.woff2",
+  variable: "--font-jakarta",
+  display: "swap",
+  weight: "300 700",
+});
+
+const spaceGrotesk = localFont({
+  src: "./fonts/SpaceGrotesk-Variable.woff2",
+  variable: "--font-grotesk",
+  display: "swap",
+  weight: "300 700",
+});
+
+const geistMono = localFont({
+  src: "./fonts/GeistMono-Variable.woff2",
+  variable: "--font-mono",
+  display: "swap",
+  weight: "400 600",
+  adjustFontFallback: false,
+});
 
 export const metadata: Metadata = {
   title: "SCENTINEL — Food Spoilage Detection System",
@@ -22,15 +49,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="font-sans antialiased bg-background text-foreground">
+      <body
+        className={`${plusJakartaSans.variable} ${spaceGrotesk.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}
+      >
         {children}
         <Toaster
           position="top-right"
