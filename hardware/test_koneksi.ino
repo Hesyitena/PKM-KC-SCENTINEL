@@ -4,7 +4,7 @@
 
 // ✏️ 1. Ganti nama dan password WiFi-mu
 const char* ssid = "SCENTINEL_DEV";
-const char* password = "jendra_elektrik";
+const char* password = "GANTI_PASSWORD_WIFI";
 
 // ✏️ 2. IP laptop kamu = 10.252.133.115, port 8081
 const char* serverName = "http://10.42.0.1:8081/api/readings/";
@@ -40,7 +40,6 @@ void loop() {
     doc["humidity"]   = 65.0;
     doc["prediction"] = "LAYAK";
     doc["confidence"] = 0.95;
-    doc["food_name"]  = "Daging Sapi Test";
 
     String body;
     serializeJson(doc, body);

@@ -68,6 +68,11 @@ coverage.xml
 .opencode/
 .windsurf/
 .qoder/
-.github/
+.github/copilot-instructions.md
 
-ml/
+# ML artefacts too large or regenerable for git — the notebook,
+# datasets, and firmware sketches under ml/ ARE tracked.
+ml/models/*.pkl
+ml/models/*.joblib
+ml/**/__pycache__/
+ml/**/.ipynb_checkpoints/
