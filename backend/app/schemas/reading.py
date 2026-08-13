@@ -59,3 +59,10 @@ class PaginatedReadings(BaseModel):
     limit: int
     offset: int
     items: list[ReadingResponse]
+
+
+class ReadingStats(BaseModel):
+    """Aggregate stats for the Settings dashboard."""
+    total: int
+    oldest_timestamp: datetime | None
+    storage_bytes: int
