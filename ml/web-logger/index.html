@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SCENTINEL - Data Collector v2</title>
+    <style>
+      :root {
+        --bg: #0b0f14;
+        --bg-grad:
+          radial-gradient(
+            1200px 600px at 10% -10%,
+            rgba(59, 165, 93, 0.08),
+            transparent
+          ),
+          radial-gradient(
+            900px 500px at 100% 0%,
+            rgba(59, 110, 165, 0.07),
+            transparent
+          );
+        --panel: #161d25;
+        --panel-2: #0f1419;
+        --border: #263140;
+        --text: #e6edf3;
+        --muted: #8b98a5;
+        --accent: #3ba55d;
+        --accent-hover: #2f8a4c;
+        --danger: #e5484d;
+        --danger-hover: #c93c40;
+        --warn: #e0a034;
+        --warn-hover: #c48a2a;
+        --mono: "SF Mono", "JetBrains Mono", Consolas, monospace;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        background: var(--bg-grad), var(--bg);
+        background-attachment: fixed;
+        color: var(--text);
+        font-family: -apple-system, "Segoe UI", Roboto, "Inter", sans-serif;
+        margin: 0;
+        padding: 14px 16px;
+        -webkit-font-smoothing: antialiased;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .top-row {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        flex-shrink: 0;
+        margin-bottom: 10px;
+      }
+      h1 {
+        font-size: 17px;
+        font-weight: 650;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 10px;
+        max-width: 1300px;
+        flex: 1;
+        min-height: 0;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 14px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow-y: auto;
+      }
+      .panel h2 {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        margin: 0 0 8px 0;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+      label {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 3px;
+        margin-top: 6px;
+      }
+      input,
+      select {
+        width: 100%;
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 7px 10px;
+        border-radius: 7px;
+        font-size: 13px;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      input:hover,
+      select:hover {
+        border-color: #384759;
+      }
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(59, 165, 93, 0.15);
+      }
+      .btn-row {
+        display: flex;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      button {
+        flex: 1;
+        padding: 8px 10px;
+        border: none;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        color: white;
+        transition:
+          background 0.15s,
+          transform 0.1s;
+      }
+      button:active:not(:disabled) {
+        transform: scale(0.97);
+      }
+      button:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+      .btn-connect {
+        background: #3b6ea5;
+      }
+      .btn-connect:hover:not(:disabled) {
+        background: #325d8c;
+      }
+      .btn-start {
+        background: var(--accent);
+      }
+      .btn-start:hover:not(:disabled) {
+        background: var(--accent-hover);
+      }
+      .btn-pause {
+        background: var(--warn);
+      }
+      .btn-pause:hover:not(:disabled) {
+        background: var(--warn-hover);
+      }
+      .btn-stop {
+        background: var(--danger);
+      }
+      .btn-stop:hover:not(:disabled) {
+        background: var(--danger-hover);
+      }
+      .btn-export {
+        background: #4a4f57;
+      }
+      .btn-export:hover:not(:disabled) {
+        background: #3d424a;
+      }
+      .btn-calib {
+        background: #6a4fa5;
+      }
+      .btn-calib:hover:not(:disabled) {
+        background: #58408c;
+      }
+      .calib-status {
+        font-size: 11px;
+        color: var(--warn);
+        margin-top: 6px;
+        min-height: 14px;
+      }
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        padding: 3px 9px;
+        border-radius: 999px;
+        background: #262e37;
+        color: var(--muted);
+      }
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--muted);
+      }
+      .status-dot.live {
+        background: var(--accent);
+        box-shadow: 0 0 6px var(--accent);
+      }
+      .status-dot.rec {
+        background: var(--danger);
+        animation: blink 1s infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0.3;
+        }
+      }
+      .readout {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 10px;
+        flex-shrink: 0;
+      }
+      .readout-cell {
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        padding: 9px 8px;
+        text-align: center;
+        transition: border-color 0.2s;
+      }
+      .readout-cell .name {
+        font-size: 10px;
+        color: var(--muted);
+        margin-bottom: 3px;
+      }
+      .readout-cell .value {
+        font-size: 16px;
+        font-family: var(--mono);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        transition: color 0.3s;
+      }
+      .readout-cell .value.flash {
+        color: var(--accent);
+      }
+      .env-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 10px;
+        flex-shrink: 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+        font-family: var(--mono);
+      }
+      th,
+      td {
+        padding: 6px 7px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      th {
+        color: var(--muted);
+        font-weight: 500;
+        position: sticky;
+        top: 0;
+        background: var(--panel);
+      }
+      tbody tr:hover {
+        background: rgba(255, 255, 255, 0.025);
+      }
+      tbody tr:last-child {
+        background: rgba(59, 165, 93, 0.06);
+      }
+      .table-wrap {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: auto;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+      }
+      .row-count {
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 6px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .row-count button {
+        flex: none;
+        padding: 3px 9px;
+        font-size: 11px;
+        background: var(--danger);
+      }
+      .row-count button:hover:not(:disabled) {
+        background: var(--danger-hover);
+      }
+      th.chk-col,
+      td.chk-col {
+        width: 20px;
+        white-space: nowrap;
+      }
+      td.del-col {
+        width: 20px;
+      }
+      .row-del-btn {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 12px;
+        padding: 0 4px;
+        flex: none;
+      }
+      .row-del-btn:hover {
+        color: var(--danger-hover);
+      }
+      .err {
+        color: var(--danger);
+        font-size: 11px;
+        margin-top: 6px;
+        min-height: 14px;
+      }
+      .recovery-box {
+        margin-top: 10px;
+        padding: 9px;
+        border-radius: 9px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid var(--border);
+        transition:
+          background 0.25s,
+          border-color 0.25s,
+          color 0.25s;
+      }
+      .recovery-box.ok {
+        background: rgba(59, 165, 93, 0.12);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .recovery-box.wait {
+        background: rgba(224, 160, 52, 0.12);
+        color: var(--warn);
+        border-color: var(--warn);
+      }
+      @media (max-width: 760px) {
+        body {
+          padding: 12px;
+          overflow-y: auto;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .panel {
+          overflow-y: visible;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-row">
+      <h1>SCENTINEL — Data Collector</h1>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2>Koneksi & Sesi</h2>
+
+        <label>Alamat IP ESP32</label>
+        <input type="text" id="espIp" placeholder="contoh: 192.168.1.184" />
+
+        <span
+          class="status-badge"
+          id="connStatus"
+          style="margin-top: 8px; display: inline-flex"
+          ><span class="status-dot" id="connDot"></span> Belum terhubung</span
+        >
+        <div class="err" id="errMsg"></div>
+
+        <div class="btn-row">
+          <button class="btn-connect" id="btnConnect">Hubungkan</button>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-calib" id="btnCalibrate" disabled>
+            🎯 Kalibrasi Baseline (60dtk)
+          </button>
+        </div>
+        <div class="calib-status" id="calibStatus"></div>
+
+        <label>ID Sampel</label>
+        <input type="number" id="sampleId" value="1" min="1" />
+
+        <label>Batch ID</label>
+        <input type="text" id="batchId" placeholder="contoh: AYAM-A" />
+
+        <label>Label</label>
+        <select id="labelSelect">
+          <option value="LAYAK">LAYAK</option>
+          <option value="TIDAK_LAYAK">TIDAK_LAYAK</option>
+        </select>
+
+        <div class="btn-row">
+          <button class="btn-start" id="btnStart" disabled>Start</button>
+          <button class="btn-pause" id="btnPause" disabled>Pause</button>
+          <button class="btn-stop" id="btnStop" disabled>Stop</button>
+        </div>
+
+        <div class="recovery-box wait" id="recoveryBox">
+          Status recovery: menunggu koneksi...
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-export" id="btnExport">Export CSV</button>
+          <button class="btn-export" id="btnClear" style="background: #5a2a2a">
+            🗑 Bersihkan
+          </button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Pembacaan Real-time</h2>
+
+        <div class="readout">
+          <div class="readout-cell">
+            <div class="name">MQ-135 (rasio)</div>
+            <div class="value" id="r135">–</div>
+          </div>
+          <div class="readout-cell">
+            <div class="name">MQ-3 (rasio)</div>
+            <div class="value" id="r3">–</div>
+          </div>
+          <div class="readout-cell">
+            <div class="name">MQ-4 (rasio)</div>
+            <div class="value" id="r4">–</div>
+          </div>
+          <div class="readout-cell">
+            <div class="name">TGS2602 (rasio)</div>
+            <div class="value" id="rTGS">–</div>
+          </div>
+        </div>
+        <div class="env-row">
+          <div class="readout-cell">
+            <div class="name">Suhu (°C)</div>
+            <div class="value" id="rSuhu">–</div>
+          </div>
+          <div class="readout-cell">
+            <div class="name">Kelembapan (%)</div>
+            <div class="value" id="rLembap">–</div>
+          </div>
+        </div>
+
+        <h2>
+          Time-series Terekam
+          <span
+            class="status-dot"
+            id="recDot"
+            style="display: inline-block"
+          ></span>
+        </h2>
+        <div class="row-count">
+          <span id="rowCount">0 baris tersimpan</span>
+          <button id="btnDeleteSelected" disabled>Hapus Terpilih</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="chk-col"><input type="checkbox" id="selectAll" /></th>
+                <th>#</th>
+                <th>t (ms)</th>
+                <th>Waktu</th>
+                <th>Sample ID</th>
+                <th>Batch ID</th>
+                <th>Label</th>
+                <th>MQ135</th>
+                <th>MQ3</th>
+                <th>MQ4</th>
+                <th>TGS</th>
+                <th>Suhu</th>
+                <th>Lembap</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="dataBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let baseUrl = "";
+      let pollTimer = null;
+      let recording = false;
+      let paused = false;
+      let rows = [];
+      let rowCounter = 0;
+
+      const STORAGE_KEY = "scentinel_dataset_timeseries_v2";
+      const el = (id) => document.getElementById(id);
+
+      function loadStored() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          rows = raw ? JSON.parse(raw) : [];
+        } catch (e) {
+          rows = [];
+        }
+        renderTable();
+      }
+      function persist() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+      }
+
+      function renderTable() {
+        el("rowCount").textContent = rows.length + " baris tersimpan";
+        const tbody = el("dataBody");
+        tbody.innerHTML = "";
+        const showRows = rows.slice(-300);
+        showRows.forEach((r, i) => {
+          const realIdx = rows.length - showRows.length + i; // actual index into rows[]
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td class="chk-col"><input type="checkbox" class="row-check" data-idx="${realIdx}" /></td>
+      <td>${realIdx + 1}</td><td>${r.elapsed_ms}</td><td>${r.time}</td><td>${r.sample_id}</td><td>${r.batch_id}</td><td>${r.label}</td>
+      <td>${r.mq135}</td><td>${r.mq3}</td><td>${r.mq4}</td><td>${r.tgs}</td><td>${r.suhu}</td><td>${r.lembap}</td>
+      <td class="del-col"><button class="row-del-btn" data-idx="${realIdx}" title="Hapus baris ini">✕</button></td>`;
+          tbody.appendChild(tr);
+        });
+        tbody.parentElement.parentElement.scrollTop =
+          tbody.parentElement.scrollHeight;
+        el("selectAll").checked = false;
+        el("btnDeleteSelected").disabled = true;
+      }
+
+      function deleteRow(idx) {
+        rows.splice(idx, 1);
+        persist();
+        renderTable();
+      }
+
+      function deleteSelectedRows() {
+        const idxs = Array.from(document.querySelectorAll(".row-check:checked"))
+          .map((c) => parseInt(c.dataset.idx, 10))
+          .sort((a, b) => b - a); // descending so splice doesn't shift earlier indices
+        if (idxs.length === 0) return;
+        if (!confirm(`Hapus ${idxs.length} baris terpilih?`)) return;
+        idxs.forEach((i) => rows.splice(i, 1));
+        persist();
+        renderTable();
+      }
+
+      function setReadout(id, value) {
+        const node = el(id);
+        if (node.textContent !== String(value)) {
+          node.textContent = value;
+          node.classList.remove("flash");
+          void node.offsetWidth; // restart animation
+          node.classList.add("flash");
+          setTimeout(() => node.classList.remove("flash"), 400);
+        }
+      }
+
+      function setError(msg) {
+        el("errMsg").textContent = msg || "";
+      }
+
+      function updateRecoveryBox(recovered) {
+        const box = el("recoveryBox");
+        if (recovered) {
+          box.textContent =
+            "Status recovery: SUDAH kembali ke baseline — aman lanjut sampel berikutnya";
+          box.className = "recovery-box ok";
+        } else {
+          box.textContent =
+            "Status recovery: BELUM stabil — tunggu sebelum sampel berikutnya";
+          box.className = "recovery-box wait";
+        }
+      }
+
+      async function connect() {
+        const ip = el("espIp").value.trim();
+        if (!ip) {
+          setError("Isi alamat IP ESP32 dulu.");
+          return;
+        }
+        baseUrl = `http://${ip}`;
+
+        try {
+          const res = await fetch(`${baseUrl}/data`, { cache: "no-store" });
+          if (!res.ok) throw new Error("Respons tidak OK: " + res.status);
+          await res.json();
+
+          setError("");
+          el("connStatus").innerHTML =
+            '<span class="status-dot live"></span> Terhubung ke ' + ip;
+          el("btnStart").disabled = false;
+          el("btnCalibrate").disabled = false;
+          startPolling();
+        } catch (e) {
+          setError(
+            "Gagal terhubung: " +
+              e.message +
+              " — cek IP benar, satu jaringan WiFi, firewall tidak memblokir.",
+          );
+          el("connStatus").innerHTML =
+            '<span class="status-dot"></span> Gagal terhubung';
+        }
+      }
+
+      function startPolling() {
+        if (pollTimer) clearInterval(pollTimer);
+        pollTimer = setInterval(pollData, 500); // sinkron dengan interval baca firmware
+      }
+
+      async function pollData() {
+        try {
+          const res = await fetch(`${baseUrl}/data`, { cache: "no-store" });
+          if (!res.ok) return;
+          const d = await res.json();
+
+          setReadout("r135", d.mq135_ratio);
+          setReadout("r3", d.mq3_ratio);
+          setReadout("r4", d.mq4_ratio);
+          setReadout("rTGS", d.tgs_ratio);
+          setReadout("rSuhu", d.suhu);
+          setReadout("rLembap", d.lembap);
+
+          updateRecoveryBox(d.recovered);
+
+          el("btnStart").disabled = d.calibrating || recording;
+          el("btnCalibrate").disabled = d.calibrating || recording;
+          if (d.calibrating) {
+            const sisa = Math.max(
+              0,
+              Math.ceil((d.calib_duration_ms - d.calib_elapsed_ms) / 1000),
+            );
+            el("calibStatus").textContent =
+              `Mengkalibrasi... sisa ${sisa}dtk (${d.calib_count} sampel) — jangan sentuh sensor`;
+          } else {
+            el("calibStatus").textContent = "";
+          }
+
+          // Rekam SETIAP polling sebagai baris time-series terpisah selama sesi aktif & tidak dipause
+          if (recording && !paused && d.session_active) {
+            rowCounter++;
+            rows.push({
+              elapsed_ms: d.elapsed_ms,
+              time: new Date().toLocaleTimeString("id-ID"),
+              sample_id: d.sample_id,
+              batch_id: d.batch_id,
+              label: d.label,
+              mq135: d.mq135_ratio,
+              mq3: d.mq3_ratio,
+              mq4: d.mq4_ratio,
+              tgs: d.tgs_ratio,
+              suhu: d.suhu,
+              lembap: d.lembap,
+            });
+            persist();
+            renderTable();
+          }
+        } catch (e) {
+          setError("Koneksi terputus: " + e.message);
+        }
+      }
+
+      el("btnConnect").addEventListener("click", connect);
+
+      el("btnStart").addEventListener("click", async () => {
+        const id = el("sampleId").value;
+        const batch = el("batchId").value.trim();
+        const label = el("labelSelect").value;
+
+        if (!batch) {
+          setError(
+            "Batch ID wajib diisi sebelum Start (untuk mencegah data leakage saat split nanti).",
+          );
+          return;
+        }
+
+        try {
+          await fetch(
+            `${baseUrl}/start?id=${id}&batch=${encodeURIComponent(batch)}&label=${label}`,
+            { cache: "no-store" },
+          );
+        } catch (e) {
+          setError("Gagal kirim START: " + e.message);
+          return;
+        }
+
+        setError("");
+        recording = true;
+        paused = false;
+        el("recDot").className = "status-dot rec";
+        el("btnStart").disabled = true;
+        el("btnPause").disabled = false;
+        el("btnStop").disabled = false;
+        el("sampleId").disabled = true;
+        el("batchId").disabled = true;
+        el("labelSelect").disabled = true;
+      });
+
+      el("btnCalibrate").addEventListener("click", async () => {
+        if (
+          !confirm(
+            "Pastikan sensor di udara bersih & tidak disentuh selama 60 detik. Mulai kalibrasi?",
+          )
+        )
+          return;
+        try {
+          const res = await fetch(`${baseUrl}/calibrate`, { cache: "no-store" });
+          if (res.status === 204) {
+            throw new Error(
+              "endpoint /calibrate tidak ditemukan di ESP32 — firmware belum di-upload ulang dengan versi terbaru",
+            );
+          }
+          if (!res.ok) throw new Error(await res.text());
+          setError("");
+        } catch (e) {
+          setError("Gagal mulai kalibrasi: " + e.message);
+        }
+      });
+
+      el("btnPause").addEventListener("click", () => {
+        paused = !paused;
+        el("btnPause").textContent = paused ? "Lanjutkan" : "Pause";
+        el("recDot").className = paused ? "status-dot" : "status-dot rec";
+      });
+
+      el("btnStop").addEventListener("click", async () => {
+        try {
+          await fetch(`${baseUrl}/stop`, { cache: "no-store" });
+        } catch (e) {
+          setError("Gagal kirim STOP: " + e.message);
+        }
+
+        recording = false;
+        paused = false;
+        el("recDot").className = "status-dot";
+        el("btnStart").disabled = false;
+        el("btnPause").disabled = true;
+        el("btnPause").textContent = "Pause";
+        el("btnStop").disabled = true;
+        el("sampleId").disabled = false;
+        el("batchId").disabled = false;
+        el("labelSelect").disabled = false;
+        el("sampleId").value = parseInt(el("sampleId").value || 0) + 1;
+      });
+
+      el("btnExport").addEventListener("click", () => {
+        if (rows.length === 0) {
+          alert("Belum ada data untuk diexport.");
+          return;
+        }
+        const header = [
+          "no",
+          "elapsed_ms",
+          "waktu",
+          "sample_id",
+          "batch_id",
+          "label",
+          "mq135_ratio",
+          "mq3_ratio",
+          "mq4_ratio",
+          "tgs_ratio",
+          "suhu",
+          "lembap",
+        ];
+        const lines = [header.join(",")];
+        rows.forEach((r, i) => {
+          lines.push(
+            [
+              i + 1,
+              r.elapsed_ms,
+              r.time,
+              r.sample_id,
+              r.batch_id,
+              r.label,
+              r.mq135,
+              r.mq3,
+              r.mq4,
+              r.tgs,
+              r.suhu,
+              r.lembap,
+            ].join(","),
+          );
+        });
+        const blob = new Blob([lines.join("\n")], {
+          type: "text/csv;charset=utf-8;",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+        a.href = url;
+        a.download = `scentinel_timeseries_${stamp}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      el("dataBody").addEventListener("click", (e) => {
+        if (e.target.classList.contains("row-del-btn")) {
+          deleteRow(parseInt(e.target.dataset.idx, 10));
+        }
+      });
+
+      el("dataBody").addEventListener("change", (e) => {
+        if (e.target.classList.contains("row-check")) {
+          const anyChecked = document.querySelectorAll(".row-check:checked").length > 0;
+          el("btnDeleteSelected").disabled = !anyChecked;
+        }
+      });
+
+      el("selectAll").addEventListener("change", (e) => {
+        document
+          .querySelectorAll(".row-check")
+          .forEach((c) => (c.checked = e.target.checked));
+        el("btnDeleteSelected").disabled = !e.target.checked;
+      });
+
+      el("btnDeleteSelected").addEventListener("click", deleteSelectedRows);
+
+      el("btnClear").addEventListener("click", () => {
+        if (confirm("Hapus semua data yang tersimpan di browser ini?")) {
+          rows = [];
+          persist();
+          renderTable();
+        }
+      });
+
+      loadStored();
+    </script>
+  </body>
+</html>
