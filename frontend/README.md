@@ -80,12 +80,12 @@ Banyak komponen bercabang pada flag ini (`process.env.NEXT_PUBLIC_DEMO_MODE === 
 ## Setup Development
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 # Buka http://localhost:3000
 ```
 
-> ⚠️ Jalankan `npm run dev` dari dalam folder `frontend/`, bukan dari root repo.
+> ⚠️ Jalankan `pnpm dev` dari dalam folder `frontend/`, bukan dari root repo.
 
 ## Environment Variables
 
@@ -98,12 +98,27 @@ npm run dev
 ## Scripts
 
 ```bash
-npm run dev        # next dev di :3000
-npm run build      # production build
-npm run start      # jalankan production build
-npm run lint       # next lint
-npm run type-check # tsc --noEmit — WAJIB dijalankan setelah perubahan TypeScript (strict mode)
+pnpm dev        # next dev di :3000
+pnpm build      # production build
+pnpm start      # jalankan production build
+pnpm lint       # next lint
+pnpm type-check # tsc --noEmit — WAJIB dijalankan setelah perubahan TypeScript (strict mode)
+pnpm test:e2e   # Playwright e2e (lihat bawah)
 ```
+
+## E2E Testing (Playwright)
+
+```bash
+pnpm test:e2e                             # semua browser (chromium, firefox, webkit)
+npx playwright test --project=chromium       # satu browser saja
+npx playwright test --ui                     # mode UI interaktif untuk debug
+npx playwright show-report                   # buka HTML report run terakhir
+```
+
+- Config: [`playwright.config.ts`](playwright.config.ts). `webServer` otomatis jalanin `pnpm dev` (dengan `NEXT_PUBLIC_DEMO_MODE=true`) sebelum test — gak perlu start dev server manual.
+- Test files di `tests/`. Test yang butuh API (mis. login) memakai `page.route()` untuk mock response backend, jadi suite ini jalan tanpa FastAPI/Postgres running.
+- First-time setup butuh browser binary: `npx playwright install`. Kalau muncul error dependency OS (mis. `libavif13` untuk WebKit), jalankan `sudo apt-get install libavif13` atau `sudo env "PATH=$PATH" npx playwright install-deps` (`sudo npx ...` polos bisa gagal kalau Node diinstall lewat nvm — sudo jatuh balik ke Node sistem yang lebih lama).
+- CI: [`.github/workflows/playwright.yml`](.github/workflows/playwright.yml) — install deps otomatis via `npx playwright install --with-deps`.
 
 ## Konvensi
 
