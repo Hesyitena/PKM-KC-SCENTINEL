@@ -13,7 +13,7 @@ import io
 
 from app.core.dependencies import CurrentUser, ESP32Auth, DBSession
 from app.models.reading import PredictionLabel
-from app.schemas.reading import ReadingCreate, ReadingResponse, PaginatedReadings, ReadingLatestResponse
+from app.schemas.reading import ReadingCreate, ReadingResponse, PaginatedReadings, ReadingLatestResponse, ReadingStats
 from app.services.reading_service import ReadingService
 
 router = APIRouter()
@@ -78,6 +78,20 @@ async def get_history(
         limit=limit,
         offset=offset,
     )
+
+
+@router.get(
+    "/stats",
+    response_model=ReadingStats,
+    summary="Get Reading Statistics",
+)
+async def get_stats(
+    current_user: CurrentUser,
+    db: DBSession,
+):
+    """Aggregate stats for the Settings page: total rows, oldest reading, storage size."""
+    service = ReadingService(db)
+    return await service.get_stats()
 
 
 @router.delete(
