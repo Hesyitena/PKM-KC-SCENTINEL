@@ -43,7 +43,9 @@ lib/
 └── utils.ts             # cn, formatDate, formatConfidence
 store/
 ├── authStore.ts        # Zustand auth state (persisted)
-└── sensorStore.ts       # Zustand sensor/SSE state
+├── sensorStore.ts       # Zustand sensor/SSE state (chartPoints dari settingsStore)
+├── settingsStore.ts      # Zustand pengaturan dashboard (persisted): autoRefresh, chartAnimation, chartPoints
+└── uiStore.ts            # Zustand UI state: sidebar open/close (mobile)
 hooks/
 ├── useAuth.ts           # Login/logout + redirect (VIEWER → /monitor)
 ├── useDevices.ts         # Fetch data perangkat
