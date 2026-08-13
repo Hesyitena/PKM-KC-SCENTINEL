@@ -40,3 +40,26 @@ async def test_submit_reading_valid_api_key():
         )
     # 201 if device exists, 404 if not seeded
     assert response.status_code in [201, 404]
+
+
+@pytest.mark.asyncio
+async def test_get_stats_requires_auth():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore[arg-type]
+        response = await client.get("/api/readings/stats")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_stats_authenticated():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore[arg-type]
+        login = await client.post("/api/auth/login", json={"username": "admin", "password": "admin123"})
+        token = login.json()["access_token"]
+        response = await client.get(
+            "/api/readings/stats",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+    assert response.status_code == 200
+    data = response.json()
+    assert "total" in data and "storage_bytes" in data
+    assert data["total"] >= 0
+    assert data["storage_bytes"] >= 0
