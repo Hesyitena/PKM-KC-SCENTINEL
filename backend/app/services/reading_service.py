@@ -13,7 +13,7 @@ from app.models.reading import SensorReading, PredictionLabel
 from app.repositories.reading_repository import ReadingRepository
 from app.repositories.device_repository import DeviceRepository
 from app.schemas.reading import (
-    ReadingCreate, ReadingResponse, PaginatedReadings, ReadingLatestResponse
+    ReadingCreate, ReadingResponse, PaginatedReadings, ReadingLatestResponse, ReadingStats
 )
 from app.utils.csv_export import generate_csv_content
 
@@ -120,6 +120,10 @@ class ReadingService:
     ) -> str:
         readings = await self.repo.get_all_for_export(device_id, start_date, end_date)
         return generate_csv_content(readings)
+
+    async def get_stats(self) -> ReadingStats:
+        stats = await self.repo.get_stats()
+        return ReadingStats(**stats)
 
     async def delete_all_readings(self) -> dict:
         """Delete all sensor readings from the database."""
