@@ -22,7 +22,7 @@ Deeper references already in the repo (read these before large changes):
 
 Full stack (from repo root, Docker — the canonical run):
 ```bash
-make up          # docker-compose up -d
+make up          # docker compose up -d
 make down
 make rebuild     # down + up --build
 make logs        # follow logs
@@ -31,10 +31,10 @@ After `make up`: dashboard via nginx at **http://localhost:8081**, API at **http
 
 Frontend (`cd frontend`):
 ```bash
-npm run dev        # next dev on :3000 (standalone UI dev)
-npm run build
-npm run lint       # next lint
-npm run type-check # tsc --noEmit — run this after TS changes; strict mode
+pnpm dev        # next dev on :3000 (standalone UI dev)
+pnpm build
+pnpm lint       # next lint
+pnpm type-check # tsc --noEmit — run this after TS changes; strict mode
 ```
 
 Backend (`cd backend`, venv in `backend/venv`):
