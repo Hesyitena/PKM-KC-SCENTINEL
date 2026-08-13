@@ -267,8 +267,8 @@ Komponen utama dashboard. Struktur internal:
 ### Development (frontend only, demo mode)
 ```bash
 cd frontend
-npm install
-npm run dev          # http://localhost:3000
+pnpm install
+pnpm dev          # http://localhost:3000
 ```
 Pastikan `NEXT_PUBLIC_DEMO_MODE=true` di `.env.local`.
 
