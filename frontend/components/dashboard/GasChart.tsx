@@ -16,6 +16,7 @@ import { format } from "date-fns";
 interface GasChartProps {
   data: SensorReading[];
   height?: number | string;
+  animated?: boolean;
 }
 
 const GAS_LINES = [
@@ -89,7 +90,7 @@ const CustomLegend = ({ payload }: { payload?: Array<{ value: string; color: str
   );
 };
 
-export function GasChart({ data, height = 300 }: GasChartProps) {
+export function GasChart({ data, height = 300, animated = true }: GasChartProps) {
   const chartData = data.map((r) => ({
     ...r,
     time: format(new Date(r.timestamp), "HH:mm:ss"),
@@ -182,6 +183,7 @@ export function GasChart({ data, height = 300 }: GasChartProps) {
               strokeWidth={3}
               fill={`url(#${line.gradientId})`}
               dot={false}
+              isAnimationActive={animated}
               activeDot={{
                 r: 5,
                 strokeWidth: 2,
