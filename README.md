@@ -72,7 +72,7 @@ cp .env.example .env
 ### 2. Jalankan Seluruh Stack
 
 ```bash
-make up          # docker-compose up -d
+make up          # docker compose up -d
 ```
 
 Container `backend` otomatis menjalankan `alembic upgrade head` lalu `python -m app.database.seed` sebelum start `uvicorn` — tidak perlu migrasi/seed manual di jalur Docker.
@@ -87,9 +87,9 @@ Container `backend` otomatis menjalankan `alembic upgrade head` lalu `python -m 
 
 ```bash
 make logs         # follow logs semua service
-make down         # docker-compose down
+make down         # docker compose down
 make rebuild       # down + up --build (setelah ubah Dockerfile/deps)
-make restart       # docker-compose restart
+make restart       # docker compose restart
 make clean        # docker image prune -f
 ```
 
@@ -125,12 +125,12 @@ uvicorn app.main:app --reload --port 8000
 
 ### Frontend
 
-> ⚠️ Selalu jalankan `npm run dev` dari **dalam folder `frontend/`**, bukan dari root.
+> ⚠️ Selalu jalankan `pnpm dev` dari **dalam folder `frontend/`**, bukan dari root.
 
 ```bash
 cd frontend
-npm install
-npm run dev
+pnpm install
+pnpm dev
 # Buka http://localhost:3000
 ```
 
@@ -255,10 +255,10 @@ cp .env.example .env
 nano .env  # Isi SECRET_KEY, ESP32_API_KEY, kredensial Postgres, dll — WAJIB ganti default
 
 # 5. Build & jalankan
-make rebuild      # atau: docker-compose up -d --build
+make rebuild      # atau: docker compose up -d --build
 
 # 6. Cek status
-docker-compose ps
+docker compose ps
 make logs
 ```
 
