@@ -40,13 +40,16 @@ Dua jalur otentikasi terpisah menyentuh router `readings` yang sama: ESP32 pakai
 scentinel/
 ├── backend/          # FastAPI + SQLAlchemy async + Alembic — lihat backend/README.md
 ├── frontend/         # Next.js 15 App Router + TypeScript — lihat frontend/README.md
+│   ├── tests/            # Playwright e2e specs
+│   └── playwright.config.ts
 ├── nginx/            # Reverse proxy (fronting backend + frontend)
 ├── hardware/         # Firmware ESP32 (contoh produksi + tes koneksi)
 ├── ml/               # Training model + pengumpulan data untuk edge classifier
-│   ├── data_collection/   # Sketch .ino pengambil data + serial_logger.py
+│   ├── data_collection/scentinel_logger/   # Sketch .ino pengambil data (server HTTP di ESP32)
+│   ├── web-logger/        # Dashboard browser (index.html) — konsumsi endpoint sketch di atas, simpan ke CSV
 │   ├── datasets/          # Dataset hasil logging (CSV)
 │   ├── models/            # Model terlatih (di-.gitignore, kecuali kode training)
-│   └── notebooks/         # train_model.ipynb
+│   └── notebooks/         # train_model.ipynb, SCENTINEL_Training_RandomForest.ipynb
 ├── docker-compose.yml
 ├── Makefile          # make up / down / rebuild / logs / restart / clean
 ├── .env.example
@@ -55,27 +58,43 @@ scentinel/
 
 ---
 
-## 🚀 Quick Start (Docker — canonical)
+## 🚀 Menjalankan dari Nol (Docker — canonical)
+
+Panduan ini asumsi repo baru saja di-`clone`, belum ada apa-apa yang ter-install.
 
 ### Prerequisites
-- Docker & Docker Compose
-- Node.js 20+ (hanya jika mau dev frontend standalone di luar Docker)
-- Python 3.11+ (hanya jika mau dev backend standalone di luar Docker)
 
-### 1. Setup Environment
+| Tool | Versi | Wajib untuk |
+|------|-------|-------------|
+| Docker + Docker Compose v2 (`docker compose`, bukan `docker-compose`) | terbaru | Menjalankan seluruh stack (jalur canonical) |
+| Node.js | 20+ | Dev frontend standalone di luar Docker |
+| pnpm | 10.28.2 (lihat `frontend/package.json` → `packageManager`, aktifkan via `corepack enable`) | Dev frontend standalone |
+| Python | 3.11+ | Dev backend standalone di luar Docker |
+
+Cek versi Docker: `docker --version && docker compose version`. Kalau `docker compose` tidak dikenali tapi `docker-compose` (dash) ada, itu Compose v1 lama — upgrade Docker Desktop/Engine dulu, semua perintah di repo ini (`Makefile`, dokumentasi) pakai sintaks v2.
+
+### Langkah demi Langkah
 
 ```bash
+# 1. Clone repo
+git clone <url-repo-anda>.git
+cd scentinel
+
+# 2. Setup environment
 cp .env.example .env
-# Edit .env: isi SECRET_KEY, ESP32_API_KEY, dan kredensial Postgres
+nano .env   # isi SECRET_KEY, ESP32_API_KEY, kredensial Postgres — jangan pakai nilai default untuk demo/deploy publik
+
+# 3. Jalankan seluruh stack
+make up     # = docker compose up -d
 ```
 
-### 2. Jalankan Seluruh Stack
+Container `backend` otomatis menjalankan `alembic upgrade head` lalu `python -m app.database.seed` sebelum start `uvicorn` — **tidak perlu migrasi/seed manual** di jalur Docker. Tunggu sekitar 10–30 detik untuk build image pertama kali dan healthcheck Postgres lolos.
 
 ```bash
-make up          # docker compose up -d
+# 4. Cek semua service hidup
+docker compose ps
+make logs         # follow logs semua service (Ctrl+C untuk keluar)
 ```
-
-Container `backend` otomatis menjalankan `alembic upgrade head` lalu `python -m app.database.seed` sebelum start `uvicorn` — tidak perlu migrasi/seed manual di jalur Docker.
 
 | Service | URL |
 |---------|-----|
@@ -86,21 +105,29 @@ Container `backend` otomatis menjalankan `alembic upgrade head` lalu `python -m 
 | PostgreSQL (host) | `localhost:5433` → container `5432` |
 
 ```bash
-make logs         # follow logs semua service
+# 5. Buka dashboard di browser
+xdg-open http://localhost:8081   # atau buka manual
+```
+
+Perintah harian lain:
+
+```bash
 make down         # docker compose down
 make rebuild       # down + up --build (setelah ubah Dockerfile/deps)
 make restart       # docker compose restart
 make clean        # docker image prune -f
 ```
 
-### 3. Login Default
+### 6. Login Default
 
 | Username | Password | Role |
 |----------|----------|------|
 | admin | admin123 | ADMIN |
 | viewer | viewer123 | VIEWER |
 
-> ⚠️ **Wajib ganti password setelah login pertama.** ADMIN dapat akses dashboard penuh (`/`, `/history`, `/devices`, `/profile`, `/settings`); VIEWER dikunci ke tampilan kiosk full-screen `/monitor` (lihat `frontend/middleware.ts`).
+> ⚠️ **Wajib ganti password setelah login pertama** (via halaman Profile). ADMIN dapat akses dashboard penuh (`/`, `/history`, `/devices`, `/profile`, `/settings`); VIEWER dikunci ke tampilan kiosk full-screen `/monitor` (lihat `frontend/middleware.ts`).
+
+Selesai — stack lengkap (DB + API + dashboard) sudah jalan. Bagian di bawah untuk kasus development lebih spesifik (iterasi UI cepat, tanpa backend sama sekali, atau deploy ke server).
 
 ---
 
@@ -129,14 +156,23 @@ uvicorn app.main:app --reload --port 8000
 
 ```bash
 cd frontend
+corepack enable   # sekali saja per mesin — aktifkan pnpm versi yang di-pin di package.json
 pnpm install
 pnpm dev
 # Buka http://localhost:3000
 ```
 
+Buat `frontend/.env.local` kalau mau override default (lihat tabel env var di [frontend/README.md](frontend/README.md#environment-variables)):
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
+NEXT_PUBLIC_SSE_URL=http://localhost:8000/api/stream
+NEXT_PUBLIC_DEMO_MODE=false
+```
+
 **Mode Demo (tanpa backend sama sekali):** set `NEXT_PUBLIC_DEMO_MODE=true` di `frontend/.env.local`. Frontend akan memakai `lib/useMockSSE.ts` (simulasi SSE ~2 detik interval), auth store diisi user dummy, dan middleware auth di-bypass. Set `false` untuk integrasi nyata ke backend. Lihat detail di [frontend/README.md](frontend/README.md).
 
-Detail lengkap masing-masing bagian ada di [backend/README.md](backend/README.md) dan [frontend/README.md](frontend/README.md).
+Detail lengkap masing-masing bagian — termasuk e2e testing (Playwright) — ada di [backend/README.md](backend/README.md) dan [frontend/README.md](frontend/README.md).
 
 ---
 
@@ -187,7 +223,9 @@ Content-Type: application/json
 
 - `hardware/scentinel_esp32_example.ino` — sketch produksi: baca sensor, jalankan model edge, POST ke `/api/readings`. Flag `DATA_COLLECTION_MODE` menentukan apakah sketch sedang mode logging data (ke Serial/SD) atau mode kirim hasil inferensi ke backend.
 - `hardware/test_koneksi.ino` — sketch minimal untuk uji koneksi WiFi + endpoint sebelum flashing firmware penuh.
-- `ml/data_collection/` — sketch `.ino` khusus pengumpulan data (`sensor_data_logger.ino`, `sensor_wifi_logger.ino`) + `serial_logger.py` yang menangkap output serial ESP32 ke CSV untuk training. Pipeline training ada di `ml/notebooks/train_model.ipynb`; model hasil training inilah yang di-flash sebagai edge classifier ke ESP32.
+- `ml/data_collection/scentinel_logger/scentinel_logger.ino` — sketch khusus pengumpulan data: ESP32 jalankan server HTTP lokal (`/data`, `/start`, `/stop`, `/calibrate`) yang dipolling dari browser, bukan nulis ke Serial/SD.
+- `ml/web-logger/index.html` — dashboard browser statis (buka langsung, tanpa build) untuk konek ke IP ESP32 di atas, kalibrasi baseline, rekam sesi per sampel/batch/label, dan export ke CSV. Lihat cara pakai di komentar sketch atau jalankan `xdg-open ml/web-logger/index.html`.
+- Pipeline training ada di `ml/notebooks/train_model.ipynb` dan `ml/notebooks/SCENTINEL_Training_RandomForest.ipynb`; model hasil training inilah yang di-flash sebagai edge classifier ke ESP32.
 
 ---
 
@@ -227,6 +265,7 @@ Semua endpoint di-mount dengan prefix `/api` (lihat `backend/app/main.py`).
 | POST | `/api/readings/` | API Key | Submit reading dari ESP32 |
 | GET | `/api/readings/latest` | JWT | Reading terbaru (opsional filter `device_id`) |
 | GET | `/api/readings/history` | JWT | Riwayat paginated (`device_id`, `start_date`, `end_date`, `prediction`, `limit`, `offset`) |
+| GET | `/api/readings/stats` | JWT | Statistik agregat (total baris, reading tertua, ukuran storage) untuk halaman Settings |
 | DELETE | `/api/readings/all` | JWT | Hapus SEMUA reading (tidak bisa dibatalkan) |
 | GET | `/api/readings/export` | JWT | Export CSV (opsional filter) |
 | GET | `/api/stream` | — | SSE realtime push ke dashboard |
