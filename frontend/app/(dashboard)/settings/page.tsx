@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Settings,
   Info,
@@ -18,8 +18,13 @@ import {
   HardDrive,
   Shield,
 } from "lucide-react";
+import { format } from "date-fns";
+import { id as localeId } from "date-fns/locale";
 import api from "@/lib/api";
 import { toast } from "sonner";
+import { useSettingsStore, CHART_POINTS_OPTIONS } from "@/store/settingsStore";
+import { ReadingStats } from "@/types/reading";
+import { MOCK_READING_STATS } from "@/lib/mockData";
 
 const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
@@ -298,9 +303,48 @@ export default function SettingsPage() {
   const [showModal, setShowModal] = useState(false);
   const [lastDeletedCount, setLastDeletedCount] = useState<number | null>(null);
 
-  const [autoRefresh, setAutoRefresh] = useState(true);
-  const [chartAnimation, setChartAnimation] = useState(true);
-  const [chartPoints, setChartPoints] = useState("60");
+  const {
+    autoRefresh, setAutoRefresh,
+    chartAnimation, setChartAnimation,
+    chartPoints, setChartPoints,
+  } = useSettingsStore();
+
+  const [stats, setStats] = useState<ReadingStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  useEffect(() => {
+    if (DEMO_MODE) {
+      setStats(MOCK_READING_STATS);
+      setStatsLoading(false);
+      return;
+    }
+    api.get<ReadingStats>("/readings/stats")
+      .then((res) => setStats(res.data))
+      .catch(() => setStats(null))
+      .finally(() => setStatsLoading(false));
+  }, []);
+
+  const statsRow = [
+    {
+      label: "Total Data",
+      value: statsLoading ? "…" : stats?.total.toLocaleString("id-ID") ?? "—",
+      sub: "pembacaan",
+    },
+    {
+      label: "Data Tertua",
+      value: !statsLoading && stats?.oldest_timestamp
+        ? format(new Date(stats.oldest_timestamp), "dd MMM", { locale: localeId })
+        : statsLoading ? "…" : "—",
+      sub: !statsLoading && stats?.oldest_timestamp
+        ? format(new Date(stats.oldest_timestamp), "yyyy", { locale: localeId })
+        : "",
+    },
+    {
+      label: "Storage",
+      value: statsLoading ? "…" : stats ? (stats.storage_bytes / (1024 * 1024)).toFixed(1) : "—",
+      sub: "MB",
+    },
+  ];
 
   const handleDeleteSuccess = (count: number) => {
     setLastDeletedCount(count);
@@ -496,7 +540,7 @@ export default function SettingsPage() {
                 <select
                   id="settings-chart-points"
                   value={chartPoints}
-                  onChange={(e) => setChartPoints(e.target.value)}
+                  onChange={(e) => setChartPoints(Number(e.target.value))}
                   className="px-3 py-1.5 rounded-lg text-sm font-medium border focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
                   style={{
                     background: "#ffffff",
@@ -505,9 +549,9 @@ export default function SettingsPage() {
                     minWidth: "80px",
                   }}
                 >
-                  <option value="30">30</option>
-                  <option value="60">60</option>
-                  <option value="120">120</option>
+                  {CHART_POINTS_OPTIONS.map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -526,11 +570,7 @@ export default function SettingsPage() {
             <div className="space-y-4">
               {/* Stats row */}
               <div className="grid grid-cols-3 gap-3">
-                {[
-                  { label: "Total Data", value: "1,247", sub: "pembacaan" },
-                  { label: "Data Tertua", value: "12 Jun", sub: "2026" },
-                  { label: "Storage", value: "2.4", sub: "MB" },
-                ].map((item) => (
+                {statsRow.map((item) => (
                   <div
                     key={item.label}
                     className="text-center px-3 py-3 rounded-xl"
@@ -551,30 +591,6 @@ export default function SettingsPage() {
                     <p className="text-[10px] text-muted-foreground mt-0.5">{item.sub}</p>
                   </div>
                 ))}
-              </div>
-
-              {/* Storage bar */}
-              <div className="px-4 py-3 rounded-xl" style={{ background: "rgba(248,250,252,0.8)", border: "1px solid #f1f5f9" }}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-muted-foreground">Penggunaan Database</span>
-                  <span className="text-xs font-semibold text-foreground" style={{ fontFeatureSettings: '"tnum" 1' }}>
-                    2.4 MB / 100 MB
-                  </span>
-                </div>
-                <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.05)" }}>
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{
-                      width: "2.4%",
-                      minWidth: "24px",
-                      background: "linear-gradient(90deg, #818cf8, #533afd)",
-                      boxShadow: "0 0 8px rgba(83,58,253,0.25)",
-                    }}
-                  />
-                </div>
-                <p className="text-[10px] text-muted-foreground mt-2">
-                  Kapasitas database masih sangat lega — estimasi muat ±40.000 pembacaan lagi
-                </p>
               </div>
             </div>
           </SettingsCard>
