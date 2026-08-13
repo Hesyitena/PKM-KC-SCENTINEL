@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useSSE } from "@/lib/useSSE";
 import { useMockSSE } from "@/lib/useMockSSE";
 import { useSensorStore } from "@/store/sensorStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { SensorReading } from "@/types/reading";
 import { SensorCard } from "./SensorCard";
 import { GasChart } from "./GasChart";
@@ -25,11 +26,14 @@ const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 export function LiveMonitoringPanel() {
   const { latestReading, chartData, setConnected, pushChartReading } =
     useSensorStore();
+  const { autoRefresh, chartAnimation } = useSettingsStore();
 
   const prevPredictionRef = useRef<string | null>(null);
   const wasConnectedRef = useRef<boolean>(false);
 
   const handleReading = (reading: SensorReading, isLive = true) => {
+    // Auto-refresh off → freeze on current data, but keep the initial load working
+    if (isLive && !autoRefresh) return;
     pushChartReading(reading);
 
     if (isLive) {
@@ -281,7 +285,7 @@ export function LiveMonitoringPanel() {
         </div>
 
         <div className="px-3 py-3 flex-1 min-h-0">
-          <GasChart data={chartData} height="100%" />
+          <GasChart data={chartData} height="100%" animated={chartAnimation} />
         </div>
       </div>
     </div>
