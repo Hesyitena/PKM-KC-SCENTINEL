@@ -81,7 +81,7 @@ python -m app.database.seed
 uvicorn app.main:app --reload --port 8000
 ```
 
-Lewat Docker (`docker-compose up backend` atau `make up` dari root), migrasi + seed dijalankan otomatis oleh entrypoint container sebelum `uvicorn` start — tidak perlu langkah manual di atas.
+Lewat Docker (`docker compose up backend` atau `make up` dari root), migrasi + seed dijalankan otomatis oleh entrypoint container sebelum `uvicorn` start — tidak perlu langkah manual di atas.
 
 ## Environment Variables
 
