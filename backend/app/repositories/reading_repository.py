@@ -3,7 +3,7 @@ SCENTINEL - Reading Repository
 Data access layer for SensorReading model with filtering and pagination.
 """
 from datetime import datetime
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, true
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -61,7 +61,7 @@ class ReadingRepository:
         if prediction:
             filters.append(SensorReading.prediction == prediction)
 
-        where_clause = and_(*filters) if filters else True
+        where_clause = and_(*filters) if filters else true()
 
         # Count query
         count_result = await self.db.execute(
@@ -95,7 +95,7 @@ class ReadingRepository:
         if end_date:
             filters.append(SensorReading.timestamp <= end_date)
 
-        where_clause = and_(*filters) if filters else True
+        where_clause = and_(*filters) if filters else true()
         result = await self.db.execute(
             select(SensorReading)
             .options(selectinload(SensorReading.device))
@@ -104,8 +104,30 @@ class ReadingRepository:
         )
         return list(result.scalars().all())
 
+    async def get_stats(self) -> dict:
+        """Aggregate stats: row count, oldest reading, and on-disk table size."""
+        total = (
+            await self.db.execute(select(func.count()).select_from(SensorReading))
+        ).scalar_one()
+        oldest_timestamp = (
+            await self.db.execute(select(func.min(SensorReading.timestamp)))
+        ).scalar_one()
+        storage_bytes = (
+            await self.db.execute(select(func.pg_total_relation_size("sensor_readings")))
+        ).scalar_one()
+        return {
+            "total": total,
+            "oldest_timestamp": oldest_timestamp,
+            "storage_bytes": storage_bytes,
+        }
+
     async def delete_all(self) -> int:
         """Delete ALL sensor readings from database. Returns count of deleted rows."""
-        from sqlalchemy import delete
-        result = await self.db.execute(delete(SensorReading))
-        return result.rowcount
+        from sqlalchemy import text
+        # Count rows first
+        count_res = await self.db.execute(text("SELECT COUNT(*) FROM sensor_readings"))
+        row_count = count_res.scalar() or 0
+        
+        # Truncate and restart identity sequence
+        await self.db.execute(text("TRUNCATE TABLE sensor_readings RESTART IDENTITY CASCADE"))
+        return row_count
