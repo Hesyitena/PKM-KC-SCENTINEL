@@ -2,8 +2,7 @@
 // Manages live readings from SSE and history data
 import { create } from "zustand";
 import { SensorReading, ReadingLatest } from "@/types/reading";
-
-const MAX_CHART_POINTS = 60; // keep last 60 points for realtime chart
+import { useSettingsStore } from "@/store/settingsStore";
 
 interface SensorState {
   // Latest reading from SSE or API
@@ -38,13 +37,16 @@ export const useSensorStore = create<SensorState>((set) => ({
     }),
 
   pushChartReading: (reading) =>
-    set((state) => ({
-      chartData: [...state.chartData.slice(-MAX_CHART_POINTS + 1), reading],
-      latestReading: state.latestReading
-        ? { ...state.latestReading, ...reading }
-        : (reading as ReadingLatest),
-      lastUpdatedAt: reading.timestamp,
-    })),
+    set((state) => {
+      const maxPoints = useSettingsStore.getState().chartPoints;
+      return {
+        chartData: [...state.chartData.slice(-maxPoints + 1), reading],
+        latestReading: state.latestReading
+          ? { ...state.latestReading, ...reading }
+          : (reading as ReadingLatest),
+        lastUpdatedAt: reading.timestamp,
+      };
+    }),
 
   setConnected: (status) => set({ isConnected: status }),
 
