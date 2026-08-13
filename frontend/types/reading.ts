@@ -36,6 +36,12 @@ export interface ReadingHistoryParams {
   offset?: number;
 }
 
+export interface ReadingStats {
+  total: number;
+  oldest_timestamp: string | null;
+  storage_bytes: number;
+}
+
 export interface ReadingCreate {
   device_id: number;
   mq3: number;
