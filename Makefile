@@ -1,7 +1,7 @@
 .PHONY: up down logs restart rebuild clean
 
 up:
-	@docker-compose up -d
+	@docker compose up -d
 	@echo ""
 	@echo "=========================================================="
 	@echo "🚀 SCENTINEL DOCKER SERVICES STARTED SUCCESSFULLY!"
@@ -14,17 +14,17 @@ up:
 	@echo "💡 Info: Gunakan 'make logs' untuk melihat log server."
 
 down:
-	@docker-compose down
+	@docker compose down
 
 logs:
-	@docker-compose logs -f
+	@docker compose logs -f
 
 restart:
-	@docker-compose restart
+	@docker compose restart
 
 rebuild:
-	@docker-compose down
-	@docker-compose up -d --build
+	@docker compose down
+	@docker compose up -d --build
 	@echo ""
 	@echo "=========================================================="
 	@echo "🚀 SCENTINEL DOCKER SERVICES REBUILT & STARTED SUCCESSFULLY!"
