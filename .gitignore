@@ -60,6 +60,7 @@ coverage.xml
 *.cover
 
 # AI
+.playwright-mcp/
 .agents/
 .clinerules
 .cursor/
@@ -69,6 +70,9 @@ coverage.xml
 .windsurf/
 .qoder/
 .github/copilot-instructions.md
+.superpowers/
+.claude/
+.agents/
 
 # ML artefacts too large or regenerable for git — the notebook,
 # datasets, and firmware sketches under ml/ ARE tracked.
