@@ -1,6 +1,6 @@
 // SCENTINEL - Realistic Dummy/Mock Data for Demo Mode
 // Digunakan saat backend tidak berjalan (NEXT_PUBLIC_DEMO_MODE=true)
-import { ReadingLatest, SensorReading, PaginatedReadings } from "@/types/reading";
+import { ReadingLatest, SensorReading, PaginatedReadings, ReadingStats } from "@/types/reading";
 import { Device } from "@/types/device";
 
 /** Interval antar data point live (ms) — harus sinkron dengan useMockSSE */
@@ -139,6 +139,14 @@ export function getMockHistory(
     items: filtered.slice(offset, offset + limit),
   };
 }
+
+// ─── Stats untuk halaman Settings ──────────────────────────────────────────────
+
+export const MOCK_READING_STATS: ReadingStats = {
+  total: ALL_HISTORY.length,
+  oldest_timestamp: ALL_HISTORY[ALL_HISTORY.length - 1].timestamp,
+  storage_bytes: ALL_HISTORY.length * 1820,
+};
 
 // ─── Initial chart data (30 titik ke belakang, interval 5 detik) ──────────────
 
