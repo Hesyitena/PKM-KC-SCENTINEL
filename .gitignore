@@ -78,5 +78,6 @@ coverage.xml
 # datasets, and firmware sketches under ml/ ARE tracked.
 ml/models/*.pkl
 ml/models/*.joblib
+ml/models/run_*/
 ml/**/__pycache__/
 ml/**/.ipynb_checkpoints/
