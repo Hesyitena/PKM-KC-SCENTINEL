@@ -61,6 +61,7 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: /api
       NEXT_PUBLIC_SSE_URL: /api/stream
+      BACKEND_URL: http://backend:8000/api
     depends_on:
       - backend
     networks:
