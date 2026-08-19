@@ -236,7 +236,7 @@ export function LiveMonitoringPanel() {
 
         {/* RIGHT: 3x2 Sensor Grid */}
         <div className="flex-shrink-0 p-4 lg:w-[55%] xl:w-[58%]">
-          <div className="grid grid-cols-3 grid-rows-2 gap-3 h-full">
+          <div className="grid grid-cols-2 sm:grid-cols-3 grid-rows-3 sm:grid-rows-2 gap-3 h-full">
             <SensorCard id="card-mq3"         label="MQ-3 Alkohol"  value={latestReading.mq3}         icon={<Wind size={13} />}         color="primary"  sublabel="ADC" />
             <SensorCard id="card-mq4"         label="MQ-4 Metana"   value={latestReading.mq4}         icon={<Wind size={13} />}         color="fresh"    sublabel="ADC" />
             <SensorCard id="card-mq135"       label="MQ-135 Udara"  value={latestReading.mq135}       icon={<FlaskConical size={13} />} color="amber"    sublabel="ADC" />

@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
   devIndicators: {
     appIsrStatus: false,
   },
+  experimental: {
+    optimizePackageImports: ["recharts", "lucide-react"],
+  },
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   async rewrites() {
     return [
       {

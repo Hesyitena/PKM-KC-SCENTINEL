@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { PwaRegister } from "@/components/PwaRegister";
 
 /* Fonts live in ./fonts rather than coming from next/font/google: the build
    container has no route to fonts.googleapis.com, and the VIEWER kiosk runs on
@@ -40,6 +41,17 @@ export const metadata: Metadata = {
     description: "Realtime food spoilage detection monitoring system",
     type: "website",
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "SCENTINEL",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#533afd",
 };
 
 export default function RootLayout({
@@ -53,6 +65,7 @@ export default function RootLayout({
         className={`${plusJakartaSans.variable} ${spaceGrotesk.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}
       >
         {children}
+        <PwaRegister />
         <Toaster
           position="top-right"
           richColors
